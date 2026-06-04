@@ -197,10 +197,59 @@ a{color:var(--pur)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(max-width:620px){.cat-grid{grid-template-columns:repeat(2,minmax(140px,1fr))}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}.bar{grid-template-columns:90px 1fr 40px}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important}}
+
+/* ===== PREMIUM POLISH ===== */
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.6) 100%)}
+.intro-eyebrow{font-size:11px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--gold);opacity:0;animation:fadeUp 1s ease .9s both;margin-bottom:16px}
+#hub.skip-intro .intro-eyebrow{animation:none;opacity:1}
+
+/* category icon medallions */
+.cat-medallion{position:relative;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:6px;
+  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.14),rgba(255,255,255,.02) 70%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 26px rgba(0,0,0,.5);transition:transform .3s cubic-bezier(.2,.8,.2,1.2),box-shadow .3s}
+.cat-medallion::before{content:"";position:absolute;inset:0;border-radius:50%;padding:1.5px;background:linear-gradient(140deg,var(--c1),var(--c2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.cat-medallion::after{content:"";position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,var(--glow,transparent),transparent 70%);opacity:0;transition:opacity .3s;z-index:-1}
+.cat-medallion svg{width:36px;height:36px;color:#fff;filter:drop-shadow(0 2px 7px rgba(0,0,0,.55))}
+.cat-tile:hover .cat-medallion{transform:scale(1.1) translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 16px 38px rgba(0,0,0,.55)}
+.cat-tile:hover .cat-medallion::after{opacity:.85}
+.cat-tile.active .cat-medallion::after{opacity:.7}
+
+/* premium poster cards */
+.card{border-radius:16px}
+.poster img{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.card:hover .poster img{transform:scale(1.07)}
+.poster .pscrim{position:absolute;left:0;right:0;bottom:0;padding:28px 12px 11px;background:linear-gradient(to top,rgba(6,6,11,.97) 8%,rgba(6,6,11,.78) 42%,rgba(6,6,11,0) 100%);pointer-events:none}
+.poster .ptitle{font-size:14.5px;font-weight:800;line-height:1.16;color:#fff;letter-spacing:.1px;text-shadow:0 1px 12px rgba(0,0,0,.8);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.poster .pmeta{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:4px}
+.ptype{backdrop-filter:blur(6px);background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14)}
+.badge-vote{backdrop-filter:blur(6px);border:1px solid rgba(255,215,120,.25)}
+.cbody{padding:9px 11px 11px;gap:9px}
+.cgenres{font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#8e8ea6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.statusrow button{border-radius:9px}
+.statusrow button:hover{border-color:var(--gold);color:#fff}
+
+/* teaser worlds */
+#teaser{position:relative;z-index:2;min-height:100vh}
+.tinner{max-width:780px;margin:0 auto;padding:64px 24px 80px;text-align:center;position:relative;animation:fadeUp .6s ease both}
+#teaser .homebtn{position:absolute;left:24px;top:24px}
+.cat-medallion.big{width:108px;height:108px;margin:6px auto 22px}
+.cat-medallion.big svg{width:50px;height:50px}
+.theader{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:3px;font-size:clamp(30px,6vw,44px);color:#fff}
+.teyebrow{font-size:11px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-top:8px}
+.ttag{font-size:clamp(17px,3vw,21px);font-weight:700;margin-top:16px}
+.tdesc{font-size:14px;color:var(--mut);max-width:520px;margin:12px auto 0;line-height:1.7}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:32px auto 0;max-width:660px}
+.tcard{position:relative;border-radius:16px;aspect-ratio:3/4;overflow:hidden;background:linear-gradient(155deg,var(--c1),var(--c2));display:flex;align-items:flex-end;border:1px solid rgba(255,255,255,.1)}
+.tcard::after{content:"";position:absolute;inset:0;background:rgba(8,8,13,.32)}
+.tcard-in{position:relative;z-index:1;padding:13px;text-align:left}
+.tcard .tt{font-size:13.5px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);line-height:1.2}
+.tcard .ts2{font-size:10.5px;color:rgba(255,255,255,.82);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.tlock{position:absolute;z-index:2;top:10px;right:11px;font-size:12px;opacity:.85}
 </style>
 </head>
 <body>
 <div class="aurora"><i></i></div>
+<div class="vignette"></div>
 <div class="boot" id="boot">Loading…</div>
 
 <!-- ===== AUTH ===== -->
@@ -234,20 +283,11 @@ a{color:var(--pur)}
   </div>
   <div class="hub-stage">
     <div class="intro">
+      <div class="intro-eyebrow">✦ Your taste, beautifully kept</div>
       <h1 class="intro-title">Screening Room</h1>
       <p class="intro-tag">Pick a world. Track what you love. Discover what's next.</p>
     </div>
-    <div class="cat-grid" id="catGrid">
-      <button class="cat-tile active" data-v="entertainment" data-name="Entertainment">
-        <span class="cat-ic">🎬</span><span class="cat-name">Entertainment</span>
-        <span class="cat-sub" id="entSub">Movies &amp; TV</span><span class="enter">Enter</span>
-      </button>
-      <button class="cat-tile soon" data-v="dining" data-name="Dining"><span class="lock">Soon</span><span class="cat-ic">🍽️</span><span class="cat-name">Dining</span><span class="cat-sub">Restaurants</span></button>
-      <button class="cat-tile soon" data-v="places" data-name="Places"><span class="lock">Soon</span><span class="cat-ic">📍</span><span class="cat-name">Places</span><span class="cat-sub">Spots to go</span></button>
-      <button class="cat-tile soon" data-v="theater" data-name="Theater"><span class="lock">Soon</span><span class="cat-ic">🎭</span><span class="cat-name">Theater</span><span class="cat-sub">Broadway &amp; live</span></button>
-      <button class="cat-tile soon" data-v="music" data-name="Music"><span class="lock">Soon</span><span class="cat-ic">🎵</span><span class="cat-name">Music</span><span class="cat-sub">Albums &amp; gigs</span></button>
-      <button class="cat-tile soon" data-v="books" data-name="Books"><span class="lock">Soon</span><span class="cat-ic">📚</span><span class="cat-name">Books</span><span class="cat-sub">Reads</span></button>
-    </div>
+    <div class="cat-grid" id="catGrid"></div>
     <div class="hub-hint">Tap a world to dive in</div>
   </div>
 </div>
@@ -257,7 +297,7 @@ a{color:var(--pur)}
   <div class="wrap">
     <header class="cat-header">
       <button class="homebtn" id="homeBtn">← Hub</button>
-      <div class="cat-title-bar"><span class="ic">🎬</span> Entertainment</div>
+      <div class="cat-title-bar"><span class="ic" style="display:inline-flex"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8.5" width="18" height="12" rx="2"/><path d="M3.4 8.5 6 4.2l3.2 2.1L11.4 4l3.2 2.1L17.8 4l2.8 4.5"/></svg></span> Entertainment</div>
       <div class="headright">
         <div class="tabs" id="tabs">
           <button data-tab="discover" class="active">Discover</button>
@@ -300,6 +340,9 @@ a{color:var(--pur)}
     </section>
   </div>
 </div>
+
+<!-- ===== TEASER (upcoming worlds) ===== -->
+<div id="teaser" class="screen hidden"></div>
 
 <!-- rating modal -->
 <div class="overlay" id="overlay">
@@ -385,7 +428,7 @@ el("signOut").addEventListener("click", async ()=>{ await sb.auth.signOut(); });
 el("signOutHub").addEventListener("click", async ()=>{ await sb.auth.signOut(); });
 
 /* ===== ROUTING ===== */
-function hideScreens(){ ["auth","hub","category"].forEach(id=>el(id).classList.add("hidden")); }
+function hideScreens(){ ["auth","hub","category","teaser"].forEach(id=>el(id).classList.add("hidden")); }
 sb.auth.onAuthStateChange((_e,s)=>{ session=s; route(); });
 async function route(){
   el("boot").classList.add("hidden");
@@ -412,10 +455,59 @@ function updateHubCounts(){
 }
 function enterCategory(){ hideScreens(); el("category").classList.remove("hidden"); showTab("discover"); }
 el("homeBtn").addEventListener("click", showHub);
-document.querySelectorAll(".cat-tile").forEach(t=> t.addEventListener("click", ()=>{
-  if(t.dataset.v==="entertainment") enterCategory();
-  else showToast(t.dataset.name+" is coming soon — same engine, a whole new world. 🚀");
-}));
+const SVGW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">';
+const ICONS={
+ clap:SVGW+'<rect x="3" y="8.5" width="18" height="12" rx="2"/><path d="M3.4 8.5 6 4.2l3.2 2.1L11.4 4l3.2 2.1L17.8 4l2.8 4.5"/></svg>',
+ fork:SVGW+'<path d="M7 3v5M11 3v5"/><path d="M9 8v13"/><path d="M7 8c0 1.1.7 1.6 2 1.6s2-.5 2-1.6"/><path d="M16 3c-1.6 1.6-1.6 6.4 0 8v10"/></svg>',
+ pin:SVGW+'<path d="M12 21s6.5-5.8 6.5-10.5A6.5 6.5 0 0 0 5.5 10.5C5.5 15.2 12 21 12 21Z"/><circle cx="12" cy="10.3" r="2.4"/></svg>',
+ mask:SVGW+'<path d="M5 4.5h14V10a7 7 0 0 1-14 0z"/><path d="M9 8.5h.01M15 8.5h.01"/><path d="M9.3 13c.9.9 4.5.9 5.4 0"/></svg>',
+ note:SVGW+'<circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16" cy="15.5" r="2.5"/><path d="M9 17.5V6l9.5-2.2v11.7"/></svg>',
+ book:SVGW+'<path d="M12 6.5C10.3 5.2 7.6 4.5 4.5 4.5V18c3.1 0 5.8.7 7.5 2 1.7-1.3 4.4-2 7.5-2V4.5c-3.1 0-5.8.7-7.5 2z"/><path d="M12 6.5V20"/></svg>'
+};
+const CATS=[
+ {v:"entertainment",name:"Entertainment",sub:"Movies & TV",a:["#8b5cf6","#ec4899"],glow:"rgba(139,92,246,.55)",icon:ICONS.clap,active:true},
+ {v:"dining",name:"Dining",sub:"Restaurants",a:["#f59e0b","#ef4444"],glow:"rgba(245,158,11,.5)",icon:ICONS.fork},
+ {v:"places",name:"Places",sub:"Spots to go",a:["#14b8a6","#06b6d4"],glow:"rgba(20,184,166,.5)",icon:ICONS.pin},
+ {v:"theater",name:"Theater",sub:"Broadway & live",a:["#fb7185","#e11d48"],glow:"rgba(251,113,133,.5)",icon:ICONS.mask},
+ {v:"music",name:"Music",sub:"Albums & gigs",a:["#6366f1","#22d3ee"],glow:"rgba(99,102,241,.5)",icon:ICONS.note},
+ {v:"books",name:"Books",sub:"Reads",a:["#34d399","#10b981"],glow:"rgba(52,211,153,.5)",icon:ICONS.book}
+];
+function medallion(c,big){ return '<span class="cat-medallion'+(big?' big':'')+'" style="--c1:'+c.a[0]+';--c2:'+c.a[1]+';--glow:'+c.glow+'">'+c.icon+'</span>'; }
+function renderHubTiles(){
+  el("catGrid").innerHTML=CATS.map(c=>{
+    const base='class="cat-tile '+(c.active?'active':'soon')+'" data-v="'+c.v+'" data-name="'+c.name+'"';
+    if(c.active) return '<button '+base+'>'+medallion(c)+'<span class="cat-name">'+c.name+'</span><span class="cat-sub" id="entSub">'+c.sub+'</span><span class="enter">Enter</span></button>';
+    return '<button '+base+'><span class="lock">Soon</span>'+medallion(c)+'<span class="cat-name">'+c.name+'</span><span class="cat-sub">'+c.sub+'</span></button>';
+  }).join("");
+  document.querySelectorAll("#catGrid .cat-tile").forEach(t=> t.addEventListener("click", ()=>{
+    if(t.dataset.v==="entertainment") enterCategory(); else showTeaser(t.dataset.v);
+  }));
+  updateHubCounts();
+}
+const TEASERS={
+ dining:{tag:"Your private table book.",desc:"Save the restaurants worth returning to, the ones you're dying to try, and rate every meal the way you rate films.",items:[["Le Bernardin","Seafood · NYC"],["Osteria Francescana","Modena"],["Sukiyabashi Jiro","Tokyo"],["Noma","Copenhagen"]]},
+ places:{tag:"Every place worth the trip.",desc:"Build a living map of destinations, stays and hidden gems — track where you've been and where you're headed next.",items:[["Aman Tokyo","Japan"],["Santorini","Greece"],["Kyoto","Japan"],["Faroe Islands","Atlantic"]]},
+ theater:{tag:"The best seats, remembered.",desc:"Keep every show you've seen and every one you're chasing tickets for — Broadway, the West End and beyond.",items:[["Hamilton","Musical"],["The Lion King","Musical"],["Cabaret","Revival"],["Sleep No More","Immersive"]]},
+ music:{tag:"Your year in sound.",desc:"Track the albums on repeat and the concerts you'll never forget, with the same effortless rating engine.",items:[["Tortured Poets Dept.","Album"],["Brat","Album"],["Coachella","Festival"],["Glastonbury","Festival"]]},
+ books:{tag:"Your shelf, everywhere.",desc:"A home for everything you've read, are reading, and mean to get to — rated and always with you.",items:[["Tomorrow & Tomorrow","Novel"],["The Bee Sting","Novel"],["Project Hail Mary","Sci-Fi"],["Atomic Habits","Non-fiction"]]}
+};
+function showTeaser(v){
+  const c=CATS.find(x=>x.v===v), d=TEASERS[v]; if(!c||!d) return;
+  hideScreens();
+  const cards=d.items.map(it=>'<div class="tcard" style="--c1:'+c.a[0]+';--c2:'+c.a[1]+'"><span class="tlock">🔒</span><div class="tcard-in"><div class="tt">'+it[0]+'</div><div class="ts2">'+it[1]+'</div></div></div>').join("");
+  el("teaser").innerHTML='<div class="tinner"><button class="homebtn" id="teaserBack">← Hub</button>'
+    +medallion(c,true)
+    +'<div class="teyebrow">Coming soon</div>'
+    +'<h2 class="theader">'+c.name+'</h2>'
+    +'<p class="ttag">'+d.tag+'</p>'
+    +'<p class="tdesc">'+d.desc+'</p>'
+    +'<div class="tgrid">'+cards+'</div>'
+    +'<button class="btn primary" id="teaserCta" style="max-width:260px;margin:28px auto 0">Notify me when it\'s live</button></div>';
+  el("teaser").classList.remove("hidden");
+  el("teaserBack").addEventListener("click", showHub);
+  el("teaserCta").addEventListener("click", ()=> showToast("You're on the list — we'll tell you the moment "+c.name+" opens. ✨"));
+  window.scrollTo(0,0);
+}
 
 /* ===== TMDB ===== */
 async function tmdb(path, params){
@@ -490,10 +582,12 @@ function posterHTML(item){
   const ratingBadge=(t&&t.status==="watched"&&t.rating!=null)?'<div class="badge-rating">'+Number(t.rating).toFixed(1)+'</div>':"";
   const voteBadge=item.vote_average?'<div class="badge-vote">★ '+Number(item.vote_average).toFixed(1)+'</div>':"";
   const typeBadge='<div class="ptype">'+(item.media_type==="tv"?"TV":"Film")+'</div>';
-  let inner;
-  if(item.poster_path){ inner='<img loading="lazy" src="'+IMG+item.poster_path+'" alt="">'; }
-  else{ const g=(item.genres&&item.genres[0])||""; const c=colorFor(g); inner='<div class="fallback" style="background:linear-gradient(150deg,'+c[0]+','+c[1]+')"><div class="ft">'+item.title+'</div></div>'; }
-  return '<div class="poster">'+inner+typeBadge+voteBadge+ratingBadge+'</div>';
+  let bg;
+  if(item.poster_path){ bg='<img loading="lazy" src="'+IMG+item.poster_path+'" alt="">'; }
+  else{ const g=(item.genres&&item.genres[0])||""; const c=colorFor(g); bg='<div class="fallback" style="background:linear-gradient(150deg,'+c[0]+','+c[1]+')"></div>'; }
+  const meta=item.year?'<div class="pmeta">'+item.year+'</div>':'';
+  const scrim='<div class="pscrim"><div class="ptitle">'+item.title+'</div>'+meta+'</div>';
+  return '<div class="poster">'+bg+typeBadge+voteBadge+ratingBadge+scrim+'</div>';
 }
 function statusButtons(item){
   const t=tracked[item.media_type+":"+item.tmdb_id], s=t?t.status:null;
@@ -503,8 +597,9 @@ function statusButtons(item){
     +'<button class="watched '+(s==="watched"?"on":"")+'" data-s="watched">Watched</button></div>';
 }
 function cardHTML(item){
-  const gl=(item.genres&&item.genres.length)?item.genres.slice(0,3).join(", "):"—";
-  return '<div class="card">'+posterHTML(item)+'<div class="cbody"><div class="ct">'+item.title+'</div><div class="cm">'+(item.year||"")+(item.year?" · ":"")+gl+'</div>'+statusButtons(item)+'</div></div>';
+  const gl=(item.genres&&item.genres.length)?item.genres.slice(0,3).join(" · "):"";
+  const gline=gl?'<div class="cgenres">'+gl+'</div>':'';
+  return '<div class="card">'+posterHTML(item)+'<div class="cbody">'+gline+statusButtons(item)+'</div></div>';
 }
 function asItem(r){ return {tmdb_id:r.tmdb_id,media_type:r.media_type,title:r.title,year:r.year,genres:r.genres||[],poster_path:r.poster_path,vote_average:r.vote_average,popularity:r.popularity}; }
 
@@ -619,6 +714,7 @@ function showToast(msg){ const t=el("toast"); t.textContent=msg; t.classList.add
 
 /* ===== INIT ===== */
 initGenreSelect();
+renderHubTiles();
 (async function(){ const {data}=await sb.auth.getSession(); session=data.session; route(); })();
 </script>
 </body>
