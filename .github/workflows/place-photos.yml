@@ -1,0 +1,39 @@
+name: Build place photos
+
+on:
+  workflow_dispatch:        # run manually from the Actions tab when you expand the catalog
+
+permissions:
+  contents: write
+
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Pick aesthetic photos
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          AI_PROVIDER:         ${{ secrets.AI_PROVIDER }}
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY:      ${{ secrets.OPENAI_API_KEY }}
+        run: node scripts/build-place-photos.mjs
+
+      - name: Commit updated places.json
+        run: |
+          git config user.name  "photo-bot"
+          git config user.email "photo-bot@users.noreply.github.com"
+          git add places.json
+          if git diff --staged --quiet; then
+            echo "No photo changes."
+          else
+            git commit -m "Aesthetic place photos ($(date -u +%Y-%m-%d))"
+            git push
+          fi
