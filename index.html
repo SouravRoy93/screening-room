@@ -735,11 +735,11 @@ el("auPrimary").addEventListener("click", async ()=>{
 el("auMagic").addEventListener("click", async ()=>{
   const email=el("auEmail").value.trim();
   if(!email){ showAuthMsg("err","Enter your email first."); return; }
-  try{ const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin}}); if(error) throw error;
+  try{ const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split(/[?#]/)[0]}}); if(error) throw error;
     showAuthMsg("ok","Magic link sent — check your email."); }
   catch(err){ showAuthMsg("err",err.message||"Couldn't send link."); }
 });
-async function oauth(p){ try{ const {error}=await sb.auth.signInWithOAuth({provider:p,options:{redirectTo:window.location.origin}}); if(error) throw error; }
+async function oauth(p){ try{ const {error}=await sb.auth.signInWithOAuth({provider:p,options:{redirectTo:location.href.split(/[?#]/)[0]}}); if(error) throw error; }
   catch(err){ showAuthMsg("err",(err.message||"OAuth failed")+" — provider may not be enabled in Supabase yet."); } }
 el("auGoogle").addEventListener("click",()=>oauth("google"));
 el("auApple").addEventListener("click",()=>oauth("apple"));
