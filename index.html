@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Screening Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080d; --panel:#14141d; --panel2:#1b1b26; --line:#2a2a38;
+  --text:#f3f3f8; --mut:#9a9ab2; --gold:#ffd36b; --pur:#8b5cf6; --pink:#ec4899;
+  --grad:linear-gradient(135deg,#8b5cf6,#ec4899);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--pur)}
+.hidden{display:none !important}
+.screen{min-height:100vh}
+.boot{display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--mut);font-size:14px}
+
+/* aurora background shared */
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--bg)}
+.aurora::before,.aurora::after{content:"";position:absolute;width:80vw;height:80vw;border-radius:50%;filter:blur(90px);opacity:.5;animation:drift 22s ease-in-out infinite}
+.aurora::before{background:radial-gradient(circle,#7c3aed,transparent 60%);top:-20%;left:-10%}
+.aurora::after{background:radial-gradient(circle,#db2777,transparent 60%);bottom:-25%;right:-10%;animation-delay:-8s}
+.aurora i{position:absolute;width:55vw;height:55vw;border-radius:50%;filter:blur(80px);opacity:.35;background:radial-gradient(circle,#2563eb,transparent 60%);top:30%;left:35%;animation:drift 28s ease-in-out infinite reverse}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(8vw,-6vh) scale(1.1)}66%{transform:translate(-6vw,8vh) scale(.95)}}
+
+/* ===== AUTH ===== */
+#auth{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;padding:24px}
+.authcard{background:rgba(20,20,29,.72);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.08);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.55);width:100%;max-width:400px;padding:32px 28px}
+.authcard .logo{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(120deg,#fff,#ffd36b,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.authcard .sub{font-size:13px;color:var(--mut);margin-top:4px;margin-bottom:22px}
+.authcard label{display:block;font-size:12px;font-weight:700;color:#cfcfe0;margin:12px 0 6px}
+.authcard input{width:100%;font:inherit;font-size:14px;padding:12px;border:1px solid var(--line);border-radius:11px;background:rgba(0,0,0,.25);color:var(--text);outline:none}
+.authcard input:focus{border-color:var(--pur);box-shadow:0 0 0 3px rgba(139,92,246,.25)}
+.btn{width:100%;font:inherit;font-size:14px;font-weight:700;padding:13px;border-radius:12px;cursor:pointer;border:0;transition:.15s;color:#fff}
+.btn.primary{background:var(--grad);margin-top:18px}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.primary:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--text);display:flex;align-items:center;justify-content:center;gap:9px}
+.btn.ghost:hover{border-color:#5a5a72;background:rgba(255,255,255,.09)}
+.oauth{display:grid;gap:9px;margin-top:14px}
+.divider{display:flex;align-items:center;gap:10px;color:#6a6a82;font-size:11px;margin:18px 0 4px}
+.divider::before,.divider::after{content:"";height:1px;background:var(--line);flex:1}
+.switchrow{font-size:13px;color:var(--mut);text-align:center;margin-top:18px}
+.switchrow button{background:none;border:0;color:var(--pur);font:inherit;font-weight:700;cursor:pointer}
+.linkbtn{background:none;border:0;color:var(--pur);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;padding:0;margin-top:10px}
+.amsg{font-size:12.5px;font-weight:600;padding:10px 12px;border-radius:9px;margin-top:14px;display:none}
+.amsg.show{display:block}
+.amsg.err{background:rgba(224,49,49,.15);color:#ff8787}
+.amsg.ok{background:rgba(47,158,68,.15);color:#69db7c}
+.amsg.info{background:rgba(255,255,255,.07);color:#cfcfe0}
+.gicon{width:17px;height:17px}
+
+/* ===== HUB ===== */
+#hub{position:relative;z-index:2;display:flex;flex-direction:column;min-height:100vh}
+.hub-top{display:flex;align-items:center;justify-content:space-between;padding:20px 26px}
+.hub-brand{font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:16px;color:#cfcfe0}
+.hub-user{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mut)}
+.hub-user button{background:none;border:1px solid var(--line);color:#cfcfe0;font:inherit;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;cursor:pointer}
+.hub-user button:hover{border-color:#5a5a72}
+.hub-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 24px 60px;text-align:center}
+.intro{margin-bottom:46px}
+.intro-title{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:clamp(44px,9vw,104px);line-height:.95;letter-spacing:.06em;
+  background:linear-gradient(110deg,#ffffff 10%,#ffd36b 40%,#8b5cf6 70%,#ec4899 95%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:introReveal 2.1s cubic-bezier(.18,.7,.2,1) both, shimmer 6s linear 2.1s infinite}
+.intro-tag{margin-top:14px;font-size:clamp(13px,2.2vw,17px);color:var(--mut);letter-spacing:.5px;opacity:0;animation:fadeUp 1s ease 1.2s both}
+#hub.skip-intro .intro-title{animation:none;background-position:0 0}
+#hub.skip-intro .intro-tag{animation:none;opacity:1}
+@keyframes introReveal{0%{opacity:0;filter:blur(16px);letter-spacing:.5em;transform:scale(1.18)}55%{opacity:1;filter:blur(0)}100%{opacity:1;letter-spacing:.06em;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:0 0}100%{background-position:220% 0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.cat-grid{display:grid;grid-template-columns:repeat(3,minmax(150px,200px));gap:20px;justify-content:center;perspective:1200px}
+.cat-tile{position:relative;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:30px 18px 24px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;backdrop-filter:blur(8px);transition:transform .28s cubic-bezier(.2,.8,.2,1.2),box-shadow .28s,border-color .28s;overflow:hidden;opacity:0}
+#hub.revealed .cat-tile{animation:pop .72s cubic-bezier(.2,.8,.2,1.25) both}
+#hub.revealed .cat-tile:nth-child(1){animation-delay:.00s}
+#hub.revealed .cat-tile:nth-child(2){animation-delay:.08s}
+#hub.revealed .cat-tile:nth-child(3){animation-delay:.16s}
+#hub.revealed .cat-tile:nth-child(4){animation-delay:.24s}
+#hub.revealed .cat-tile:nth-child(5){animation-delay:.32s}
+#hub.revealed .cat-tile:nth-child(6){animation-delay:.40s}
+@keyframes pop{0%{opacity:0;transform:translateY(34px) scale(.82)}60%{opacity:1;transform:translateY(-6px) scale(1.04)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.cat-ic{font-size:46px;line-height:1;filter:drop-shadow(0 8px 20px rgba(0,0,0,.55));transition:transform .28s}
+.cat-name{font-size:16px;font-weight:800;letter-spacing:.2px}
+.cat-sub{font-size:11.5px;color:var(--mut)}
+.cat-tile:hover{transform:translateY(-9px) scale(1.04);border-color:rgba(255,255,255,.22);box-shadow:0 24px 55px rgba(0,0,0,.55)}
+.cat-tile:hover .cat-ic{transform:scale(1.12) rotate(-4deg)}
+.cat-tile:active{transform:translateY(-3px) scale(1.0)}
+.cat-tile.active{background:linear-gradient(165deg,rgba(139,92,246,.28),rgba(236,72,153,.12));border-color:rgba(139,92,246,.55);box-shadow:0 0 0 1px rgba(139,92,246,.25),0 18px 50px rgba(124,58,237,.28);animation:glowPulse 3.2s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 0 1px rgba(139,92,246,.25),0 18px 50px rgba(124,58,237,.22)}50%{box-shadow:0 0 0 1px rgba(236,72,153,.4),0 22px 60px rgba(236,72,153,.35)}}
+.cat-tile .enter{margin-top:5px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:var(--grad);color:#fff;padding:5px 13px;border-radius:20px}
+.cat-tile .lock{position:absolute;top:11px;right:11px;font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);border:1px solid var(--line);padding:2px 8px;border-radius:20px}
+.cat-tile.soon{opacity:0}
+#hub.revealed .cat-tile.soon{opacity:.78}
+#hub.revealed .cat-tile.soon:hover{opacity:1}
+.hub-hint{text-align:center;color:#5a5a72;font-size:12px;margin-top:34px;opacity:0}
+#hub.revealed .hub-hint{animation:fadeUp .8s ease .5s both}
+
+/* ===== CATEGORY (app) ===== */
+#category{position:relative;z-index:2;background:linear-gradient(180deg,#0b0b12,#0a0a0f)}
+.wrap{max-width:1240px;margin:0 auto;padding:16px 20px 70px}
+.cat-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 0 18px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.homebtn{background:rgba(255,255,255,.05);border:1px solid var(--line);color:#cfcfe0;font:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:20px;cursor:pointer}
+.homebtn:hover{border-color:#5a5a72;background:rgba(255,255,255,.09)}
+.cat-title-bar{display:flex;align-items:center;gap:9px;font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:19px}
+.cat-title-bar .ic{font-size:22px}
+.headright{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.05);padding:4px;border-radius:12px}
+.tabs button{border:0;background:transparent;font:inherit;font-weight:600;font-size:13.5px;color:var(--mut);padding:7px 14px;border-radius:9px;cursor:pointer}
+.tabs button.active{background:var(--grad);color:#fff}
+.userchip{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mut);background:rgba(255,255,255,.04);border:1px solid var(--line);padding:5px 10px 5px 6px;border-radius:20px}
+.userchip .av{width:22px;height:22px;border-radius:50%;background:var(--grad);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.userchip button{background:none;border:0;color:#ff8787;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.controls input[type=search],.controls select{font:inherit;font-size:13.5px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.04);color:var(--text);outline:none}
+.controls input[type=search]{flex:1;min-width:230px}
+.controls input[type=search]::placeholder{color:#6a6a82}
+.controls input[type=search]:focus,.controls select:focus{border-color:var(--pur);box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+.controls select option{background:#16161f}
+.seg{display:flex;background:rgba(255,255,255,.05);border-radius:11px;padding:3px}
+.seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;color:var(--mut);padding:7px 13px;border-radius:8px;cursor:pointer}
+.seg button.active{background:rgba(255,255,255,.12);color:#fff}
+.count{font-size:12.5px;color:var(--mut);margin-left:auto}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px}
+.card{background:var(--panel);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s,border-color .15s}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(0,0,0,.5);border-color:rgba(139,92,246,.4)}
+.poster{position:relative;aspect-ratio:2/3;background:#22222e}
+.poster img{width:100%;height:100%;object-fit:cover;display:block}
+.poster .fallback{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;color:#fff}
+.poster .fallback .ft{font-size:16px;font-weight:800;line-height:1.15;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.poster .ptype{position:absolute;top:10px;left:10px;font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(0,0,0,.6);color:#fff;padding:3px 7px;border-radius:20px}
+.badge-rating{position:absolute;bottom:10px;right:10px;background:#000;color:var(--gold);font-size:12px;font-weight:800;padding:3px 8px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.badge-vote{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.65);color:var(--gold);font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px}
+.cbody{padding:10px 11px 12px;display:flex;flex-direction:column;gap:7px;flex:1}
+.cbody .ct{font-size:13.5px;font-weight:700;line-height:1.2}
+.cbody .cm{font-size:11.5px;color:var(--mut)}
+.statusrow{display:flex;gap:5px;margin-top:auto}
+.statusrow button{flex:1;border:1px solid var(--line);background:rgba(255,255,255,.03);font:inherit;font-size:11px;font-weight:600;color:#b9b9cc;padding:6px 0;border-radius:8px;cursor:pointer}
+.statusrow button:hover{border-color:#5a5a72}
+.statusrow button.on{color:#fff;border-color:transparent}
+.statusrow button.on.want{background:#1098ad}
+.statusrow button.on.watching{background:#f08c00}
+.statusrow button.on.watched{background:#2f9e44}
+
+.shelf{margin-bottom:28px}
+.shelf h2{font-size:15px;font-weight:800;margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.shelf h2 .dot{width:10px;height:10px;border-radius:3px}
+.shelf h2 .n{font-size:12px;font-weight:600;color:#6a6a82}
+.empty{text-align:center;color:#8a8aa0;padding:60px 20px;font-size:14px}
+.empty b{color:#cfcfe0}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:26px}
+.stat{background:var(--panel);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:18px}
+.stat .v{font-size:30px;font-weight:800;letter-spacing:-1px}
+.stat .l{font-size:12.5px;color:var(--mut);margin-top:2px}
+.bars{background:var(--panel);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:20px}
+.bars h3{font-size:14px;font-weight:800;margin-bottom:16px}
+.bar{display:grid;grid-template-columns:130px 1fr 44px;align-items:center;gap:10px;margin-bottom:10px}
+.bar .bl{font-size:12.5px;color:#cfcfe0;font-weight:600}
+.bar .btrack{background:rgba(255,255,255,.08);border-radius:20px;height:12px;overflow:hidden}
+.bar .bfill{height:100%;border-radius:20px}
+.bar .bn{font-size:12px;color:var(--mut);text-align:right;font-weight:600}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:18px;z-index:60;backdrop-filter:blur(4px)}
+.overlay.show{display:flex}
+.modal{background:var(--panel2);border:1px solid var(--line);border-radius:18px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 30px 70px rgba(0,0,0,.6)}
+.mhead{padding:20px 22px 14px;border-bottom:1px solid var(--line)}
+.mhead .mt{font-size:17px;font-weight:800}
+.mhead .ms{font-size:12.5px;color:var(--mut);margin-top:2px}
+.mbody{padding:18px 22px}
+.q{margin-bottom:18px}
+.q .ql{font-size:13.5px;font-weight:700;margin-bottom:9px}
+.opts{display:grid;gap:7px}
+.opts label{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;font-size:13px}
+.opts label:hover{border-color:#5a5a72}
+.opts label.sel{border-color:var(--pur);background:rgba(139,92,246,.15)}
+.opts input{accent-color:var(--pur)}
+.live{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.live .lv{font-size:28px;font-weight:800;color:#c4b5fd;letter-spacing:-1px}
+.live .ll{font-size:12px;color:var(--mut)}
+.live .stars{font-size:18px;letter-spacing:1px;color:var(--gold)}
+.mfoot{padding:14px 22px 20px;display:flex;gap:10px}
+.mfoot button{flex:1;font:inherit;font-size:14px;font-weight:700;padding:12px;border-radius:11px;cursor:pointer;border:0}
+.mfoot .save{background:var(--grad);color:#fff}
+.mfoot .save:disabled{opacity:.5;cursor:not-allowed}
+.mfoot .cancel{background:rgba(255,255,255,.08);color:#cfcfe0}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:#1b1b26;border:1px solid var(--line);color:var(--text);font-size:13px;font-weight:600;padding:13px 20px;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:80;opacity:0;pointer-events:none;transition:.3s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:620px){.cat-grid{grid-template-columns:repeat(2,minmax(140px,1fr))}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}.bar{grid-template-columns:90px 1fr 40px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001s !important}}
+
+/* ===== PREMIUM POLISH ===== */
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.6) 100%)}
+.intro-eyebrow{font-size:11px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--gold);opacity:0;animation:fadeUp 1s ease .9s both;margin-bottom:16px}
+#hub.skip-intro .intro-eyebrow{animation:none;opacity:1}
+
+/* category icon medallions */
+.cat-medallion{position:relative;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:6px;
+  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.14),rgba(255,255,255,.02) 70%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 26px rgba(0,0,0,.5);transition:transform .3s cubic-bezier(.2,.8,.2,1.2),box-shadow .3s}
+.cat-medallion::before{content:"";position:absolute;inset:0;border-radius:50%;padding:1.5px;background:linear-gradient(140deg,var(--c1),var(--c2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.cat-medallion::after{content:"";position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,var(--glow,transparent),transparent 70%);opacity:0;transition:opacity .3s;z-index:-1}
+.cat-medallion svg{width:36px;height:36px;color:#fff;filter:drop-shadow(0 2px 7px rgba(0,0,0,.55))}
+.cat-tile:hover .cat-medallion{transform:scale(1.1) translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 16px 38px rgba(0,0,0,.55)}
+.cat-tile:hover .cat-medallion::after{opacity:.85}
+.cat-tile.active .cat-medallion::after{opacity:.7}
+
+/* premium poster cards */
+.card{border-radius:16px}
+.poster img{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.card:hover .poster img{transform:scale(1.07)}
+.poster .pscrim{position:absolute;left:0;right:0;bottom:0;padding:28px 12px 11px;background:linear-gradient(to top,rgba(6,6,11,.97) 8%,rgba(6,6,11,.78) 42%,rgba(6,6,11,0) 100%);pointer-events:none}
+.poster .ptitle{font-size:14.5px;font-weight:800;line-height:1.16;color:#fff;letter-spacing:.1px;text-shadow:0 1px 12px rgba(0,0,0,.8);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.poster .pmeta{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:4px}
+.ptype{backdrop-filter:blur(6px);background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14)}
+.badge-vote{backdrop-filter:blur(6px);border:1px solid rgba(255,215,120,.25)}
+.cbody{padding:9px 11px 11px;gap:9px}
+.cgenres{font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#8e8ea6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.statusrow button{border-radius:9px}
+.statusrow button:hover{border-color:var(--gold);color:#fff}
+
+/* teaser worlds */
+#teaser{position:relative;z-index:2;min-height:100vh}
+.tinner{max-width:780px;margin:0 auto;padding:64px 24px 80px;text-align:center;position:relative;animation:fadeUp .6s ease both}
+#teaser .homebtn{position:absolute;left:24px;top:24px}
+.cat-medallion.big{width:108px;height:108px;margin:6px auto 22px}
+.cat-medallion.big svg{width:50px;height:50px}
+.theader{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:3px;font-size:clamp(30px,6vw,44px);color:#fff}
+.teyebrow{font-size:11px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-top:8px}
+.ttag{font-size:clamp(17px,3vw,21px);font-weight:700;margin-top:16px}
+.tdesc{font-size:14px;color:var(--mut);max-width:520px;margin:12px auto 0;line-height:1.7}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:32px auto 0;max-width:660px}
+.tcard{position:relative;border-radius:16px;aspect-ratio:3/4;overflow:hidden;background:linear-gradient(155deg,var(--c1),var(--c2));display:flex;align-items:flex-end;border:1px solid rgba(255,255,255,.1)}
+.tcard::after{content:"";position:absolute;inset:0;background:rgba(8,8,13,.32)}
+.tcard-in{position:relative;z-index:1;padding:13px;text-align:left}
+.tcard .tt{font-size:13.5px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);line-height:1.2}
+.tcard .ts2{font-size:10.5px;color:rgba(255,255,255,.82);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.tlock{position:absolute;z-index:2;top:10px;right:11px;font-size:12px;opacity:.85}
+
+/* ===== DINING ===== */
+.cat-title-bar .ic{display:inline-flex}
+.cat-title-bar .ic svg{width:22px;height:22px;color:#cfcfe0}
+.cat-title-bar .loc{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(255,211,107,.12);border:1px solid rgba(255,211,107,.3);padding:2px 8px;border-radius:20px;margin-left:4px}
+.cat-tile.ready{border-color:rgba(245,158,11,.45);background:linear-gradient(165deg,rgba(245,158,11,.16),rgba(239,68,68,.05))}
+.cat-tile .newbadge{position:absolute;top:11px;right:11px;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#0a0a0f;background:linear-gradient(135deg,#f59e0b,#ef4444);padding:2px 8px;border-radius:20px}
+.poster.dine .ptitle{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;letter-spacing:.3px}
+.poster .dped{font-size:9.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 6px rgba(0,0,0,.7);margin-bottom:2px}
+.rope{position:absolute;top:10px;right:10px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:3px 8px;border-radius:20px;backdrop-filter:blur(6px)}
+.rope.r1{background:rgba(47,158,68,.22);color:#8ce99a;border:1px solid rgba(47,158,68,.45)}
+.rope.r2{background:rgba(255,255,255,.12);color:#e9ecef;border:1px solid rgba(255,255,255,.22)}
+.rope.r3{background:rgba(34,139,230,.2);color:#a5d8ff;border:1px solid rgba(34,139,230,.45)}
+.rope.r4{background:rgba(245,159,11,.22);color:#ffd8a8;border:1px solid rgba(245,159,11,.5)}
+.rope.r5{background:rgba(236,72,153,.22);color:#ffe08a;border:1px solid rgba(255,215,120,.55);box-shadow:0 0 16px rgba(236,72,153,.4)}
+.dsig{font-size:11.5px;color:#d7c08a;font-weight:600;line-height:1.35}
+.dsig span{color:#8a8a72;font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.6px;margin-right:3px}
+.docc{display:flex;gap:5px;flex-wrap:wrap}
+.ochip{font-size:9px;font-weight:700;color:#b9b9cc;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:2px 8px;border-radius:20px}
+.fchip{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#ffd8a8;background:rgba(245,159,11,.14);border:1px solid rgba(245,159,11,.32);padding:2px 8px;border-radius:20px}
+.poster.dine{overflow:hidden}
+.poster.dine .dimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.card:hover .poster.dine .dimg{transform:scale(1.07)}
+.poster.dine .pscrim,.poster.dine .rope,.poster.dine .badge-rating{z-index:2}
+.poster.dine .pscrim{background:linear-gradient(to top,rgba(6,6,11,.97) 16%,rgba(6,6,11,.55) 58%,rgba(6,6,11,.08))}
+.controls span[id$=Controls]{display:contents}
+/* score ring */
+.score-ring-wrap{position:absolute;bottom:8px;left:10px;z-index:3;display:flex;align-items:center;gap:5px}
+.score-ring{width:32px;height:32px;transform:rotate(-90deg);filter:drop-shadow(0 1px 4px rgba(0,0,0,.7))}
+.score-ring .ring-bg{fill:none;stroke:rgba(255,255,255,.18);stroke-width:3.5}
+.score-ring .ring-fill{fill:none;stroke:var(--gold);stroke-width:3.5;stroke-linecap:round;transition:stroke-dasharray .5s ease}
+.ring-val{font-size:10px;font-weight:800;color:var(--gold);text-shadow:0 1px 4px rgba(0,0,0,.8)}
+
+/* ===== DETAIL SCREEN ===== */
+#detail{position:relative;z-index:2;background:var(--bg);min-height:100vh}
+.det-topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;position:sticky;top:0;z-index:10;background:rgba(8,8,13,.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)}
+.det-reserve-btn{font-size:13px;font-weight:700;color:#fff;background:var(--grad);padding:8px 18px;border-radius:20px;text-decoration:none;transition:.15s}
+.det-reserve-btn:hover{filter:brightness(1.1)}
+.det-reserve-btn.hidden-link{display:none}
+.det-photos-wrap{width:100%;height:280px;overflow-x:auto;overflow-y:hidden;display:flex;gap:6px;scrollbar-width:none;background:var(--panel)}
+.det-photos-wrap::-webkit-scrollbar{display:none}
+.det-photo-placeholder{min-width:100%;height:280px;background:var(--panel2);display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:13px}
+.det-photos-wrap img{height:280px;min-width:220px;object-fit:cover;flex-shrink:0}
+.det-body{max-width:700px;margin:0 auto;padding:26px 20px 90px}
+.det-title-block .dt-name{font-family:'Oswald',sans-serif;font-weight:700;font-size:34px;letter-spacing:.3px;line-height:1.1;margin-bottom:7px}
+.det-title-block .dt-meta{font-size:13px;color:var(--mut);display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+.det-title-block .dt-recog{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);background:rgba(255,211,107,.1);border:1px solid rgba(255,211,107,.3);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px}
+.det-title-block .dt-blurb{font-size:14px;color:#b9b9cc;line-height:1.7;margin-bottom:16px}
+.det-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.det-status-wrap{display:flex;gap:8px;margin-bottom:26px}
+.det-status-wrap button{flex:1;border:1px solid var(--line);background:rgba(255,255,255,.04);font:inherit;font-size:12.5px;font-weight:700;color:#b9b9cc;padding:11px 8px;border-radius:11px;cursor:pointer;transition:.12s}
+.det-status-wrap button:hover{border-color:#5a5a72}
+.det-status-wrap button.on{color:#fff;border-color:transparent}
+.det-status-wrap button.on.want{background:#1098ad}
+.det-status-wrap button.on.watching{background:#f08c00}
+.det-status-wrap button.on.watched{background:#2f9e44}
+.det-section-head{font-size:13px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#8a8aa8;margin-bottom:12px}
+.det-info-block{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:2px 18px;margin-bottom:22px;display:none}
+.det-info-block.has-data{display:block}
+.det-info-row{display:flex;gap:14px;align-items:flex-start;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px}
+.det-info-row:last-child{border-bottom:0}
+.det-info-row .di-label{width:76px;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);flex-shrink:0;padding-top:2px}
+.det-info-row .di-val{color:#e0e0ee;line-height:1.45}
+.det-info-row .di-val a{color:var(--pur);text-decoration:none}
+.det-notes-block{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:18px;margin-bottom:22px}
+.det-notes-block textarea,.det-notes-block input[type=text]{width:100%;font:inherit;font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(0,0,0,.25);color:var(--text);outline:none;resize:vertical;margin-bottom:10px}
+.det-notes-block textarea:focus,.det-notes-block input[type=text]:focus{border-color:var(--pur);box-shadow:0 0 0 3px rgba(139,92,246,.2)}
+.det-notes-block textarea{min-height:80px}
+.det-recommend-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.det-recommend-wrap .rtag{font-size:12px;font-weight:700;padding:6px 13px;border:1px solid var(--line);border-radius:20px;cursor:pointer;background:rgba(255,255,255,.04);color:#b9b9cc;transition:.12s;user-select:none}
+.det-recommend-wrap .rtag.on{background:var(--grad);border-color:transparent;color:#fff}
+.det-save-btn{font:inherit;font-size:13px;font-weight:700;padding:10px 22px;border-radius:11px;background:var(--grad);color:#fff;border:0;cursor:pointer;transition:.12s}
+.det-save-btn:hover{filter:brightness(1.1)}
+.det-reviews-block{margin-bottom:22px;display:none}
+.det-reviews-block.has-reviews{display:block}
+.det-review-card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.det-review-card .rv-author{font-size:12px;font-weight:700;color:#cfcfe0;margin-bottom:5px}
+.det-review-card .rv-text{font-size:13px;color:#9a9ab2;line-height:1.55;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.det-similar-block{margin-bottom:20px}
+.det-similar-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.det-similar-scroll::-webkit-scrollbar{display:none}
+.det-similar-card{min-width:130px;max-width:130px;border-radius:12px;overflow:hidden;cursor:pointer;flex-shrink:0;background:var(--panel);border:1px solid rgba(255,255,255,.05);transition:transform .15s,box-shadow .15s}
+.det-similar-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.det-similar-card img{width:100%;height:90px;object-fit:cover;display:block}
+.det-similar-card .sim-name{font-size:11.5px;font-weight:700;padding:7px 8px 4px;line-height:1.2}
+.det-similar-card .sim-meta{font-size:10px;color:var(--mut);padding:0 8px 9px}
+
+/* ===== PLACES (scoped, warm editorial) ===== */
+#places{position:relative;z-index:2;min-height:100vh;background:#f4efe6;color:#211d18;font-family:'Inter',sans-serif}
+#places .pwrap{max-width:1180px;margin:0 auto;padding:22px 22px 90px}
+#places .ptop{display:flex;align-items:center;justify-content:space-between;padding:4px 0 16px;flex-wrap:wrap;gap:10px}
+#places .pbrand{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:22px;color:#211d18}
+#places .pbrand span{color:#a9803f}
+#places .pnav{display:flex;gap:6px;flex-wrap:wrap}
+#places .pnav button{font:inherit;font-size:13px;font-weight:600;color:#5d564c;background:#fffdf9;border:1px solid #e2d9c9;padding:8px 15px;border-radius:30px;cursor:pointer}
+#places .pnav button:hover{border-color:#a9803f}
+#places .pnav button.on{background:#211d18;color:#fff;border-color:#211d18}
+#places .pgreet{margin:14px 0 6px}
+#places .pgreet h1{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(28px,5vw,44px);line-height:1.06}
+#places .pgreet .psub{font-size:14px;color:#5d564c;margin-top:8px;max-width:560px}
+#places .pwx{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:#5d564c;background:#fffdf9;border:1px solid #e2d9c9;padding:8px 14px;border-radius:30px}
+#places .pwx b{color:#211d18;font-weight:600}
+#places .pmoods{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 6px}
+#places .pmood{font-family:'Cormorant Garamond',serif;font-size:16px;color:#211d18;background:#fffdf9;border:1px solid #e2d9c9;padding:8px 16px;border-radius:30px;cursor:pointer}
+#places .pmood:hover{border-color:#a9803f}
+#places .pmood.on{background:#a9803f;border-color:#a9803f;color:#fff}
+#places .pdrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:24px 0 8px}
+#places .pdbtn{font:inherit;font-size:14px;font-weight:600;color:#fff;background:linear-gradient(120deg,#b8924f,#8a6a30);border:0;padding:13px 22px;border-radius:30px;cursor:pointer;box-shadow:0 8px 22px rgba(169,128,63,.28)}
+#places .ptoggle{font:inherit;font-size:12.5px;font-weight:600;color:#5d564c;background:#fffdf9;border:1px solid #e2d9c9;padding:9px 15px;border-radius:30px;cursor:pointer}
+#places .ptoggle.on{background:#211d18;color:#fff;border-color:#211d18}
+#places .psection{margin-top:32px}
+#places .psh{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+#places .psh h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px}
+#places .psh .pmore{font-size:12px;color:#8a8175}
+#places .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:22px}
+#places .pcard{background:#fffdf9;border-radius:16px;overflow:hidden;border:1px solid #e2d9c9;cursor:pointer;transition:transform .18s,box-shadow .18s}
+#places .pcard:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(33,29,24,.14)}
+#places .pph{position:relative;aspect-ratio:4/3;overflow:hidden;background:#e7ddca}
+#places .pph img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+#places .pcard:hover .pph img{transform:scale(1.06)}
+#places .pph::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(20,16,11,.45),transparent 45%)}
+#places .pbadge{position:absolute;z-index:2;top:12px;left:12px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#3a2d12;background:rgba(255,250,235,.92);padding:4px 10px;border-radius:30px}
+#places .pscore{position:absolute;z-index:2;bottom:12px;right:12px;font-size:11px;font-weight:700;color:#fff;background:rgba(20,16,11,.55);backdrop-filter:blur(4px);padding:3px 9px;border-radius:30px}
+#places .psaveDot{position:absolute;z-index:2;top:12px;right:12px;font-size:13px;color:#fff;background:rgba(169,128,63,.95);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+#places .pcb{padding:13px 15px 16px}
+#places .pcb .parea{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a9803f}
+#places .pcb h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px;line-height:1.1;margin:3px 0 6px}
+#places .pcb .pvibe{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15.5px;color:#5d564c}
+#places .pcb .pmeta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:#8a8175}
+#places .pcb .pmeta b{color:#5d564c;font-weight:600}
+#places .pempty{grid-column:1/-1;text-align:center;color:#8a8175;padding:50px;font-family:'Cormorant Garamond',serif;font-size:20px}
+/* onboarding */
+#places .ponb{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+#places .ponbox{max-width:560px;width:100%}
+#places .peye{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#a9803f}
+#places .ponbox h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:clamp(28px,6vw,40px);margin:10px 0 6px;line-height:1.1}
+#places .ponbox p{font-size:13.5px;color:#5d564c;margin-bottom:22px}
+#places .popts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+#places .popt{font-family:'Cormorant Garamond',serif;font-size:17px;color:#211d18;background:#fffdf9;border:1px solid #e2d9c9;padding:10px 18px;border-radius:30px;cursor:pointer}
+#places .popt:hover{border-color:#a9803f}
+#places .popt.on{background:#a9803f;border-color:#a9803f;color:#fff}
+#places .ponbtn{margin-top:26px;font:inherit;font-size:15px;font-weight:600;color:#fff;background:#211d18;border:0;padding:14px 40px;border-radius:30px;cursor:pointer}
+#places .ponbtn:disabled{opacity:.4;cursor:not-allowed}
+#places .pskip{display:block;margin:18px auto 0;background:none;border:0;color:#8a8175;font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline}
+/* detail + perfect day overlays */
+#places .pov{position:fixed;inset:0;background:rgba(28,24,18,.5);backdrop-filter:blur(5px);display:none;align-items:flex-start;justify-content:center;padding:30px 18px;z-index:70;overflow-y:auto}
+#places .pov.show{display:flex}
+#places .psheet{background:#f4efe6;border-radius:20px;max-width:680px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);margin:auto}
+#places .phero{position:relative;height:300px}
+#places .phero img{width:100%;height:100%;object-fit:cover}
+#places .phero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(20,16,11,.85),rgba(20,16,11,.1) 55%,transparent)}
+#places .phero .px{position:absolute;top:14px;right:14px;z-index:3;width:34px;height:34px;border-radius:50%;background:rgba(255,250,235,.92);border:0;font-size:17px;cursor:pointer;color:#211d18}
+#places .phero .phtext{position:absolute;z-index:2;left:24px;right:24px;bottom:18px;color:#fff}
+#places .phero .pharea{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#ecd9b3}
+#places .phero h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;line-height:1.05;margin:4px 0;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+#places .phero .phvibe{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:#f3ead8;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+#places .psbody{padding:22px 24px 26px}
+#places .pbadges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+#places .pbpill{font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#7a5b1f;background:#f1e6cf;border:1px solid #e6d4ad;padding:4px 11px;border-radius:30px}
+#places .pfacts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 20px;margin-bottom:20px}
+#places .pfact .pk{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#8a8175;margin-bottom:2px}
+#places .pfact .pv{font-size:13px;color:#211d18;font-weight:500}
+#places .pverdict{display:grid;gap:10px;margin-bottom:20px}
+#places .pv1,#places .pv2{border-radius:12px;padding:13px 15px;font-size:13.5px;line-height:1.5}
+#places .pv1{background:#eef3ea;border:1px solid #d4e3cb}
+#places .pv2{background:#f6ece9;border:1px solid #e8cfc7}
+#places .pv1 b,#places .pv2 b{display:block;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px}
+#places .pv1 b{color:#3f6b34}#places .pv2 b{color:#9a4a32}
+#places .pinsider{background:#211d18;color:#f3ead8;border-radius:12px;padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;line-height:1.55;margin-bottom:20px}
+#places .pinsider b{display:block;font-family:'Inter';font-style:normal;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#cda45c;margin-bottom:5px}
+#places .pscores{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+#places .psc .pk{color:#8a8175;font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;font-size:9.5px}
+#places .psc .pbar{height:5px;background:#e2d9c9;border-radius:5px;overflow:hidden}
+#places .psc .pfill{height:100%;background:linear-gradient(90deg,#c79a52,#8a6a30)}
+#places .pnearby{font-size:13px;color:#5d564c;margin-bottom:20px;line-height:1.7}
+#places .pnearby b{color:#211d18;font-weight:600}
+#places .psact{display:flex;gap:10px;flex-wrap:wrap}
+#places .psact button{font:inherit;font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:30px;cursor:pointer;border:1px solid #e2d9c9;background:#fffdf9;color:#211d18}
+#places .psact .on{background:#a9803f;color:#fff;border-color:#a9803f}
+#places .pdsheet{background:#f4efe6;border-radius:20px;max-width:560px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.4);margin:auto;overflow:hidden}
+#places .pdhead{padding:24px;border-bottom:1px solid #e2d9c9;position:relative}
+#places .pdhead h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:30px}
+#places .pdhead .pdsub{font-size:13px;color:#5d564c;margin-top:4px}
+#places .pdhead .px{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:50%;background:#fffdf9;border:1px solid #e2d9c9;font-size:16px;cursor:pointer}
+#places .pdctrl{display:flex;gap:6px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid #e2d9c9}
+#places .pdctrl button{font:inherit;font-size:12px;font-weight:600;color:#5d564c;background:#fffdf9;border:1px solid #e2d9c9;padding:7px 13px;border-radius:30px;cursor:pointer}
+#places .pdctrl button.on{background:#a9803f;color:#fff;border-color:#a9803f}
+#places .ptl{padding:18px 24px 8px}
+#places .pstep{display:grid;grid-template-columns:62px 1fr;gap:14px;padding-bottom:18px;position:relative}
+#places .pstep::before{content:"";position:absolute;left:71px;top:22px;bottom:-2px;width:1px;background:#e2d9c9}
+#places .pstep:last-child::before{display:none}
+#places .pstep .pt{font-size:12px;font-weight:700;color:#a9803f;padding-top:2px}
+#places .pstep .pdot{position:absolute;left:67px;top:6px;width:9px;height:9px;border-radius:50%;background:#a9803f;border:2px solid #f4efe6;z-index:1}
+#places .pstep .pd h4{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;line-height:1.1}
+#places .pstep .pd p{font-size:12.5px;color:#5d564c;margin-top:2px}
+#places .pdfoot{padding:14px 24px 22px;font-size:12.5px;color:#5d564c;border-top:1px solid #e2d9c9;line-height:1.6}
+#places .pdfoot b{color:#211d18}
+</style>
+</head>
+<body>
+<div class="aurora"><i></i></div>
+<div class="vignette"></div>
+<div class="boot" id="boot">Loading…</div>
+
+<!-- ===== AUTH ===== -->
+<div id="auth" class="screen hidden">
+  <div class="authcard">
+    <div class="logo">Screening Room</div>
+    <div class="sub">Track everything you watch — and soon, everywhere you go.</div>
+    <div id="emailForm">
+      <label>Email</label>
+      <input type="email" id="auEmail" placeholder="you@example.com" autocomplete="email">
+      <label>Password</label>
+      <input type="password" id="auPass" placeholder="••••••••" autocomplete="current-password">
+      <button class="btn primary" id="auPrimary">Sign in</button>
+      <button class="linkbtn" id="auMagic">Email me a magic link instead</button>
+    </div>
+    <div class="divider">or continue with</div>
+    <div class="oauth">
+      <button class="btn ghost" id="auGoogle"><svg class="gicon" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Google</button>
+      <button class="btn ghost" id="auApple"><svg class="gicon" viewBox="0 0 24 24"><path fill="#fff" d="M16.36 1.43c.05 1.06-.34 2.1-1 2.86-.69.79-1.83 1.41-2.93 1.32-.07-1.03.39-2.1 1.02-2.79.71-.79 1.93-1.38 2.91-1.39zM20.5 17.1c-.5 1.16-.74 1.68-1.39 2.7-.9 1.43-2.18 3.2-3.76 3.21-1.4.01-1.76-.92-3.66-.91-1.9.01-2.3.93-3.7.91-1.58-.01-2.79-1.62-3.69-3.04-2.52-3.99-2.79-8.66-1.23-11.14 1.1-1.77 2.85-2.81 4.49-2.81 1.67 0 2.72.92 4.1.92 1.34 0 2.16-.92 4.09-.92 1.46 0 3.01.8 4.11 2.18-3.62 1.98-3.03 7.16.34 8.4z"/></svg> Apple</button>
+    </div>
+    <div id="authMsg" class="amsg"></div>
+    <div class="switchrow"><span id="switchText">New here?</span> <button id="auToggle">Create an account</button></div>
+  </div>
+</div>
+
+<!-- ===== HUB ===== -->
+<div id="hub" class="screen hidden">
+  <div class="hub-top">
+    <div class="hub-brand">Screening Room</div>
+    <div class="hub-user"><span id="hubUser"></span><button id="signOutHub">Sign out</button></div>
+  </div>
+  <div class="hub-stage">
+    <div class="intro">
+      <div class="intro-eyebrow">✦ Your taste, beautifully kept</div>
+      <h1 class="intro-title">Screening Room</h1>
+      <p class="intro-tag">Pick a world. Track what you love. Discover what's next.</p>
+    </div>
+    <div class="cat-grid" id="catGrid"></div>
+    <div class="hub-hint">Tap a world to dive in</div>
+  </div>
+</div>
+
+<!-- ===== CATEGORY ===== -->
+<div id="category" class="screen hidden">
+  <div class="wrap">
+    <header class="cat-header">
+      <button class="homebtn" id="homeBtn">← Hub</button>
+      <div class="cat-title-bar" id="catTitle"></div>
+      <div class="headright">
+        <div class="tabs" id="tabs">
+          <button data-tab="discover" class="active">Discover</button>
+          <button data-tab="library">My Library</button>
+          <button data-tab="stats">Stats</button>
+        </div>
+        <span class="userchip"><span class="av" id="userAv">?</span><span id="userEmail"></span><button id="signOut">Sign out</button></span>
+      </div>
+    </header>
+
+    <section id="discover">
+      <div class="controls">
+        <input type="search" id="search" placeholder="Search any movie or show (live from TMDB)…">
+        <span id="entControls">
+          <div class="seg" id="typeSeg">
+            <button data-type="all" class="active">All</button>
+            <button data-type="movie">Movies</button>
+            <button data-type="tv">TV</button>
+          </div>
+          <select id="genreSel"></select>
+        </span>
+        <span id="dinControls" style="display:none">
+          <div class="seg" id="dModeSeg">
+            <button data-dmode="trending" class="active">🔥 Trending</button>
+            <button data-dmode="all">All</button>
+            <button data-dmode="nearby">📍 Near Me</button>
+          </div>
+          <select id="cuisineSel"></select>
+          <select id="occasionSel"></select>
+          <select id="ropeSel">
+            <option value="all">Any difficulty</option>
+            <option value="5">Near impossible</option>
+            <option value="4">Hard to get</option>
+            <option value="3">Book the drop</option>
+            <option value="2">Plan ahead</option>
+            <option value="1">Walk right in</option>
+          </select>
+        </span>
+        <span class="count" id="discoverCount"></span>
+      </div>
+      <div class="grid" id="discoverGrid"></div>
+    </section>
+
+    <section id="library" class="hidden">
+      <div class="controls">
+        <div class="seg" id="libSeg">
+          <button data-status="watched" class="active">Watched</button>
+          <button data-status="watching">Watching</button>
+          <button data-status="want">Watchlist</button>
+        </div>
+        <span class="count" id="libCount"></span>
+      </div>
+      <div id="libraryBody"></div>
+    </section>
+
+    <section id="stats" class="hidden">
+      <div class="stats-grid" id="statCards"></div>
+      <div class="bars" id="genreBars"></div>
+    </section>
+  </div>
+</div>
+
+<!-- ===== TEASER (upcoming worlds) ===== -->
+<div id="teaser" class="screen hidden"></div>
+
+<!-- ===== PLACES (NYC concierge) ===== -->
+<div id="places" class="screen hidden"></div>
+
+<!-- ===== DETAIL (restaurant) ===== -->
+<div id="detail" class="screen hidden">
+  <div class="det-topbar">
+    <button class="homebtn" id="detBack">← Back</button>
+    <a id="detReserve" href="#" target="_blank" class="det-reserve-btn hidden-link">Reserve a table ↗</a>
+  </div>
+  <div id="detPhotos" class="det-photos-wrap"><div class="det-photo-placeholder">Loading photos…</div></div>
+  <div class="det-body">
+    <div id="detTitleBlock" class="det-title-block"></div>
+    <div id="detStatusWrap" class="det-status-wrap"></div>
+    <div id="detInfoBlock" class="det-info-block"></div>
+    <div id="detNotesBlock" class="det-notes-block"></div>
+    <div id="detReviewsBlock" class="det-reviews-block"></div>
+    <div id="detSimilarBlock" class="det-similar-block"></div>
+  </div>
+</div>
+
+<!-- hidden map mount required by PlacesService -->
+<div id="gmap-hidden" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></div>
+
+<!-- rating modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mhead"><div class="mt" id="modalTitle"></div><div class="ms">Answer a few quick questions — we'll work out your rating.</div></div>
+    <div class="mbody" id="modalQuestions"></div>
+    <div class="mbody" style="padding-top:0">
+      <div class="live"><div><div class="ll">Your implicit rating</div><div class="stars" id="liveStars">☆☆☆☆☆</div></div><div class="lv" id="liveScore">–</div></div>
+    </div>
+    <div class="mfoot"><button class="cancel" id="modalCancel">Cancel</button><button class="save" id="modalSave" disabled>Save to Watched</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ===== CONFIG ===== */
+const SUPABASE_URL = "https://jxqtggajabevmpzpxhtk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_TJ8ChS2A0qlBNPE6JwsKnA_b382P3AR";
+const TMDB_KEY     = "f55148eb9c5f84d935845bc4510abe6e";
+const GOOGLE_PLACES_KEY = "AIzaSyAD3vr_u-0NJkRURtf8nxWbXeil-WtJviI";
+const IMG = "https://image.tmdb.org/t/p/w342";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const GENRES_MOVIE = {28:"Action",12:"Adventure",16:"Animation",35:"Comedy",80:"Crime",99:"Documentary",18:"Drama",10751:"Family",14:"Fantasy",36:"History",27:"Horror",10402:"Music",9648:"Mystery",10749:"Romance",878:"Sci-Fi",10770:"TV Movie",53:"Thriller",10752:"War",37:"Western"};
+const GENRES_TV = {10759:"Action & Adventure",16:"Animation",35:"Comedy",80:"Crime",99:"Documentary",18:"Drama",10751:"Family",10762:"Kids",9648:"Mystery",10763:"News",10764:"Reality",10765:"Sci-Fi & Fantasy",10766:"Soap",10767:"Talk",10768:"War & Politics",37:"Western"};
+function genreNames(item, mt){ const map = mt==="tv"?GENRES_TV:GENRES_MOVIE; return (item.genre_ids||[]).map(id=>map[id]).filter(Boolean); }
+
+const GC = {"Action":["#ff6b6b","#c92a2a"],"Action & Adventure":["#ff6b6b","#c92a2a"],"Adventure":["#ff922b","#e8590c"],"Comedy":["#ffd43b","#f59f00"],"Drama":["#748ffc","#3b5bdb"],"Sci-Fi":["#3bc9db","#0c8599"],"Sci-Fi & Fantasy":["#3bc9db","#0c8599"],"Fantasy":["#b197fc","#6741d9"],"Horror":["#5c636e","#212529"],"Thriller":["#f06595","#a61e4d"],"Crime":["#9775fa","#5f3dc4"],"Romance":["#faa2c1","#e64980"],"Animation":["#69db7c","#2f9e44"],"Family":["#63e6be","#099268"],"Mystery":["#5c7cfa","#364fc7"],"History":["#e8a87c","#b08968"],"War":["#868e96","#495057"],"War & Politics":["#868e96","#495057"],"Music":["#da77f2","#9c36b5"],"Documentary":["#4dabf7","#1971c2"],"Western":["#d9a066","#a86a36"]};
+function colorFor(g){ return GC[g] || ["#5a5a72","#2a2a38"]; }
+
+const QUESTIONS = [
+ {id:"enjoy", label:"How much did you enjoy it?", opts:[["Loved it",3],["Liked it",2],["It was fine",1],["Not for me",0]]},
+ {id:"engage", label:"How gripped were you?", opts:[["Couldn't look away",3],["Mostly held me",2],["Drifted at times",1],["A struggle to finish",0]]},
+ {id:"recommend", label:"Would you recommend or rewatch it?", opts:[["Yes, eagerly",2],["Maybe",1],["No",0]]},
+ {id:"stuck", label:"Did it stick with you afterward?", opts:[["A lot",2],["Somewhat",1],["Not really",0]]}
+];
+let curQuestions = QUESTIONS;
+
+function el(id){ return document.getElementById(id); }
+function starsSimple(r10){ const full=Math.round(r10/2); return "★".repeat(full)+"☆".repeat(5-full); }
+function yearOf(d){ return d?parseInt(String(d).slice(0,4),10):null; }
+
+let session=null, tracked={}, vertical="entertainment", tab="discover";
+let filterType="all", filterGenre="all", searchQ="";
+let CATALOG_FILE=[], viewIndex={}, hubIntroPlayed=false;
+
+/* ===== GOOGLE PLACES ===== */
+let placesService=null, mapsLoaded=false, dCurrentResults=[], dMode="trending";
+const RING_CIRC = +(2 * Math.PI * 13).toFixed(2); // circumference for r=13
+
+window.initGoogleMaps = function(){
+  var map = new google.maps.Map(el("gmap-hidden"), {center:{lat:40.758,lng:-73.9855},zoom:14});
+  placesService = new google.maps.places.PlacesService(map);
+  mapsLoaded = true;
+  if(vertical==="dining" && tab==="discover") renderDiningDiscover();
+};
+
+function fmtCount(n){
+  if(!n) return "0";
+  return n>=1000 ? (n/1000).toFixed(1).replace(/\.0$/,"")+"k" : String(n);
+}
+
+function mapGooglePlace(place){
+  const typeMap = {"japanese_restaurant":"Japanese","sushi_restaurant":"Sushi","chinese_restaurant":"Cantonese","french_restaurant":"French","italian_restaurant":"Italian","american_restaurant":"American","seafood_restaurant":"Seafood","steak_house":"Steakhouse","pizza_restaurant":"Pizza","mexican_restaurant":"Mexican","korean_restaurant":"Korean","indian_restaurant":"Indian"};
+  let cuisine="Restaurant";
+  for(const t of (place.types||[])){ if(typeMap[t]){ cuisine=typeMap[t]; break; } }
+  const vicinity=place.vicinity||"";
+  const neighborhood=vicinity.split(",").slice(-2)[0].trim();
+  const recognition=place.rating?"★ "+Number(place.rating).toFixed(1)+" ("+fmtCount(place.user_ratings_total)+")":null;
+  return {
+    id:place.place_id, tmdb_id:place.place_id, media_type:"dining",
+    name:place.name, title:place.name, cuisine, neighborhood,
+    price:place.price_level||0, google_rating:place.rating||null,
+    user_ratings_total:place.user_ratings_total||0,
+    genres:[cuisine],
+    lat:place.geometry&&place.geometry.location?place.geometry.location.lat():null,
+    lng:place.geometry&&place.geometry.location?place.geometry.location.lng():null,
+    rope:null, occasion:[], format:null, recognition, signature:null, isGooglePlace:true
+  };
+}
+
+function dLoadTrending(){
+  // Trending = curated dining.json sorted by prestige (rope desc, then recognition).
+  // Google Places near Times Square returns too many hotels — curated data is better here.
+  if(!DINING.length){ el("discoverGrid").innerHTML='<div class="empty">Loading…</div>'; el("discoverCount").textContent=""; return; }
+  const RECOG_SCORE={"★★★ Michelin":100,"★★ Michelin · World's 50 Best":95,"★★ Michelin":90,"★ Michelin · Institution":80,"★ Michelin":75,"Scene icon":60,"Institution":50};
+  const items=[...DINING].sort((a,b)=>{
+    if(b.rope!==a.rope) return b.rope-a.rope;
+    return (RECOG_SCORE[b.recognition]||0)-(RECOG_SCORE[a.recognition]||0);
+  });
+  renderGrid(items);
+}
+
+function dLoadNearMe(){
+  if(!mapsLoaded){ el("discoverGrid").innerHTML='<div class="empty">Google Maps loading — try again in a moment.</div>'; el("discoverCount").textContent=""; return; }
+  if(!navigator.geolocation){ showToast("Location not available"); renderDiningCatalog(); return; }
+  el("discoverGrid").innerHTML='<div class="empty">Getting your location…</div>';
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      placesService.nearbySearch({location:{lat:pos.coords.latitude,lng:pos.coords.longitude},rankBy:google.maps.places.RankBy.DISTANCE,type:"restaurant"},
+        function(results,status){
+          if(status===google.maps.places.PlacesServiceStatus.OK&&results&&results.length){
+            dCurrentResults=results.map(mapGooglePlace); renderGrid(dCurrentResults);
+          } else { showToast("No restaurants found nearby"); renderDiningCatalog(); }
+        });
+    },
+    function(){ showToast("Couldn't get your location"); renderDiningCatalog(); }
+  );
+}
+
+function dLiveSearch(q){
+  if(!mapsLoaded){ renderDiningCatalog(); return; }
+  el("discoverGrid").innerHTML='<div class="empty">Searching restaurants…</div>';
+  const query=q+(q.toLowerCase().includes("nyc")||q.toLowerCase().includes("new york")?"":" restaurant NYC");
+  placesService.textSearch({query},function(results,status){
+    if(status===google.maps.places.PlacesServiceStatus.OK&&results&&results.length){
+      dCurrentResults=results.map(mapGooglePlace); renderGrid(dCurrentResults);
+    } else { el("discoverGrid").innerHTML='<div class="empty">No results found.</div>'; el("discoverCount").textContent=""; }
+  });
+}
+
+/* ===== AUTH ===== */
+let authMode="signin";
+function showAuthMsg(c,m){ const x=el("authMsg"); x.className="amsg show "+c; x.textContent=m; }
+function clearAuthMsg(){ el("authMsg").className="amsg"; }
+function toggleAuthMode(){
+  authMode=authMode==="signin"?"signup":"signin";
+  el("auPrimary").textContent=authMode==="signin"?"Sign in":"Create account";
+  el("switchText").textContent=authMode==="signin"?"New here?":"Have an account?";
+  el("auToggle").textContent=authMode==="signin"?"Create an account":"Sign in";
+  clearAuthMsg();
+}
+el("auToggle").addEventListener("click", toggleAuthMode);
+el("auPrimary").addEventListener("click", async ()=>{
+  const email=el("auEmail").value.trim(), password=el("auPass").value;
+  if(!email||!password){ showAuthMsg("err","Enter your email and password."); return; }
+  el("auPrimary").disabled=true;
+  try{
+    if(authMode==="signup"){
+      const r=await sb.auth.signUp({email,password}); if(r.error) throw r.error;
+      if(!r.data.session){ showAuthMsg("ok","Account created — now sign in."); authMode="signin"; el("auPrimary").textContent="Sign in"; }
+    } else { const r=await sb.auth.signInWithPassword({email,password}); if(r.error) throw r.error; }
+  }catch(err){ showAuthMsg("err",err.message||"Couldn't authenticate."); }
+  el("auPrimary").disabled=false;
+});
+el("auMagic").addEventListener("click", async ()=>{
+  const email=el("auEmail").value.trim();
+  if(!email){ showAuthMsg("err","Enter your email first."); return; }
+  try{ const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin}}); if(error) throw error;
+    showAuthMsg("ok","Magic link sent — check your email."); }
+  catch(err){ showAuthMsg("err",err.message||"Couldn't send link."); }
+});
+async function oauth(p){ try{ const {error}=await sb.auth.signInWithOAuth({provider:p,options:{redirectTo:window.location.origin}}); if(error) throw error; }
+  catch(err){ showAuthMsg("err",(err.message||"OAuth failed")+" — provider may not be enabled in Supabase yet."); } }
+el("auGoogle").addEventListener("click",()=>oauth("google"));
+el("auApple").addEventListener("click",()=>oauth("apple"));
+el("signOut").addEventListener("click", async ()=>{ await sb.auth.signOut(); });
+el("signOutHub").addEventListener("click", async ()=>{ await sb.auth.signOut(); });
+
+/* ===== ROUTING ===== */
+function hideScreens(){ ["auth","hub","category","teaser","places","detail"].forEach(id=>el(id).classList.add("hidden")); }
+sb.auth.onAuthStateChange((_e,s)=>{ session=s; route(); });
+async function route(){
+  el("boot").classList.add("hidden");
+  if(session&&session.user){
+    const email=session.user.email||"account";
+    el("userEmail").textContent=email; el("userAv").textContent=(email[0]||"?").toUpperCase();
+    el("hubUser").textContent="Hi, "+email.split("@")[0];
+    await loadCatalogFile(); await loadTracked();
+    showHub();
+  } else { hideScreens(); el("auth").classList.remove("hidden"); }
+}
+function showHub(){
+  hideScreens(); updateHubCounts(); el("hub").classList.remove("hidden");
+  if(!hubIntroPlayed){
+    hubIntroPlayed=true;
+    el("hub").classList.remove("revealed","skip-intro");
+    void el("hub").offsetWidth;
+    setTimeout(()=>el("hub").classList.add("revealed"),2000);
+  } else { el("hub").classList.add("skip-intro","revealed"); }
+}
+function updateHubCounts(){
+  const n=CATALOG_FILE.length;
+  el("entSub").textContent=n?(n.toLocaleString()+" titles"):"Movies & TV";
+}
+async function enterCategory(v){
+  vertical=v||"entertainment";
+  hideScreens(); el("category").classList.remove("hidden");
+  filterType="all"; filterGenre="all"; searchQ=""; el("search").value="";
+  diningCuisine="all"; diningOccasion="all"; diningRope="all"; libStatus="watched";
+  dMode="trending"; dCurrentResults=[];
+  document.querySelectorAll("#dModeSeg button").forEach(b=>b.classList.toggle("active",b.dataset.dmode==="trending"));
+  if(vertical==="dining"&&!DINING.length) await loadDining();
+  setupVertical(vertical);
+  await loadTracked();
+  showTab("discover");
+}
+el("homeBtn").addEventListener("click", showHub);
+const SVGW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">';
+const ICONS={
+ clap:SVGW+'<rect x="3" y="8.5" width="18" height="12" rx="2"/><path d="M3.4 8.5 6 4.2l3.2 2.1L11.4 4l3.2 2.1L17.8 4l2.8 4.5"/></svg>',
+ fork:SVGW+'<path d="M7 3v5M11 3v5"/><path d="M9 8v13"/><path d="M7 8c0 1.1.7 1.6 2 1.6s2-.5 2-1.6"/><path d="M16 3c-1.6 1.6-1.6 6.4 0 8v10"/></svg>',
+ pin:SVGW+'<path d="M12 21s6.5-5.8 6.5-10.5A6.5 6.5 0 0 0 5.5 10.5C5.5 15.2 12 21 12 21Z"/><circle cx="12" cy="10.3" r="2.4"/></svg>',
+ mask:SVGW+'<path d="M5 4.5h14V10a7 7 0 0 1-14 0z"/><path d="M9 8.5h.01M15 8.5h.01"/><path d="M9.3 13c.9.9 4.5.9 5.4 0"/></svg>',
+ note:SVGW+'<circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16" cy="15.5" r="2.5"/><path d="M9 17.5V6l9.5-2.2v11.7"/></svg>',
+ book:SVGW+'<path d="M12 6.5C10.3 5.2 7.6 4.5 4.5 4.5V18c3.1 0 5.8.7 7.5 2 1.7-1.3 4.4-2 7.5-2V4.5c-3.1 0-5.8.7-7.5 2z"/><path d="M12 6.5V20"/></svg>'
+};
+const CATS=[
+ {v:"entertainment",name:"Entertainment",sub:"Movies & TV",a:["#8b5cf6","#ec4899"],glow:"rgba(139,92,246,.55)",icon:ICONS.clap,active:true},
+ {v:"dining",name:"Dining",sub:"New York · 50 tables",a:["#f59e0b","#ef4444"],glow:"rgba(245,158,11,.5)",icon:ICONS.fork,ready:true},
+ {v:"places",name:"Places",sub:"New York · 20 spots",a:["#14b8a6","#06b6d4"],glow:"rgba(20,184,166,.5)",icon:ICONS.pin,ready:true},
+ {v:"theater",name:"Theater",sub:"Broadway & live",a:["#fb7185","#e11d48"],glow:"rgba(251,113,133,.5)",icon:ICONS.mask},
+ {v:"music",name:"Music",sub:"Albums & gigs",a:["#6366f1","#22d3ee"],glow:"rgba(99,102,241,.5)",icon:ICONS.note},
+ {v:"books",name:"Books",sub:"Reads",a:["#34d399","#10b981"],glow:"rgba(52,211,153,.5)",icon:ICONS.book}
+];
+function medallion(c,big){ return '<span class="cat-medallion'+(big?' big':'')+'" style="--c1:'+c.a[0]+';--c2:'+c.a[1]+';--glow:'+c.glow+'">'+c.icon+'</span>'; }
+function renderHubTiles(){
+  el("catGrid").innerHTML=CATS.map(c=>{
+    const enterable=c.active||c.ready;
+    const cls='cat-tile '+(c.active?'active':c.ready?'ready':'soon');
+    const base='class="'+cls+'" data-v="'+c.v+'" data-name="'+c.name+'"';
+    if(enterable){
+      const badge=c.ready?'<span class="newbadge">New</span>':'';
+      const subId=c.v==="entertainment"?' id="entSub"':'';
+      return '<button '+base+'>'+badge+medallion(c)+'<span class="cat-name">'+c.name+'</span><span class="cat-sub"'+subId+'>'+c.sub+'</span><span class="enter">Enter</span></button>';
+    }
+    return '<button '+base+'><span class="lock">Soon</span>'+medallion(c)+'<span class="cat-name">'+c.name+'</span><span class="cat-sub">'+c.sub+'</span></button>';
+  }).join("");
+  document.querySelectorAll("#catGrid .cat-tile").forEach(t=>t.addEventListener("click",()=>{
+    const v=t.dataset.v, c=CATS.find(x=>x.v===v);
+    if(v==="places"){ if(window.plEnter) window.plEnter(); return; }
+    if(c&&(c.active||c.ready)) enterCategory(v); else showTeaser(v);
+  }));
+  updateHubCounts();
+}
+const TEASERS={
+ dining:{tag:"Your private table book.",desc:"Save the restaurants worth returning to, the ones you're dying to try, and rate every meal the way you rate films.",items:[["Le Bernardin","Seafood · NYC"],["Osteria Francescana","Modena"],["Sukiyabashi Jiro","Tokyo"],["Noma","Copenhagen"]]},
+ places:{tag:"Every place worth the trip.",desc:"Build a living map of destinations, stays and hidden gems — track where you've been and where you're headed next.",items:[["Aman Tokyo","Japan"],["Santorini","Greece"],["Kyoto","Japan"],["Faroe Islands","Atlantic"]]},
+ theater:{tag:"The best seats, remembered.",desc:"Keep every show you've seen and every one you're chasing tickets for — Broadway, the West End and beyond.",items:[["Hamilton","Musical"],["The Lion King","Musical"],["Cabaret","Revival"],["Sleep No More","Immersive"]]},
+ music:{tag:"Your year in sound.",desc:"Track the albums on repeat and the concerts you'll never forget, with the same effortless rating engine.",items:[["Tortured Poets Dept.","Album"],["Brat","Album"],["Coachella","Festival"],["Glastonbury","Festival"]]},
+ books:{tag:"Your shelf, everywhere.",desc:"A home for everything you've read, are reading, and mean to get to — rated and always with you.",items:[["Tomorrow & Tomorrow","Novel"],["The Bee Sting","Novel"],["Project Hail Mary","Sci-Fi"],["Atomic Habits","Non-fiction"]]}
+};
+function showTeaser(v){
+  const c=CATS.find(x=>x.v===v), d=TEASERS[v]; if(!c||!d) return;
+  hideScreens();
+  const cards=d.items.map(it=>'<div class="tcard" style="--c1:'+c.a[0]+';--c2:'+c.a[1]+'"><span class="tlock">🔒</span><div class="tcard-in"><div class="tt">'+it[0]+'</div><div class="ts2">'+it[1]+'</div></div></div>').join("");
+  el("teaser").innerHTML='<div class="tinner"><button class="homebtn" id="teaserBack">← Hub</button>'
+    +medallion(c,true)
+    +'<div class="teyebrow">Coming soon</div>'
+    +'<h2 class="theader">'+c.name+'</h2>'
+    +'<p class="ttag">'+d.tag+'</p>'
+    +'<p class="tdesc">'+d.desc+'</p>'
+    +'<div class="tgrid">'+cards+'</div>'
+    +'<button class="btn primary" id="teaserCta" style="max-width:260px;margin:28px auto 0">Notify me when it\'s live</button></div>';
+  el("teaser").classList.remove("hidden");
+  el("teaserBack").addEventListener("click", showHub);
+  el("teaserCta").addEventListener("click",()=>showToast("You're on the list — we'll tell you the moment "+c.name+" opens. ✨"));
+  window.scrollTo(0,0);
+}
+
+/* ===== DINING DATA ===== */
+let DINING=[], DINING_BY_ID={};
+let diningCuisine="all", diningOccasion="all", diningRope="all";
+const ROPE={1:"Walk right in",2:"Plan ahead",3:"Book the drop",4:"Hard to get",5:"Near impossible"};
+const DACC={"Italian":["#b91c1c","#5b1414"],"Italian-American":["#b91c1c","#5b1414"],"Italian Seafood":["#9f1239","#3f0a1a"],"French":["#3730a3","#1a1840"],"French-American":["#3730a3","#1a1840"],"Japanese":["#334155","#0f172a"],"Sushi":["#334155","#0f172a"],"Korean":["#9f1239","#3f0a1a"],"Korean Steakhouse":["#9f1239","#3f0a1a"],"Steakhouse":["#7c2d12","#3a1206"],"American":["#92400e","#3a1f06"],"American Chophouse":["#7c2d12","#3a1206"],"Seafood":["#0f766e","#062f2b"],"New American":["#6d28d9","#2e1065"],"Nordic":["#475569","#1e293b"],"Indian":["#c2410c","#5c1d06"],"South Indian":["#c2410c","#5c1d06"],"Mexican":["#15803d","#06301a"],"Spanish":["#b45309","#5c2a06"],"Sichuan":["#a16207","#3f2706"],"Cantonese":["#a16207","#3f2706"],"Cantonese-American":["#a16207","#3f2706"],"Pizza":["#b91c1c","#450a0a"],"Jewish Deli":["#a16207","#3f2706"],"Afro-Caribbean American":["#7e22ce","#3b0764"],"Restaurant":["#3f3f46","#18181b"]};
+function dacc(c){ return DACC[c]||["#3f3f46","#18181b"]; }
+const FOODKW={"Italian":"pasta","Italian-American":"pasta","Italian Seafood":"seafood","French":"french","French-American":"french","Japanese":"sushi","Sushi":"sushi","Korean":"korean","Korean Steakhouse":"barbecue","Steakhouse":"steak","American":"burger","American Chophouse":"steak","Seafood":"seafood","New American":"plating","Nordic":"seafood","Indian":"curry","South Indian":"curry","Mexican":"tacos","Spanish":"tapas","Sichuan":"dumplings","Cantonese":"dumplings","Cantonese-American":"dumplings","Pizza":"pizza","Jewish Deli":"sandwich","Afro-Caribbean American":"caribbean","Restaurant":"food"};
+function foodImg(r){
+  const kw=FOODKW[r.cuisine]||"restaurant";
+  // loremflickr needs a numeric lock — hash string IDs (Google place_ids) to a number
+  const rawId=r.id||1;
+  const lock=typeof rawId==="number"?rawId:String(rawId).split("").reduce((a,c)=>(a*31+c.charCodeAt(0))&0x7fffffff,1)%9999+1;
+  return "https://loremflickr.com/440/320/"+kw+",food?lock="+lock;
+}
+const QUESTIONS_DINE=[
+ {id:"food", label:"How was the food?", opts:[["Exceptional",3],["Very good",2],["Fine",1],["Disappointing",0]]},
+ {id:"vibe", label:"Vibe & service?", opts:[["Flawless",3],["Good",2],["A bit off",1],["Poor",0]]},
+ {id:"worth", label:"Worth it for the price?", opts:[["Absolutely",2],["Yes",1],["Not really",0]]},
+ {id:"return", label:"Would you go back or send a friend?", opts:[["Already planning",2],["Maybe",1],["No",0]]}
+];
+
+async function loadDining(){
+  try{
+    // Try dining.json first (friend's file name), fall back to dining-catalog.json
+    let resp=await fetch("./dining.json?_="+Date.now());
+    if(!resp.ok) resp=await fetch("./dining-catalog.json?_="+Date.now());
+    const r=resp; const arr=await r.json();
+    DINING=arr.map(x=>Object.assign({},x,{tmdb_id:x.id,media_type:"dining",title:x.name,genres:[x.cuisine,x.format,x.neighborhood]}));
+    DINING_BY_ID={}; DINING.forEach(x=>DINING_BY_ID[x.id]=x);
+    const cuis=[...new Set(DINING.map(x=>x.cuisine))].sort();
+    el("cuisineSel").innerHTML='<option value="all">All cuisines</option>'+cuis.map(c=>'<option value="'+c+'">'+c+'</option>').join("");
+    const occs=[...new Set(DINING.flatMap(x=>x.occasion||[]))].sort();
+    el("occasionSel").innerHTML='<option value="all">Any occasion</option>'+occs.map(o=>'<option value="'+o+'">'+o+'</option>').join("");
+  }catch(e){ DINING=[]; }
+}
+
+function setupVertical(v){
+  const c=CATS.find(x=>x.v===v);
+  el("catTitle").innerHTML='<span class="ic">'+c.icon+'</span> '+c.name+(v==="dining"?' <span class="loc">New York</span>':'');
+  const ent=v==="entertainment";
+  el("entControls").style.display=ent?"contents":"none";
+  el("dinControls").style.display=v==="dining"?"contents":"none";
+  el("search").placeholder=v==="dining"?"Search NYC restaurants…":"Search any movie or show (live from TMDB)…";
+  if(ent){ document.querySelectorAll("#typeSeg button").forEach(b=>b.classList.toggle("active",b.dataset.type==="all")); if(el("genreSel")) el("genreSel").value="all"; }
+  else if(v==="dining"){ el("cuisineSel").value="all"; el("occasionSel").value="all"; el("ropeSel").value="all"; }
+  const lib=v==="dining"?{watched:"Been",watching:"Booked",want:"Want to go"}:{watched:"Watched",watching:"Watching",want:"Watchlist"};
+  document.querySelectorAll("#libSeg button").forEach(b=>{ b.textContent=lib[b.dataset.status]; b.classList.toggle("active",b.dataset.status==="watched"); });
+}
+
+/* ===== DINING DISCOVER (router + renderers) ===== */
+function renderDiningDiscover(){
+  if(searchQ.length>1){ dLiveSearch(searchQ); return; }
+  if(dMode==="trending"){ dLoadTrending(); return; }
+  if(dMode==="nearby"){ dLoadNearMe(); return; }
+  renderDiningCatalog();
+}
+
+function renderDiningCatalog(){
+  if(!DINING.length){ el("discoverGrid").innerHTML='<div class="empty">Loading restaurants…</div>'; el("discoverCount").textContent=""; return; }
+  const q=searchQ.toLowerCase();
+  let items=DINING.filter(r=>{
+    if(diningCuisine!=="all"&&r.cuisine!==diningCuisine) return false;
+    if(diningOccasion!=="all"&&!(r.occasion||[]).includes(diningOccasion)) return false;
+    if(diningRope!=="all"&&String(r.rope)!==diningRope) return false;
+    if(q.length>1&&!r.name.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=>b.rope-a.rope||a.name.localeCompare(b.name));
+  renderGrid(items);
+}
+
+function scoreRingHTML(rating, maxRating){
+  const fill=((Math.min(Math.max(rating/maxRating,0),1))*RING_CIRC).toFixed(1);
+  return '<div class="score-ring-wrap">'
+    +'<svg class="score-ring" viewBox="0 0 32 32">'
+      +'<circle class="ring-bg" cx="16" cy="16" r="13"/>'
+      +'<circle class="ring-fill" cx="16" cy="16" r="13" stroke-dasharray="'+fill+' '+RING_CIRC+'"/>'
+    +'</svg>'
+    +'<span class="ring-val">'+Number(rating).toFixed(1)+'</span>'
+    +'</div>';
+}
+
+function diningCardHTML(item){
+  const r=DINING_BY_ID[item.tmdb_id]||item;
+  const a=dacc(r.cuisine||""); const price="$".repeat(r.price||0);
+  const t=tracked["dining:"+(r.id||item.tmdb_id)];
+  const hasRating=t&&t.status==="watched"&&t.rating!=null;
+  const scoreRing=hasRating?scoreRingHTML(t.rating,10):"";
+  const rope=ROPE[r.rope];
+  const meta=(r.cuisine||"")+(r.neighborhood?" · "+r.neighborhood:"")+(price?" · "+price:"");
+  const recog=r.recognition||(r.google_rating?"★ "+Number(r.google_rating).toFixed(1)+(r.user_ratings_total?" ("+fmtCount(r.user_ratings_total)+")":""):null);
+  const chips=(r.format?'<span class="fchip">'+r.format+'</span>':'')+(r.occasion||[]).slice(0,2).map(o=>'<span class="ochip">'+o+'</span>').join("");
+  return '<div class="card">'
+    +'<div class="poster dine" style="background:linear-gradient(155deg,'+a[0]+','+a[1]+')">'
+      +'<img class="dimg" loading="lazy" src="'+foodImg(r)+'" alt="" onerror="this.remove()">'
+      +(rope?'<div class="rope r'+r.rope+'">'+rope+'</div>':'')
+      +scoreRing
+      +'<div class="pscrim">'+(recog?'<div class="dped">'+recog+'</div>':'')+'<div class="ptitle">'+r.name+'</div><div class="pmeta">'+meta+'</div></div>'
+    +'</div>'
+    +'<div class="cbody">'
+      +(chips?'<div class="docc">'+chips+'</div>':'')
+      +(r.signature?'<div class="dsig"><span>Order</span> '+r.signature+'</div>':'')
+      +statusButtons(item)
+    +'</div></div>';
+}
+
+/* ===== PLACES MODULE (isolated) ===== */
+(function(){
+const STYLES=["Iconic","Hidden gems","Luxury","Romantic","Food & cafés","Culture","Nature & views","Nightlife","Shopping","Wellness","Photography","Family"];
+const MOODS=[["all","Everything"],["beautiful","Something beautiful"],["romantic","A romantic evening"],["calm","Something calm"],["premium","A premium experience"],["hidden","A hidden gem"],["iconic","Something iconic"],["photo","A great photo"],["quick","Only 90 minutes"],["avoid-crowds","Avoid crowds"],["classy","A classy night out"]];
+const WX={0:["Clear","☀"],1:["Mainly clear","🌤"],2:["Partly cloudy","⛅"],3:["Overcast","☁"],45:["Foggy","🌫"],48:["Foggy","🌫"],51:["Light drizzle","🌦"],53:["Drizzle","🌦"],55:["Drizzle","🌦"],61:["Light rain","🌧"],63:["Rain","🌧"],65:["Heavy rain","🌧"],71:["Snow","🌨"],73:["Snow","🌨"],75:["Snow","🌨"],80:["Showers","🌦"],81:["Showers","🌦"],82:["Showers","🌧"],95:["Thunderstorm","⛈"]};
+const PLACES_INLINE=[
+{id:1,name:"Central Park — Bethesda Terrace",area:"Central Park",vibe:"A cathedral of elms opening onto the city's most romantic fountain.",styles:["Iconic","Romantic","Nature & views","Photography"],moods:["beautiful","romantic","calm","iconic","photo"],best:"Golden hour, 1 hr before sunset",dur:90,crowd:"Moderate",price:"Free",dress:"Comfortable",hours:"6am–1am",resv:"No",photo:"Bethesda Terrace arcade, toward the fountain",cafe:"Le Pain Quotidien (Mineral Springs)",dinner:"Tavern on the Green",insider:"Enter at 72nd & 5th and walk the Mall north — the reveal of the terrace is the whole point.",worth:"You want the quintessential, genuinely beautiful NYC walk.",skip:"You only have time for one skyline view — go up high instead.",badges:["Editor's Pick","Best at Sunset","Best for Couples"],scores:{b:5,u:4,e:5,c:3,v:5,l:4},rain:false,img:"centralpark"},
+{id:2,name:"The Met",area:"Upper East Side",vibe:"The encyclopaedic museum where you could lose a lifetime — so don't try to see it all.",styles:["Culture","Iconic","Photography"],moods:["beautiful","calm","iconic","culture","premium"],best:"Weekday morning at opening",dur:150,crowd:"High",price:"$$ (suggested)",dress:"Smart casual",hours:"10am–5pm (closed Wed)",resv:"No",photo:"The Temple of Dendur gallery",cafe:"The Met's Balcony Bar",dinner:"Cafe Boulud",insider:"Skip the Great Hall crush — go straight to the Rooftop Garden Bar for skyline + martinis.",worth:"You love art and want one of the world's great museums.",skip:"You dislike big crowds and want something intimate — try the Frick.",badges:["Editor's Pick","First-Timer","Tourist Heavy"],scores:{b:5,u:5,e:3,c:2,v:5,l:4},rain:true,img:"museum"},
+{id:3,name:"The High Line",area:"Chelsea",vibe:"A wildflower railway in the sky, threading between galleries and the Hudson.",styles:["Iconic","Nature & views","Photography","Romantic"],moods:["beautiful","romantic","iconic","photo","calm"],best:"Late afternoon into golden hour",dur:75,crowd:"High",price:"Free",dress:"Comfortable",hours:"7am–10pm",resv:"No",photo:"The 10th Ave overlook amphitheatre",cafe:"Empire Diner",dinner:"L'Artusi or Don Angie nearby",insider:"Start at the Whitney (south) and walk north — it empties out toward Hudson Yards.",worth:"You want an effortless, scenic walk with design and views.",skip:"You're after solitude — weekends are shoulder-to-shoulder.",badges:["Editor's Pick","Best at Sunset","Tourist Heavy"],scores:{b:5,u:5,e:4,c:2,v:5,l:3},rain:false,img:"highline"},
+{id:4,name:"Brooklyn Bridge at Dawn",area:"DUMBO / Lower Manhattan",vibe:"The most photographed walk in America — silent and golden if you go early.",styles:["Iconic","Photography","Romantic","Nature & views"],moods:["iconic","photo","romantic","beautiful","avoid-crowds"],best:"Sunrise (truly empty)",dur:60,crowd:"High",price:"Free",dress:"Layers, comfy shoes",hours:"24h",resv:"No",photo:"Under the Manhattan Bridge on Washington St",cafe:"Butler, DUMBO",dinner:"Cecconi's, DUMBO",insider:"Walk Brooklyn→Manhattan at sunrise. By 9am crowds make photos impossible.",worth:"You'll go early and want the iconic shot in peace.",skip:"You can only go midday — it's a river of selfie sticks.",badges:["Best at Sunset","Avoid Peak Hours","First-Timer"],scores:{b:5,u:4,e:4,c:2,v:5,l:3},rain:false,img:"brooklynbridge"},
+{id:5,name:"The Met Cloisters",area:"Fort Tryon Park",vibe:"A medieval monastery transplanted above the Hudson — the city's quietest escape.",styles:["Hidden gems","Culture","Wellness","Romantic"],moods:["calm","hidden","romantic","beautiful","premium"],best:"Weekday late morning",dur:120,crowd:"Low",price:"$$ (suggested)",dress:"Smart casual",hours:"10am–4:30pm",resv:"No",photo:"The Cuxa Cloister garden colonnade",cafe:"New Leaf Café",dinner:"Saggio, Hudson Heights",insider:"Pair with Fort Tryon's heather garden — almost no tourists make it this far north.",worth:"You want hushed beauty and a true escape from crowds.",skip:"You're short on time — it's 45 min from Midtown.",badges:["Quiet Luxury","Local Favorite","Editor's Pick"],scores:{b:5,u:5,e:3,c:5,v:4,l:4},rain:true,img:"cloister"},
+{id:6,name:"SUMMIT One Vanderbilt",area:"Midtown",vibe:"A mirrored dream above Grand Central — the most cinematic deck in the city.",styles:["Luxury","Photography","Iconic","Nightlife"],moods:["premium","photo","iconic","beautiful","classy"],best:"Arrive 75 min before sunset",dur:90,crowd:"High",price:"$$$",dress:"Light colours photograph best",hours:"9am–10pm",resv:"Yes — timed ticket",photo:"The mirrored 'Air' room",cafe:"Joe Coffee, Grand Central",dinner:"Le Pavillon (downstairs)",insider:"Book the last slot before sunset — daylight, golden hour and city lights in one ticket.",worth:"You want a designed, picture-perfect skyline experience.",skip:"You prefer raw classic views — Top of the Rock is simpler.",badges:["Best at Sunset","Worth the Price","Reservation Essential"],scores:{b:5,u:5,e:4,c:2,v:4,l:5},rain:true,img:"skyline"},
+{id:7,name:"The Frick Collection",area:"Upper East Side",vibe:"A Gilded-Age mansion of Vermeers — art the way a billionaire once lived with it.",styles:["Luxury","Culture","Hidden gems","Romantic"],moods:["premium","calm","romantic","beautiful","culture"],best:"Weekday afternoon",dur:90,crowd:"Low",price:"$$$",dress:"Smart",hours:"10am–6pm (closed Mon)",resv:"Recommended",photo:"The Garden Court fountain",cafe:"Via Quadronno",dinner:"Daniel",insider:"Sit in the Garden Court ten minutes, phone away. That's the experience.",worth:"You want quiet, world-class art in an opulent setting.",skip:"You want blockbuster shows — this is small and serene by design.",badges:["Quiet Luxury","Best for Couples","Worth the Price"],scores:{b:5,u:5,e:4,c:5,v:4,l:5},rain:true,img:"art"},
+{id:8,name:"Little Island",area:"Hudson River Park",vibe:"A floating garden on tulip-stem pylons — whimsical, romantic, and free.",styles:["Hidden gems","Romantic","Nature & views","Photography"],moods:["beautiful","romantic","photo","calm","hidden"],best:"Sunset",dur:60,crowd:"Moderate",price:"Free",dress:"Comfortable",hours:"6am–11pm",resv:"No",photo:"The southwest overlook at golden hour",cafe:"The café on the island",dinner:"Pastis, Meatpacking",insider:"Climb the highest 'hill' on the west side for the Hudson sunset — most people miss it.",worth:"You want something genuinely new, lovely and free at golden hour.",skip:"You expect a big attraction — it's small; pair with the High Line.",badges:["Editor's Pick","Best at Sunset","Local Favorite"],scores:{b:5,u:5,e:5,c:4,v:5,l:4},rain:false,img:"park"},
+{id:9,name:"Grand Central Terminal",area:"Midtown",vibe:"A Beaux-Arts cathedral to travel — the ceiling alone is worth the detour.",styles:["Iconic","Culture","Photography"],moods:["iconic","beautiful","photo","quick"],best:"Mid-morning, fewer commuters",dur:45,crowd:"High",price:"Free",dress:"Anything",hours:"5:15am–2am",resv:"No",photo:"The west balcony, down the main concourse",cafe:"Cipriani Dolci balcony",dinner:"The Grill nearby",insider:"Find the Whispering Gallery by the Oyster Bar — speak into the corner, a friend hears across the arch.",worth:"You want a free, jaw-dropping interior in 30 minutes.",skip:"Nothing — it's free and on the way to everything.",badges:["First-Timer","Editor's Pick"],scores:{b:5,u:4,e:5,c:3,v:5,l:3},rain:true,img:"grandcentral"},
+{id:10,name:"Top of the Rock",area:"Rockefeller Center",vibe:"The view with the Empire State *in* it — the classic skyline shot.",styles:["Iconic","Photography","Nature & views"],moods:["iconic","photo","beautiful","premium"],best:"45 min before sunset",dur:75,crowd:"High",price:"$$$",dress:"A warm layer (it's windy)",hours:"9am–11pm",resv:"Yes — timed",photo:"South deck: Empire State; north: Central Park",cafe:"Blue Bottle, Rock Center",dinner:"Lodi, Rockefeller Center",insider:"The open-air top deck has no glass — shoot south, then turn for Central Park.",worth:"You want the postcard skyline with the Empire State in frame.",skip:"You've already done SUMMIT — the views overlap.",badges:["Best at Sunset","First-Timer","Worth the Price"],scores:{b:5,u:4,e:4,c:2,v:4,l:4},rain:false,img:"skyline"},
+{id:11,name:"New York Public Library",area:"Midtown",vibe:"Marble lions, a painted-sky reading room, and the hush of a century.",styles:["Culture","Hidden gems","Photography"],moods:["beautiful","calm","culture","photo","hidden"],best:"Weekday late morning",dur:50,crowd:"Moderate",price:"Free",dress:"Anything",hours:"10am–6pm (varies)",resv:"No",photo:"The Rose Main Reading Room ceiling",cafe:"Bryant Park kiosks next door",dinner:"Bryant Park Grill",insider:"The Rose Reading Room is free and largely tourist-free — pair with Bryant Park beside it.",worth:"You love beautiful interiors and quiet grandeur, for free.",skip:"Almost never — it's free, central and stunning.",badges:["Quiet Luxury","Local Favorite","Editor's Pick"],scores:{b:5,u:4,e:5,c:4,v:5,l:4},rain:true,img:"library"},
+{id:12,name:"Whitney Museum",area:"Meatpacking District",vibe:"American art with terraces that frame the Hudson and the High Line below.",styles:["Culture","Photography","Nature & views"],moods:["culture","beautiful","photo","premium"],best:"Friday evening (pay-what-you-wish)",dur:120,crowd:"Moderate",price:"$$$",dress:"Smart casual",hours:"10:30am–6pm (closed Tue)",resv:"Recommended",photo:"The outdoor terraces, river + High Line",cafe:"Frenchette Bakery",dinner:"Frenchette / Pastis",insider:"Ride to the top and work down via the terraces — the building is half the art.",worth:"You like modern art and want river-view terraces.",skip:"You're not into contemporary work — try the Met.",badges:["Editor's Pick","Best at Sunset"],scores:{b:4,u:5,e:4,c:3,v:4,l:4},rain:true,img:"art"},
+{id:13,name:"Brooklyn Heights Promenade",area:"Brooklyn Heights",vibe:"A quiet balcony over the East River with the whole skyline laid before you.",styles:["Hidden gems","Romantic","Nature & views","Photography"],moods:["romantic","beautiful","photo","calm","avoid-crowds"],best:"Blue hour, just after sunset",dur:45,crowd:"Low",price:"Free",dress:"Comfortable",hours:"24h",resv:"No",photo:"Mid-promenade, skyline + Brooklyn Bridge",cafe:"Iris Café",dinner:"Colonie, Atlantic Ave",insider:"Walk the leafy Heights first (Willow St) — film-set brownstones, no tourists.",worth:"You want the skyline view locals love, for free.",skip:"You want to be in the action — this is calm and residential.",badges:["Quiet Luxury","Best for Couples","Local Favorite"],scores:{b:5,u:4,e:5,c:5,v:5,l:4},rain:false,img:"skyline"},
+{id:14,name:"Brooklyn Botanic Garden",area:"Prospect Heights",vibe:"Cherry esplanades, a Japanese pond, and a glasshouse — the gentlest morning.",styles:["Nature & views","Wellness","Romantic","Family"],moods:["calm","beautiful","romantic","wellness","hidden"],best:"Spring mornings (cherry blossom)",dur:120,crowd:"Moderate",price:"$$",dress:"Comfortable",hours:"10am–6pm (closed Mon)",resv:"Recommended",photo:"The Japanese Hill-and-Pond torii",cafe:"Yellow Magnolia Café",dinner:"Olmsted, Prospect Heights",insider:"Go at opening in blossom season — by noon it's full. Pair with the Brooklyn Museum next door.",worth:"You want a restorative, slow, beautiful morning.",skip:"It's deep winter — the grounds are bare.",badges:["Quiet Luxury","Best for Couples"],scores:{b:5,u:4,e:4,c:3,v:4,l:4},rain:false,img:"garden"},
+{id:15,name:"The Oculus",area:"Financial District",vibe:"A soaring white rib-cage of marble — part transit hall, part cathedral of light.",styles:["Photography","Iconic","Shopping"],moods:["photo","iconic","beautiful","quick"],best:"Sunny midday",dur:30,crowd:"Moderate",price:"Free",dress:"Anything",hours:"Daily",resv:"No",photo:"Floor-centre looking up the spine",cafe:"Le District nearby",dinner:"Manhatta (60 floors up)",insider:"Any clear noon is dramatic as light pours through the ribs.",worth:"You love architecture and want a quick, free, striking shot.",skip:"You're not into modern architecture — it's a beautiful mall.",badges:["Editor's Pick","First-Timer"],scores:{b:4,u:5,e:5,c:4,v:5,l:3},rain:true,img:"architecture"},
+{id:16,name:"Bryant Park",area:"Midtown",vibe:"A perfect green room behind the library — Parisian chairs and quiet corners.",styles:["Nature & views","Food & cafés","Family"],moods:["calm","beautiful","quick","romantic"],best:"Late afternoon",dur:45,crowd:"Moderate",price:"Free",dress:"Anything",hours:"7am–10pm",resv:"No",photo:"The lawn toward the library facade",cafe:"Bryant Park kiosks",dinner:"Bryant Park Grill",insider:"Grab a green chair on the library side with a coffee — the best free seat in Midtown.",worth:"You want a calm, pretty pause between Midtown stops.",skip:"You want a destination — this is a lovely in-between.",badges:["Local Favorite","Quiet Luxury"],scores:{b:4,u:3,e:5,c:4,v:5,l:3},rain:false,img:"park"},
+{id:17,name:"Roosevelt Island Tram",area:"East River",vibe:"A four-minute cable-car glide over the river — the city's cheapest great view.",styles:["Hidden gems","Photography","Romantic","Family"],moods:["photo","romantic","hidden","quick","beautiful"],best:"Sunset, eastbound then back",dur:40,crowd:"Low",price:"$ (a subway swipe)",dress:"Anything",hours:"6am–2am",resv:"No",photo:"Front of the cabin, looking back at Midtown",cafe:"Granny Annie's",dinner:"Sutton Place spots",insider:"Use OMNY/MetroCard — same price as the subway for a skyline cable-car ride.",worth:"You want a delightful, cheap, uncrowded view few tourists know.",skip:"You're afraid of heights — it climbs high over the river.",badges:["Quiet Luxury","Local Favorite","Best at Sunset"],scores:{b:4,u:5,e:5,c:5,v:5,l:3},rain:true,img:"newyork"},
+{id:18,name:"The Morgan Library",area:"Murray Hill",vibe:"J.P. Morgan's private study — a jewel-box of manuscripts and gilt ceilings.",styles:["Culture","Hidden gems","Luxury"],moods:["calm","premium","culture","hidden","beautiful"],best:"Weekday afternoon",dur:75,crowd:"Low",price:"$$$",dress:"Smart",hours:"10:30am–5pm (closed Mon)",resv:"Recommended",photo:"Mr. Morgan's Study, red silk walls",cafe:"The Morgan Café",dinner:"Scarpetta nearby",insider:"The three-tiered original library room is breathtaking and almost always empty.",worth:"You love rare beauty and quiet, opulent rooms.",skip:"You want something lively or large — this is small and scholarly.",badges:["Quiet Luxury","Worth the Price","Local Favorite"],scores:{b:5,u:5,e:4,c:5,v:4,l:5},rain:true,img:"library"},
+{id:19,name:"The Battery & Sea Glass Carousel",area:"Lower Manhattan",vibe:"Harbour gardens at the island's tip, with a glowing carousel at dusk.",styles:["Nature & views","Family","Romantic"],moods:["calm","romantic","beautiful","family","quick"],best:"Sunset over the harbour",dur:60,crowd:"Moderate",price:"Free (carousel $)",dress:"Comfortable",hours:"Daily",resv:"No",photo:"Harbour rail with the Statue of Liberty beyond",cafe:"Brookfield Place cafés",dinner:"Crown Shy (FiDi)",insider:"Skip the ferry queue — enjoy the gardens and Liberty view from shore at golden hour.",worth:"You want harbour air, Liberty views and a charming dusk stroll.",skip:"You specifically want to visit the Statue — that needs a ferry ticket.",badges:["Local Favorite","Best at Sunset"],scores:{b:4,u:4,e:4,c:4,v:5,l:3},rain:false,img:"newyork"},
+{id:20,name:"Conservatory Garden",area:"Central Park (105th St)",vibe:"Central Park's only formal garden — wisteria, fountains, and almost no one.",styles:["Hidden gems","Romantic","Wellness","Nature & views"],moods:["calm","romantic","hidden","beautiful","wellness"],best:"Late spring morning",dur:45,crowd:"Low",price:"Free",dress:"Comfortable",hours:"8am–dusk",resv:"No",photo:"The Italian garden's wisteria pergola",cafe:"Clarke's on 5th",dinner:"Le Veau d'Or",insider:"Enter at the Vanderbilt Gate (105th & 5th) — a designated quiet zone, genuinely peaceful.",worth:"You want a secret, formal, romantic corner with no crowds.",skip:"It's mid-winter — beds are bare; come spring–autumn.",badges:["Quiet Luxury","Best for Couples","Local Favorite"],scores:{b:5,u:5,e:4,c:5,v:5,l:4},rain:false,img:"garden"}
+];
+let PLACES=PLACES_INLINE.slice(), PB={}; PLACES.forEach(p=>PB[p.id]=p);
+let placesLoaded=false;
+async function loadPlaces(){ if(placesLoaded) return; try{ const r=await fetch("./places.json?_="+Date.now()); const d=await r.json(); if(Array.isArray(d)&&d.length){ PLACES=d; PB={}; PLACES.forEach(p=>PB[p.id]=p); } }catch(e){} placesLoaded=true; }
+const PD_TEMPLATES={"Romantic evening":[["",20],["",8],["",13]],"Quiet & restorative":[["",14],["",5],["",20]],"Iconic first-timer":[["",9],["",3],["",10]],"Art & culture":[["",2],["",7],["",18]],"Golden-hour photo":[["",4],["",3],["",6]]};
+const PD_TIMES={Relaxed:["10:30 AM","1:30 PM","5:30 PM"],Balanced:["10:00 AM","1:00 PM","4:30 PM"],Packed:["9:30 AM","12:30 PM","3:30 PM"]};
+const LS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+let prof=LS("pl_prof")||{styles:[],pace:""}, saved=LS("pl_saved")||{};
+let mood="all",trap=false,lux=false,pview="home",isWet=false,pdMood="Romantic evening",pick=new Set();
+let WXCACHE=null;
+const R=()=>document.getElementById("places");
+const plImg=p=>"https://loremflickr.com/640/480/"+p.img+"?lock="+p.id;
+const saveLS=()=>{localStorage.setItem("pl_prof",JSON.stringify(prof));localStorage.setItem("pl_saved",JSON.stringify(saved));};
+
+function enterPlaces(){ try{ hideScreens(); R().classList.remove("hidden"); window.scrollTo(0,0); if(prof.styles&&prof.styles.length){ renderShell(); } else { renderOnb(); } }catch(e){ console.error(e); } }
+window.plEnter=enterPlaces;
+
+function renderOnb(){ pick=new Set(prof.styles||[]);
+  R().innerHTML='<div class="ponb"><div class="ponbox"><div class="peye">Welcome</div><h2>How do you like to explore?</h2><p>Choose a few. We\'ll quietly shape everything around them.</p><div class="popts">'+STYLES.map(s=>'<button class="popt'+(pick.has(s)?" on":"")+'" data-style="'+s+'">'+s+'</button>').join("")+'</div><button class="ponbtn" data-act="onbNext"'+(pick.size?'':' disabled')+'>Continue</button><button class="pskip" data-act="onbSkip">Skip for now</button></div></div>';
+}
+function renderPace(){
+  R().innerHTML='<div class="ponb"><div class="ponbox"><div class="peye">Almost there</div><h2>What pace do you prefer?</h2><p>Luxury is rarely rushed.</p><div class="popts">'+["Relaxed","Balanced","Packed itinerary"].map(p=>'<button class="popt'+((prof.pace&&p.indexOf(prof.pace)===0)?" on":"")+'" data-pace="'+p+'">'+p+'</button>').join("")+'</div><button class="ponbtn" data-act="onbDone"'+(prof.pace?'':' disabled')+'>Enter</button><button class="pskip" data-act="onbSkip">Skip for now</button></div></div>';
+}
+function renderShell(){
+  R().innerHTML='<div class="pwrap"><div class="ptop"><div class="pbrand">Screening Room <span>· Places</span></div><div class="pnav"><button data-nav="hub">← Hub</button><button data-nav="home" class="'+(pview==="home"?"on":"")+'">Discover</button><button data-nav="saved" class="'+(pview==="saved"?"on":"")+'">Saved</button><button class="ptoggle'+(trap?" on":"")+'" data-act="trap">Avoid tourist traps</button></div></div><div id="pBody"></div></div><div class="pov" id="pDetail"></div><div class="pov" id="pPd"></div>';
+  renderBody();
+}
+function greetTxt(){ const h=new Date().getHours(); return (h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", Rohan."; }
+function subTxt(){ const h=new Date().getHours(); return h<12?"Three quiet, beautiful ways to begin your day in New York.":h<17?"A few handpicked ways to spend your afternoon.":"Three beautiful ways to spend your evening."; }
+function renderBody(){
+  if(pview==="saved"){ renderSaved(); return; }
+  document.getElementById("pBody").innerHTML='<div class="pgreet"><h1>'+greetTxt()+'</h1><div class="psub">'+subTxt()+'</div><div class="pwx" id="pWx">'+(WXCACHE||"Reading the New York sky…")+'</div></div><div class="pmoods">'+MOODS.map(m=>'<button class="pmood'+(m[0]===mood?" on":"")+'" data-mood="'+m[0]+'">'+m[1]+'</button>').join("")+'</div><div class="pdrow"><button class="pdbtn" data-act="pd">✦ Design my perfect day</button><button class="ptoggle'+(lux?" on":"")+'" data-act="lux">Luxury nearby</button></div><div id="pSections"></div>';
+  renderSections(); loadWeather();
+}
+function match(p){
+  if(trap && p.badges.includes("Tourist Heavy")) return false;
+  if(lux && !(p.styles.includes("Luxury")||p.badges.includes("Quiet Luxury")||p.badges.includes("Worth the Price"))) return false;
+  if(mood==="all") return true;
+  if(mood==="quick") return p.dur<=90;
+  if(mood==="avoid-crowds") return p.crowd==="Low";
+  if(mood==="classy") return p.styles.includes("Nightlife")||p.styles.includes("Luxury")||p.badges.includes("Quiet Luxury");
+  return p.moods.includes(mood);
+}
+function pcard(p){ const b=p.badges[0]?'<div class="pbadge">'+p.badges[0]+'</div>':''; const dot=saved[p.id]?'<div class="psaveDot">✓</div>':''; const sc=Math.round((p.scores.b+p.scores.u+p.scores.v+p.scores.l)/4*10)/5; return '<div class="pcard" data-place="'+p.id+'"><div class="pph"><img loading="lazy" src="'+plImg(p)+'" alt="">'+b+dot+'<div class="pscore">Worth it '+sc.toFixed(1)+'</div></div><div class="pcb"><div class="parea">'+p.area+'</div><h3>'+p.name+'</h3><div class="pvibe">'+p.vibe+'</div><div class="pmeta"><span><b>'+p.dur+' min</b></span><span>'+p.crowd+' crowd</span><span>'+p.price+'</span></div></div></div>'; }
+function shelf(t,l,n){ if(!l.length) return ""; return '<div class="psection"><div class="psh"><h2>'+t+'</h2>'+(n?'<span class="pmore">'+n+'</span>':'')+'</div><div class="pgrid">'+l.map(pcard).join("")+'</div></div>'; }
+function renderSections(){ const host=document.getElementById("pSections"); if(!host) return; const base=PLACES.filter(match);
+  if(mood!=="all"){ const lbl=MOODS.find(m=>m[0]===mood)[1]; host.innerHTML=shelf(lbl,base)||'<div class="pempty">Nothing matches — try another mood.</div>'; return; }
+  const byStyle=base.filter(p=>p.styles.some(s=>prof.styles.includes(s)));
+  const out=[]; out.push(shelf("Handpicked for you",(byStyle.length?byStyle:base).slice(0,6),"based on your taste"));
+  if(isWet) out.push(shelf("Rain-friendly today",base.filter(p=>p.rain).slice(0,6),"stay dry, stay beautiful"));
+  else out.push(shelf("Best at golden hour",base.filter(p=>p.badges.includes("Best at Sunset")).slice(0,6),"plan around the light"));
+  out.push(shelf("Quiet luxury — less touristy",base.filter(p=>p.crowd==="Low").slice(0,6),"where locals go"));
+  out.push(shelf("Perfect for two hours",base.filter(p=>p.dur<=90).slice(0,6),"a beautiful in-between"));
+  host.innerHTML=out.join("")||'<div class="pempty">Nothing matches — loosen a filter.</div>';
+}
+function renderSaved(){ document.getElementById("pBody").innerHTML='<div class="pgreet"><h1>Saved</h1><div class="psub">Your collection — places kept for the right moment.</div></div><div class="psection"><div class="pgrid" id="pSaved"></div></div>'; const ids=Object.keys(saved).map(Number); document.getElementById("pSaved").innerHTML=ids.length?ids.map(id=>pcard(PB[id])).join(""):'<div class="pempty">Nothing saved yet — tap ♡ on a place you love.</div>'; }
+async function loadWeather(){ try{ const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.006&current=temperature_2m,weather_code&temperature_unit=fahrenheit"); const d=await r.json(); const c=d.current.weather_code,t=Math.round(d.current.temperature_2m),wx=WX[c]||["","🌡"]; isWet=[51,53,55,61,63,65,80,81,82,95,71,73,75].includes(c); const note=isWet?"a fine evening for galleries and grand interiors.":t>=60?"a beautiful evening for a rooftop or a park.":"crisp — bundle up for that skyline view."; WXCACHE=wx[1]+' &nbsp;<b>'+t+'°·'+wx[0]+'</b>&nbsp; New York — '+note; const w=document.getElementById("pWx"); if(w) w.innerHTML=WXCACHE; renderSections(); }catch(e){} }
+function fct(k,v){ return '<div class="pfact"><div class="pk">'+k+'</div><div class="pv">'+v+'</div></div>'; }
+function scb(k,v){ return '<div class="psc"><div class="pk">'+k+'</div><div class="pbar"><div class="pfill" style="width:'+(v*20)+'%"></div></div></div>'; }
+function openDetail(id){ const p=PB[id], s=!!saved[id]; document.getElementById("pDetail").innerHTML='<div class="psheet"><div class="phero"><img src="'+plImg(p)+'" alt=""><button class="px" data-pclose="pDetail">×</button><div class="phtext"><div class="pharea">'+p.area+'</div><h2>'+p.name+'</h2><div class="phvibe">'+p.vibe+'</div></div></div><div class="psbody"><div class="pbadges">'+p.badges.map(b=>'<span class="pbpill">'+b+'</span>').join("")+'</div><div class="pfacts">'+fct("Best time",p.best)+fct("Ideal duration",p.dur+" minutes")+fct("Crowd level",p.crowd)+fct("Price",p.price)+fct("Dress code",p.dress)+fct("Hours",p.hours)+fct("Reservation",p.resv)+fct("Best photo",p.photo)+'</div><div class="pverdict"><div class="pv1"><b>Worth it if</b>'+p.worth+'</div><div class="pv2"><b>Skip if</b>'+p.skip+'</div></div><div class="pinsider"><b>Insider tip</b>'+p.insider+'</div><div class="pscores">'+scb("Beauty",p.scores.b)+scb("Unique",p.scores.u)+scb("Ease",p.scores.e)+scb("Calm",p.scores.c)+scb("Value",p.scores.v)+scb("Luxury",p.scores.l)+'</div><div class="pnearby"><b>Coffee nearby:</b> '+p.cafe+'<br><b>Dinner after:</b> '+p.dinner+'</div><div class="psact"><button class="'+(s?"on":"")+'" data-save="'+id+'">'+(s?"✓ Saved":"♡ Save")+'</button><button data-map="'+encodeURIComponent(p.name+" New York")+'">Open in Maps</button></div></div></div>'; document.getElementById("pDetail").classList.add("show"); }
+function openPd(){ const pace=prof.pace||"Balanced", themes=Object.keys(PD_TEMPLATES); if(!themes.includes(pdMood)) pdMood=themes[0]; const ids=PD_TEMPLATES[pdMood], times=PD_TIMES[pace]||PD_TIMES.Balanced; const steps=ids.map(function(pair,i){const p=PB[pair[1]];return '<div class="pstep"><div class="pdot"></div><div class="pt">'+times[i]+'</div><div class="pd"><h4>'+p.name+'</h4><p>'+p.vibe+'</p></div></div>';}).join("")+'<div class="pstep"><div class="pdot"></div><div class="pt">'+(pace==="Packed"?"7:30 PM":"8:00 PM")+'</div><div class="pd"><h4>Dinner</h4><p>'+PB[ids[2][1]].dinner+' — near your last stop.</p></div></div>'; const outfit=isWet?"Bring a handsome umbrella and a layer.":"Light layers; comfortable shoes for the walks."; const wxnote=isWet?"Rain expected — this plan leans on covered, beautiful interiors.":"Clear skies — your golden-hour stops will shine."; document.getElementById("pPd").innerHTML='<div class="pdsheet"><div class="pdhead"><button class="px" data-pclose="pPd">×</button><h2>Your perfect day</h2><div class="pdsub">'+pace+' pace · New York</div></div><div class="pdctrl">'+themes.map(t=>'<button class="'+(t===pdMood?"on":"")+'" data-pdtheme="'+t+'">'+t+'</button>').join("")+'</div><div class="ptl">'+steps+'</div><div class="pdfoot"><b>Outfit:</b> '+outfit+'<br><b>Weather:</b> '+wxnote+'<br><b>Tip:</b> book your sunset stop and dinner now — the rest is walk-up.</div></div>'; document.getElementById("pPd").classList.add("show"); }
+
+document.addEventListener("click", function(e){
+  if(!e.target.closest("#places")) return;
+  const t=e.target;
+  if(t.classList && t.classList.contains("pov")){ t.classList.remove("show"); return; }
+  const st=t.closest("[data-style]"); if(st){ const s=st.dataset.style; if(pick.has(s)){pick.delete(s);st.classList.remove("on");}else{pick.add(s);st.classList.add("on");} const b=R().querySelector('[data-act="onbNext"]'); if(b) b.disabled=pick.size===0; return; }
+  const pc=t.closest("[data-pace]"); if(pc){ R().querySelectorAll("[data-pace]").forEach(x=>x.classList.remove("on")); pc.classList.add("on"); prof.pace=pc.dataset.pace.replace(" itinerary",""); const b=R().querySelector('[data-act="onbDone"]'); if(b) b.disabled=false; return; }
+  const act=t.closest("[data-act]"); if(act){ const a=act.dataset.act;
+    if(a==="onbNext"){ prof.styles=[...pick]; renderPace(); }
+    else if(a==="onbDone"){ if(!prof.pace) prof.pace="Balanced"; saveLS(); renderShell(); }
+    else if(a==="onbSkip"){ if(!prof.styles.length) prof.styles=["Iconic","Hidden gems","Romantic"]; if(!prof.pace) prof.pace="Balanced"; saveLS(); renderShell(); }
+    else if(a==="trap"){ trap=!trap; renderShell(); }
+    else if(a==="lux"){ lux=!lux; renderBody(); }
+    else if(a==="pd"){ openPd(); }
+    return; }
+  const nav=t.closest("[data-nav]"); if(nav){ const n=nav.dataset.nav; if(n==="hub"){ R().classList.add("hidden"); showHub(); } else { pview=n; renderShell(); } return; }
+  const md=t.closest("[data-mood]"); if(md){ mood=md.dataset.mood; renderBody(); return; }
+  const pdt=t.closest("[data-pdtheme]"); if(pdt){ pdMood=pdt.dataset.pdtheme; openPd(); return; }
+  const cl=t.closest("[data-pclose]"); if(cl){ const ov=document.getElementById(cl.dataset.pclose); if(ov) ov.classList.remove("show"); return; }
+  const sv=t.closest("[data-save]"); if(sv){ const id=+sv.dataset.save; if(saved[id]) delete saved[id]; else saved[id]={at:Date.now()}; saveLS(); openDetail(id); if(pview==="saved") renderSaved(); else renderSections(); return; }
+  const mp=t.closest("[data-map]"); if(mp){ window.open("https://www.google.com/maps/search/?api=1&query="+mp.dataset.map,"_blank"); return; }
+  const cd=t.closest("[data-place]"); if(cd){ openDetail(+cd.dataset.place); return; }
+});
+})();
+
+/* ===== TMDB ===== */
+async function tmdb(path, params){
+  const url=new URL("https://api.themoviedb.org/3/"+path);
+  url.searchParams.set("api_key",TMDB_KEY);
+  Object.keys(params||{}).forEach(k=>url.searchParams.set(k,params[k]));
+  const r=await fetch(url.toString()); if(!r.ok) throw new Error("TMDB "+r.status); return r.json();
+}
+function mapTmdb(it, mt){
+  const date=it.release_date||it.first_air_date;
+  return {tmdb_id:it.id,media_type:mt,title:it.title||it.name,year:yearOf(date),genres:genreNames(it,mt),poster_path:it.poster_path||null,vote_average:it.vote_average||null,popularity:it.popularity||null,release_date:date||null};
+}
+async function loadCatalogFile(){
+  try{ const r=await fetch("./catalog.json?_="+Date.now()); CATALOG_FILE=await r.json(); }
+  catch(e){ CATALOG_FILE=[]; }
+}
+function loadDiscover(){
+  if(vertical==="dining") return renderDiningDiscover();
+  const grid=el("discoverGrid");
+  if(searchQ.length>1) return liveSearch();
+  if(!CATALOG_FILE.length){ grid.innerHTML='<div class="empty">Catalog is loading… <b>try a search</b> to pull live from TMDB.</div>'; el("discoverCount").textContent=""; return; }
+  let items=CATALOG_FILE.filter(c=>{
+    if(filterType!=="all"&&c.media_type!==filterType) return false;
+    if(filterGenre!=="all"&&!(c.genres||[]).includes(filterGenre)) return false;
+    return true;
+  }).sort((a,b)=>(b.popularity||0)-(a.popularity||0)).slice(0,120).map(asItem);
+  renderGrid(items);
+}
+async function liveSearch(){
+  const grid=el("discoverGrid"); grid.innerHTML='<div class="empty">Searching TMDB…</div>';
+  try{
+    const res=await tmdb("search/multi",{query:searchQ,include_adult:"false",page:1});
+    let items=(res.results||[]).filter(r=>r.media_type==="movie"||r.media_type==="tv").map(r=>asItem(mapTmdb(r,r.media_type)));
+    if(filterType!=="all") items=items.filter(i=>i.media_type===filterType);
+    if(filterGenre!=="all") items=items.filter(i=>(i.genres||[]).includes(filterGenre));
+    renderGrid(items);
+  }catch(e){ grid.innerHTML='<div class="empty">Search failed: '+e.message+'</div>'; }
+}
+
+/* ===== TRACKED ITEMS ===== */
+async function loadTracked(){
+  tracked={};
+  const {data,error}=await sb.from("tracked_items").select("*").eq("vertical",vertical);
+  if(!error&&data){ data.forEach(r=>tracked[r.media_type+":"+r.tmdb_id]=r); }
+}
+async function setStatus(item, status){
+  const k=item.media_type+":"+item.tmdb_id, existing=tracked[k];
+  if(existing&&existing.status===status){
+    await sb.from("tracked_items").delete().eq("id",existing.id); delete tracked[k];
+  } else {
+    const row={vertical,tmdb_id:String(item.tmdb_id),media_type:item.media_type,title:item.title,year:item.year,genres:item.genres,poster_path:item.poster_path,status,updated_at:new Date().toISOString()};
+    if(existing){ row.rating=existing.rating; row.answers=existing.answers; row.rated_at=existing.rated_at; }
+    const {data}=await sb.from("tracked_items").upsert(Object.assign({user_id:session.user.id},row),{onConflict:"user_id,tmdb_id,media_type"}).select().maybeSingle();
+    tracked[k]=data||Object.assign({id:existing&&existing.id},row);
+  }
+  refresh();
+}
+async function saveWatched(item, rating, answers){
+  const k=item.media_type+":"+item.tmdb_id;
+  const row={user_id:session.user.id,vertical,tmdb_id:String(item.tmdb_id),media_type:item.media_type,title:item.title,year:item.year,genres:item.genres,poster_path:item.poster_path,status:"watched",rating,answers,rated_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+  const {data}=await sb.from("tracked_items").upsert(row,{onConflict:"user_id,tmdb_id,media_type"}).select().maybeSingle();
+  tracked[k]=data||row; refresh();
+}
+
+/* ===== CARDS ===== */
+function posterHTML(item){
+  const t=tracked[item.media_type+":"+item.tmdb_id];
+  const ratingBadge=(t&&t.status==="watched"&&t.rating!=null)?'<div class="badge-rating">'+Number(t.rating).toFixed(1)+'</div>':"";
+  const voteBadge=item.vote_average?'<div class="badge-vote">★ '+Number(item.vote_average).toFixed(1)+'</div>':"";
+  const typeBadge='<div class="ptype">'+(item.media_type==="tv"?"TV":"Film")+'</div>';
+  let bg;
+  if(item.poster_path){ bg='<img loading="lazy" src="'+IMG+item.poster_path+'" alt="">'; }
+  else{ const g=(item.genres&&item.genres[0])||""; const c=colorFor(g); bg='<div class="fallback" style="background:linear-gradient(150deg,'+c[0]+','+c[1]+')"></div>'; }
+  const meta=item.year?'<div class="pmeta">'+item.year+'</div>':'';
+  const scrim='<div class="pscrim"><div class="ptitle">'+item.title+'</div>'+meta+'</div>';
+  return '<div class="poster">'+bg+typeBadge+voteBadge+ratingBadge+scrim+'</div>';
+}
+function statusButtons(item){
+  const t=tracked[item.media_type+":"+item.tmdb_id], s=t?t.status:null;
+  const dine=item.media_type==="dining";
+  const L=dine?{want:"Want to go",watching:"Booked",watched:"Been"}:{want:"Watchlist",watching:"Watching",watched:"Watched"};
+  return '<div class="statusrow" data-key="'+item.media_type+":"+item.tmdb_id+'">'
+    +'<button class="want '+(s==="want"?"on":"")+'" data-s="want">'+L.want+'</button>'
+    +'<button class="watching '+(s==="watching"?"on":"")+'" data-s="watching">'+L.watching+'</button>'
+    +'<button class="watched '+(s==="watched"?"on":"")+'" data-s="watched">'+L.watched+'</button></div>';
+}
+function cardHTML(item){
+  if(item.media_type==="dining") return diningCardHTML(item);
+  const gl=(item.genres&&item.genres.length)?item.genres.slice(0,3).join(" · "):"";
+  const gline=gl?'<div class="cgenres">'+gl+'</div>':'';
+  return '<div class="card">'+posterHTML(item)+'<div class="cbody">'+gline+statusButtons(item)+'</div></div>';
+}
+function asItem(r){ return {tmdb_id:r.tmdb_id,media_type:r.media_type,title:r.title,year:r.year,genres:r.genres||[],poster_path:r.poster_path,vote_average:r.vote_average,popularity:r.popularity}; }
+
+/* ===== DISCOVER render ===== */
+const ALL_GENRES=[...new Set([...Object.values(GENRES_MOVIE),...Object.values(GENRES_TV)])].sort();
+function initGenreSelect(){ el("genreSel").innerHTML='<option value="all">All genres</option>'+ALL_GENRES.map(g=>'<option value="'+g+'">'+g+'</option>').join(""); }
+function renderGrid(items){
+  const grid=el("discoverGrid"); viewIndex={};
+  items.forEach(it=>viewIndex[it.media_type+":"+it.tmdb_id]=it);
+  grid.innerHTML=items.length?items.map(cardHTML).join(""):'<div class="empty">No results found.</div>';
+  el("discoverCount").textContent=items.length+" "+(vertical==="dining"?"places":(searchQ.length>1?"results":"titles"));
+}
+
+/* ===== LIBRARY ===== */
+let libStatus="watched";
+function renderLibrary(){
+  const body=el("libraryBody");
+  const items=Object.values(tracked).filter(t=>t.status===libStatus);
+  const dine=vertical==="dining";
+  el("libCount").textContent=items.length+" "+(dine?"place":"title")+(items.length===1?"":"s");
+  if(!items.length){
+    const lE={watched:"watched",watching:"currently watching",want:"on your watchlist"};
+    const lD={watched:"visited",watching:"booked",want:"on your go-to list"};
+    body.innerHTML='<div class="empty">Nothing '+(dine?lD:lE)[libStatus]+' yet.<br><b>Head to Discover</b> to add '+(dine?"places":"titles")+'.</div>'; return;
+  }
+  // Build lookup combining viewIndex and dCurrentResults cache
+  const liveCache={};
+  dCurrentResults.forEach(r=>{ liveCache["dining:"+r.tmdb_id]=r; });
+  const groups={};
+  items.forEach(t=>{ const g=(t.genres&&t.genres[0])||"Other"; (groups[g]=groups[g]||[]).push(t); });
+  body.innerHTML=Object.keys(groups).sort().map(g=>{
+    const c=dine?dacc(g):colorFor(g); let arr=groups[g].slice();
+    if(libStatus==="watched") arr.sort((x,y)=>(y.rating||0)-(x.rating||0)); else arr.sort((x,y)=>(y.year||0)-(x.year||0));
+    return '<div class="shelf"><h2><span class="dot" style="background:linear-gradient(135deg,'+c[0]+','+c[1]+')"></span>'+g+' <span class="n">'+arr.length+'</span></h2><div class="grid">'+arr.map(function(t){
+      if(dine){
+        const k="dining:"+t.tmdb_id;
+        const src=viewIndex[k]||liveCache[k]||DINING_BY_ID[t.tmdb_id];
+        const base={tmdb_id:t.tmdb_id,media_type:"dining",title:t.title,year:null,genres:t.genres||[],poster_path:null};
+        return cardHTML(src?Object.assign({},base,src):base);
+      }
+      return cardHTML(asItem(t));
+    }).join("")+'</div></div>';
+  }).join("");
+}
+
+/* ===== STATS ===== */
+function renderStats(){
+  const vals=Object.values(tracked), watched=vals.filter(t=>t.status==="watched");
+  const watching=vals.filter(t=>t.status==="watching").length, want=vals.filter(t=>t.status==="want").length;
+  const rated=watched.filter(t=>t.rating!=null);
+  const avg=rated.length?rated.reduce((s,t)=>s+Number(t.rating),0)/rated.length:0;
+  let top="—"; if(rated.length) top=rated.slice().sort((a,b)=>Number(b.rating)-Number(a.rating))[0].title;
+  const dine=vertical==="dining";
+  el("statCards").innerHTML=
+     '<div class="stat"><div class="v">'+watched.length+'</div><div class="l">'+(dine?"Been":"Watched")+'</div></div>'
+    +'<div class="stat"><div class="v">'+watching+'</div><div class="l">'+(dine?"Booked":"Watching now")+'</div></div>'
+    +'<div class="stat"><div class="v">'+want+'</div><div class="l">'+(dine?"Want to go":"On watchlist")+'</div></div>'
+    +'<div class="stat"><div class="v">'+(avg?avg.toFixed(1):"–")+'</div><div class="l">Avg rating /10</div></div>';
+  const gc={};
+  watched.forEach(t=>(t.genres||[]).forEach(g=>gc[g]=(gc[g]||0)+1));
+  const entries=Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,8), max=entries.length?entries[0][1]:1;
+  const bars=el("genreBars");
+  if(!watched.length){ bars.innerHTML='<h3>Your taste</h3><div class="empty" style="padding:30px">'+(dine?"Mark a few visits to see your taste profile.":"Rate a few watched titles to see your taste profile.")+'</div>'; return; }
+  bars.innerHTML='<h3>'+(dine?"What you go for most":"What you watch most")+' '+(top!=="—"?'· top pick: <span style="color:#c4b5fd">'+top+'</span>':'')+'</h3>'
+    +entries.map(function(en){ const g=en[0],n=en[1],c=dine?dacc(g):colorFor(g);
+      return '<div class="bar"><div class="bl">'+g+'</div><div class="btrack"><div class="bfill" style="width:'+Math.round(n/max*100)+'%;background:linear-gradient(90deg,'+c[0]+','+c[1]+')"></div></div><div class="bn">'+n+'</div></div>'; }).join("");
+}
+
+/* ===== CLICK HANDLER ===== */
+document.body.addEventListener("click", function(e){
+  // Open detail screen when clicking a dining card body (not status buttons)
+  if(vertical==="dining" && !e.target.closest(".statusrow") && !e.target.closest(".det-similar-card")){
+    const card=e.target.closest(".card");
+    if(card){
+      const sr=card.querySelector(".statusrow");
+      if(sr){
+        const k=sr.dataset.key, parts=k.split(":");
+        let item=viewIndex[k];
+        if(!item){ const lc={}; dCurrentResults.forEach(r=>{lc["dining:"+r.tmdb_id]=r;}); item=lc[k]; }
+        if(!item){ const numId=parseInt(parts[1],10); item=DINING_BY_ID[numId]||DINING_BY_ID[parts[1]]; }
+        if(!item&&tracked[k]) item={tmdb_id:parts[1],media_type:"dining",title:tracked[k].title,year:null,genres:tracked[k].genres||[],poster_path:null};
+        if(item){ openDetailScreen(item); return; }
+      }
+    }
+  }
+  const btn=e.target.closest(".statusrow button"); if(!btn) return;
+  const k=btn.parentElement.dataset.key, s=btn.dataset.s, inTracked=tracked[k];
+  let item=viewIndex[k];
+  if(!item){ const liveCache={}; dCurrentResults.forEach(r=>{liveCache["dining:"+r.tmdb_id]=r;}); item=liveCache[k]; }
+  if(!item&&inTracked) item=asItem(inTracked);
+  if(!item){ const card=btn.closest(".card"), tn=card.querySelector(".ptitle"), parts=k.split(":");
+    item={media_type:parts[0],tmdb_id:parts[1],title:tn?tn.textContent:"",year:null,genres:[],poster_path:null}; }
+  if(s==="watched"){ if(inTracked&&inTracked.status==="watched"){ setStatus(item,"watched"); return; } openRatingModal(item); return; }
+  setStatus(item,s);
+});
+
+/* ===== RATING MODAL ===== */
+let modalItem=null, answers={};
+function openRatingModal(item){
+  modalItem=item; answers={};
+  const dine=item.media_type==="dining";
+  curQuestions=dine?QUESTIONS_DINE:QUESTIONS;
+  el("modalSave").textContent=dine?"Mark as Been":"Save to Watched";
+  el("modalTitle").textContent=item.title+(item.year?(" ("+item.year+")"):"");
+  el("modalQuestions").innerHTML=curQuestions.map(function(q){
+    return '<div class="q"><div class="ql">'+q.label+'</div><div class="opts">'+q.opts.map(function(o){ return '<label><input type="radio" name="'+q.id+'" value="'+o[1]+'"> '+o[0]+'</label>'; }).join("")+'</div></div>';
+  }).join("");
+  updateLive(); el("overlay").classList.add("show");
+}
+function updateLive(){
+  const answered=Object.keys(answers).length, total=curQuestions.length, raw=Object.values(answers).reduce((s,v)=>s+v,0);
+  if(answered===total){ el("liveScore").textContent=raw.toFixed(1); el("liveStars").textContent=starsSimple(raw); el("modalSave").disabled=false; }
+  else { el("liveScore").textContent=answered+"/"+total; el("liveStars").textContent=starsSimple(raw); el("modalSave").disabled=true; }
+}
+el("modalQuestions").addEventListener("change", function(e){
+  if(e.target.name){ answers[e.target.name]=parseInt(e.target.value,10);
+    const opts=e.target.closest(".opts"); opts.querySelectorAll("label").forEach(l=>l.classList.remove("sel")); e.target.closest("label").classList.add("sel"); updateLive(); }
+});
+el("modalSave").addEventListener("click", async function(){
+  if(Object.keys(answers).length<curQuestions.length) return;
+  const rating=Object.values(answers).reduce((s,v)=>s+v,0);
+  el("modalSave").disabled=true; await saveWatched(modalItem,rating,answers); closeModal();
+});
+function closeModal(){ el("overlay").classList.remove("show"); modalItem=null; answers={}; }
+el("modalCancel").addEventListener("click", closeModal);
+el("overlay").addEventListener("click", function(e){ if(e.target.id==="overlay") closeModal(); });
+
+/* ===== TABS / CONTROLS ===== */
+function showTab(t){
+  tab=t;
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));
+  el("discover").classList.toggle("hidden",t!=="discover");
+  el("library").classList.toggle("hidden",t!=="library");
+  el("stats").classList.toggle("hidden",t!=="stats");
+  if(t==="discover") loadDiscover();
+  if(t==="library") renderLibrary();
+  if(t==="stats") renderStats();
+}
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+el("typeSeg").addEventListener("click",function(e){ const b=e.target.closest("button"); if(!b) return; filterType=b.dataset.type; document.querySelectorAll("#typeSeg button").forEach(x=>x.classList.toggle("active",x===b)); loadDiscover(); });
+el("libSeg").addEventListener("click",function(e){ const b=e.target.closest("button"); if(!b) return; libStatus=b.dataset.status; document.querySelectorAll("#libSeg button").forEach(x=>x.classList.toggle("active",x===b)); renderLibrary(); });
+el("genreSel").addEventListener("change",function(e){ filterGenre=e.target.value; loadDiscover(); });
+let searchTimer=null;
+el("search").addEventListener("input",function(e){ searchQ=e.target.value.trim(); clearTimeout(searchTimer); searchTimer=setTimeout(loadDiscover,350); });
+el("cuisineSel").addEventListener("change",function(e){ diningCuisine=e.target.value; if(dMode==="all") renderDiningCatalog(); });
+el("occasionSel").addEventListener("change",function(e){ diningOccasion=e.target.value; if(dMode==="all") renderDiningCatalog(); });
+el("ropeSel").addEventListener("change",function(e){ diningRope=e.target.value; if(dMode==="all") renderDiningCatalog(); });
+
+/* Dining discover mode selector */
+el("dModeSeg").addEventListener("click",function(e){
+  const b=e.target.closest("button"); if(!b) return;
+  dMode=b.dataset.dmode;
+  document.querySelectorAll("#dModeSeg button").forEach(x=>x.classList.toggle("active",x===b));
+  searchQ=""; el("search").value="";
+  if(tab==="discover") renderDiningDiscover();
+});
+
+function refresh(){
+  if(tab==="discover"){ if(vertical==="dining") renderDiningDiscover(); else if(searchQ.length>1) renderGrid(Object.values(viewIndex)); else loadDiscover(); }
+  if(tab==="library") renderLibrary();
+  if(tab==="stats") renderStats();
+}
+
+/* ===== DETAIL SCREEN ===== */
+let detailItem=null, detailRecommend=[];
+const RECOMMEND_TAGS=["Must try","Romantic","Great for groups","Date night","Business lunch","Hidden gem","Worth the splurge","Take visitors here"];
+
+function openDetailScreen(item){
+  detailItem=item; detailRecommend=[];
+  hideScreens();
+  el("detail").classList.remove("hidden");
+  // Reset state
+  el("detPhotos").innerHTML='<div class="det-photo-placeholder">Loading photos…</div>';
+  el("detInfoBlock").className="det-info-block";
+  el("detInfoBlock").innerHTML="";
+  el("detReviewsBlock").className="det-reviews-block";
+  el("detReviewsBlock").innerHTML="";
+  el("detReserve").classList.add("hidden-link");
+  window.scrollTo(0,0);
+  renderDetailBase(item);
+  // Fetch live details from Google Places
+  if(item.isGooglePlace&&item.id) fetchAndRenderPlaceDetails(item.id, item);
+  else if(mapsLoaded) fetchCuratedPlaceDetails(item);
+  else el("detPhotos").innerHTML='<img src="'+foodImg(item)+'" style="height:280px;min-width:100%;object-fit:cover">';
+  loadSimilarRestaurants(item);
+}
+
+function renderDetailBase(item){
+  const r=DINING_BY_ID[item.tmdb_id]||item;
+  const t=tracked["dining:"+item.tmdb_id];
+  const price="$".repeat(r.price||0);
+  const meta=[r.cuisine,r.neighborhood,r.borough].filter(Boolean).join(" · ")+(price?" · "+price:"");
+  // Title block
+  let html=(r.recognition?'<div class="dt-recog">'+r.recognition+'</div>':'')
+    +'<div class="dt-name">'+r.name+'</div>'
+    +'<div class="dt-meta"><span>'+meta+'</span>'
+    +(r.rope?'<span class="rope r'+r.rope+'" style="position:static;font-size:10px">'+ROPE[r.rope]+'</span>':'')
+    +'</div>'
+    +(r.blurb?'<div class="dt-blurb">'+r.blurb+'</div>':'')
+    +(r.signature?'<div class="dsig" style="margin-bottom:14px"><span>Order</span> '+r.signature+'</div>':'');
+  const chips=(r.format?'<span class="fchip">'+r.format+'</span>':'')+((r.occasion||[]).map(o=>'<span class="ochip">'+o+'</span>').join(""));
+  if(chips) html+='<div class="det-chips">'+chips+'</div>';
+  el("detTitleBlock").innerHTML=html;
+  // Status buttons
+  const s=t?t.status:null;
+  el("detStatusWrap").innerHTML=
+    '<button class="want '+(s==="want"?"on":"")+'" data-ds="want">Want to go</button>'
+    +'<button class="watching '+(s==="watching"?"on":"")+'" data-ds="watching">Booked</button>'
+    +'<button class="watched '+(s==="watched"?"on":"")+'" data-ds="watched">Been here</button>';
+  el("detStatusWrap").querySelectorAll("button").forEach(b=>{
+    b.addEventListener("click",async function(){
+      if(b.dataset.ds==="watched"){
+        const tk=tracked["dining:"+item.tmdb_id];
+        if(tk&&tk.status==="watched"){ await setStatus(item,"watched"); renderDetailBase(item); return; }
+        openRatingModal(item);
+        return;
+      }
+      await setStatus(item,b.dataset.ds);
+      renderDetailBase(item);
+    });
+  });
+  // Notes section
+  renderNotesSection(item, t);
+}
+
+function renderNotesSection(item, t){
+  const meta=(t&&t.meta)?t.meta:{};
+  const tags=meta.recommend||[];
+  detailRecommend=[...tags];
+  el("detNotesBlock").innerHTML=
+    '<div class="det-section-head">Your notes</div>'
+    +'<textarea id="detNotes" placeholder="How was it? Any thoughts…">'+((meta.notes)||"")+'</textarea>'
+    +'<input type="text" id="detDishNotes" placeholder="Standout dishes (e.g. the duck, black truffle pasta)" value="'+((meta.dish_notes)||"")+'">'
+    +'<input type="text" id="detWentWith" placeholder="Who did you go with?" value="'+((meta.went_with)||"")+'">'
+    +'<div class="det-section-head" style="margin-top:4px">Tag it</div>'
+    +'<div class="det-recommend-wrap">'+RECOMMEND_TAGS.map(tag=>'<span class="rtag'+(tags.includes(tag)?" on":"")+'" data-tag="'+tag+'">'+tag+'</span>').join("")+'</div>'
+    +'<button class="det-save-btn" id="detSaveNotes">Save notes</button>';
+  el("detNotesBlock").querySelectorAll(".rtag").forEach(span=>{
+    span.addEventListener("click",function(){
+      const tag=span.dataset.tag;
+      if(detailRecommend.includes(tag)){ detailRecommend=detailRecommend.filter(x=>x!==tag); span.classList.remove("on"); }
+      else { detailRecommend.push(tag); span.classList.add("on"); }
+    });
+  });
+  el("detSaveNotes").addEventListener("click", saveDetailNotes);
+}
+
+async function saveDetailNotes(){
+  if(!detailItem||!session) return;
+  const notes=el("detNotes").value.trim();
+  const dish_notes=el("detDishNotes").value.trim();
+  const went_with=el("detWentWith").value.trim();
+  const meta={notes,dish_notes,went_with,recommend:detailRecommend};
+  const k="dining:"+detailItem.tmdb_id, t=tracked[k];
+  if(t){
+    await sb.from("tracked_items").update({meta,updated_at:new Date().toISOString()}).eq("id",t.id);
+    tracked[k]=Object.assign({},t,{meta});
+    showToast("Notes saved ✓");
+  } else {
+    showToast("Add to Want / Booked / Been first to save notes.");
+  }
+}
+
+function fetchCuratedPlaceDetails(item){
+  // Search Google by restaurant name to get real photos, hours, website
+  const query=(item.name||item.title)+" New York";
+  placesService.textSearch({query},function(results,status){
+    if(status===google.maps.places.PlacesServiceStatus.OK&&results&&results[0]){
+      fetchAndRenderPlaceDetails(results[0].place_id, item);
+    } else {
+      el("detPhotos").innerHTML='<img src="'+foodImg(item)+'" style="height:280px;min-width:100%;object-fit:cover">';
+    }
+  });
+}
+
+function fetchAndRenderPlaceDetails(placeId, item){
+  placesService.getDetails({
+    placeId,
+    fields:["name","formatted_address","international_phone_number","opening_hours","website","photos","reviews","url"]
+  }, function(place, status){
+    if(status!==google.maps.places.PlacesServiceStatus.OK||!place){
+      el("detPhotos").innerHTML='<img src="'+foodImg(item)+'" style="height:280px;min-width:100%;object-fit:cover">';
+      return;
+    }
+    // Photos carousel
+    if(place.photos&&place.photos.length){
+      el("detPhotos").innerHTML=place.photos.slice(0,10).map(p=>'<img src="'+p.getUrl({maxWidth:700,maxHeight:400})+'" alt="" onerror="this.remove()">').join("");
+    } else {
+      el("detPhotos").innerHTML='<img src="'+foodImg(item)+'" style="height:280px;min-width:100%;object-fit:cover">';
+    }
+    // Reserve link
+    if(place.website){ const a=el("detReserve"); a.href=place.website; a.classList.remove("hidden-link"); }
+    // Info block
+    const rows=[];
+    if(place.formatted_address) rows.push({l:"Address",v:place.formatted_address});
+    if(place.international_phone_number) rows.push({l:"Phone",v:place.international_phone_number});
+    if(place.opening_hours&&place.opening_hours.weekday_text){
+      const day=new Date().getDay(), todayStr=place.opening_hours.weekday_text[(day+6)%7]||"";
+      const hours=todayStr.replace(/^[^:]+:\s*/,"");
+      rows.push({l:"Today",v:hours});
+    }
+    if(place.website) rows.push({l:"Website",v:'<a href="'+place.website+'" target="_blank">'+place.website.replace(/^https?:\/\/(www\.)?/,"").split("/")[0]+'</a>'});
+    if(place.url) rows.push({l:"Maps",v:'<a href="'+place.url+'" target="_blank">Open in Google Maps ↗</a>'});
+    if(rows.length){
+      el("detInfoBlock").innerHTML=rows.map(r=>'<div class="det-info-row"><div class="di-label">'+r.l+'</div><div class="di-val">'+r.v+'</div></div>').join("");
+      el("detInfoBlock").classList.add("has-data");
+    }
+    // Reviews
+    if(place.reviews&&place.reviews.length){
+      const revs=place.reviews.slice(0,3).map(rv=>'<div class="det-review-card"><div class="rv-author">'+rv.author_name+' &nbsp;'+'★'.repeat(Math.round(rv.rating||0))+'</div><div class="rv-text">'+rv.text+'</div></div>').join("");
+      el("detReviewsBlock").innerHTML='<div class="det-section-head">Google reviews</div>'+revs;
+      el("detReviewsBlock").classList.add("has-reviews");
+    }
+  });
+}
+
+function loadSimilarRestaurants(item){
+  const r=DINING_BY_ID[item.tmdb_id]||item;
+  if(!DINING.length){ el("detSimilarBlock").innerHTML=""; return; }
+  const similar=DINING.filter(x=>x.id!==r.id&&x.tmdb_id!==r.tmdb_id&&(x.cuisine===r.cuisine||(x.occasion||[]).some(o=>(r.occasion||[]).includes(o)))).sort(()=>Math.random()-.5).slice(0,10);
+  if(!similar.length){ el("detSimilarBlock").innerHTML=""; return; }
+  const cards=similar.map(s=>'<div class="det-similar-card" data-sid="'+s.id+'"><img src="'+foodImg(s)+'" alt="" onerror="this.style.background=\'#1b1b26\'"><div class="sim-name">'+s.name+'</div><div class="sim-meta">'+s.cuisine+'</div></div>').join("");
+  el("detSimilarBlock").innerHTML='<div class="det-section-head">You might also like</div><div class="det-similar-scroll">'+cards+'</div>';
+  el("detSimilarBlock").querySelectorAll(".det-similar-card").forEach(card=>{
+    card.addEventListener("click",function(){
+      const sid=parseInt(card.dataset.sid,10), simItem=DINING_BY_ID[sid];
+      if(simItem) openDetailScreen(simItem);
+    });
+  });
+}
+
+/* ===== TOAST ===== */
+let toastTimer=null;
+function showToast(msg){ const t=el("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),3200); }
+
+/* Detail back button */
+el("detBack").addEventListener("click", function(){
+  hideScreens(); el("category").classList.remove("hidden");
+  if(tab==="discover") loadDiscover();
+  else if(tab==="library") renderLibrary();
+});
+
+/* After rating modal saves from detail screen, refresh detail status buttons */
+var _detCloseModal=closeModal;
+closeModal=function(){ _detCloseModal(); if(detailItem&&!el("detail").classList.contains("hidden")) renderDetailBase(detailItem); };
+
+/* ===== INIT ===== */
+initGenreSelect();
+renderHubTiles();
+(async function(){ const {data}=await sb.auth.getSession(); session=data.session; route(); })();
+</script>
+<!-- Google Maps JS API — PlacesService loaded via initGoogleMaps callback -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD3vr_u-0NJkRURtf8nxWbXeil-WtJviI&libraries=places&callback=initGoogleMaps"></script>
+</body>
+</html>
