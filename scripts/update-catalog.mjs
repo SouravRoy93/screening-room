@@ -13,17 +13,19 @@ const YEAR = new Date().getFullYear();
 
 // [mediaType, path, pages, extraParams]
 const JOBS = [
-  ["movie","movie/popular",5,{}],
-  ["movie","movie/now_playing",2,{}],
-  ["movie","movie/top_rated",3,{}],
-  ["movie","movie/upcoming",2,{}],
+  ["movie","movie/popular",25,{}],
+  ["movie","movie/top_rated",20,{}],
+  ["movie","movie/now_playing",6,{}],
+  ["movie","movie/upcoming",6,{}],
   ["movie","trending/movie/week",2,{}],
-  ["movie","discover/movie",3,{ sort_by:"popularity.desc", primary_release_year:String(YEAR) }],
-  ["tv","tv/popular",4,{}],
-  ["tv","tv/top_rated",3,{}],
-  ["tv","tv/on_the_air",2,{}],
+  ["movie","discover/movie",12,{ sort_by:"popularity.desc", primary_release_year:String(YEAR) }],
+  ["movie","discover/movie",12,{ sort_by:"popularity.desc", primary_release_year:String(YEAR-1) }],
+  ["tv","tv/popular",20,{}],
+  ["tv","tv/top_rated",15,{}],
+  ["tv","tv/on_the_air",6,{}],
   ["tv","trending/tv/week",2,{}],
-  ["tv","discover/tv",3,{ sort_by:"popularity.desc", first_air_date_year:String(YEAR) }],
+  ["tv","discover/tv",12,{ sort_by:"popularity.desc", first_air_date_year:String(YEAR) }],
+  ["tv","discover/tv",12,{ sort_by:"popularity.desc", first_air_date_year:String(YEAR-1) }],
 ];
 
 function genreNames(ids, mt){
