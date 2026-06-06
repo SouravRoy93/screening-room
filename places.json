@@ -1,22 +1,960 @@
 [
-{"id":1,"name":"Central Park — Bethesda Terrace","area":"Central Park","vibe":"A cathedral of elms opening onto the city's most romantic fountain.","styles":["Iconic","Romantic","Nature & views","Photography"],"moods":["beautiful","romantic","calm","iconic","photo"],"best":"Golden hour, 1 hr before sunset","dur":90,"crowd":"Moderate","price":"Free","dress":"Comfortable","hours":"6am–1am","resv":"No","photo":"Bethesda Terrace arcade, toward the fountain","cafe":"Le Pain Quotidien (Mineral Springs)","dinner":"Tavern on the Green","insider":"Enter at 72nd & 5th and walk the Mall north — the reveal of the terrace is the whole point.","worth":"You want the quintessential, genuinely beautiful NYC walk.","skip":"You only have time for one skyline view — go up high instead.","badges":["Editor's Pick","Best at Sunset","Best for Couples"],"scores":{"b":5,"u":4,"e":5,"c":3,"v":5,"l":4},"rain":false,"img":"centralpark"},
-{"id":2,"name":"The Met","area":"Upper East Side","vibe":"The encyclopaedic museum where you could lose a lifetime — so don't try to see it all.","styles":["Culture","Iconic","Photography"],"moods":["beautiful","calm","iconic","culture","premium"],"best":"Weekday morning at opening","dur":150,"crowd":"High","price":"$$ (suggested)","dress":"Smart casual","hours":"10am–5pm (closed Wed)","resv":"No","photo":"The Temple of Dendur gallery","cafe":"The Met's Balcony Bar","dinner":"Cafe Boulud","insider":"Skip the Great Hall crush — go straight to the Rooftop Garden Bar for skyline + martinis.","worth":"You love art and want one of the world's great museums.","skip":"You dislike big crowds and want something intimate — try the Frick.","badges":["Editor's Pick","First-Timer","Tourist Heavy"],"scores":{"b":5,"u":5,"e":3,"c":2,"v":5,"l":4},"rain":true,"img":"museum"},
-{"id":3,"name":"The High Line","area":"Chelsea","vibe":"A wildflower railway in the sky, threading between galleries and the Hudson.","styles":["Iconic","Nature & views","Photography","Romantic"],"moods":["beautiful","romantic","iconic","photo","calm"],"best":"Late afternoon into golden hour","dur":75,"crowd":"High","price":"Free","dress":"Comfortable","hours":"7am–10pm","resv":"No","photo":"The 10th Ave overlook amphitheatre","cafe":"Empire Diner","dinner":"L'Artusi or Don Angie nearby","insider":"Start at the Whitney (south) and walk north — it empties out toward Hudson Yards.","worth":"You want an effortless, scenic walk with design and views.","skip":"You're after solitude — weekends are shoulder-to-shoulder.","badges":["Editor's Pick","Best at Sunset","Tourist Heavy"],"scores":{"b":5,"u":5,"e":4,"c":2,"v":5,"l":3},"rain":false,"img":"highline"},
-{"id":4,"name":"Brooklyn Bridge at Dawn","area":"DUMBO / Lower Manhattan","vibe":"The most photographed walk in America — silent and golden if you go early.","styles":["Iconic","Photography","Romantic","Nature & views"],"moods":["iconic","photo","romantic","beautiful","avoid-crowds"],"best":"Sunrise (truly empty)","dur":60,"crowd":"High","price":"Free","dress":"Layers, comfy shoes","hours":"24h","resv":"No","photo":"Under the Manhattan Bridge on Washington St","cafe":"Butler, DUMBO","dinner":"Cecconi's, DUMBO","insider":"Walk Brooklyn→Manhattan at sunrise. By 9am crowds make photos impossible.","worth":"You'll go early and want the iconic shot in peace.","skip":"You can only go midday — it's a river of selfie sticks.","badges":["Best at Sunset","Avoid Peak Hours","First-Timer"],"scores":{"b":5,"u":4,"e":4,"c":2,"v":5,"l":3},"rain":false,"img":"brooklynbridge"},
-{"id":5,"name":"The Met Cloisters","area":"Fort Tryon Park","vibe":"A medieval monastery transplanted above the Hudson — the city's quietest escape.","styles":["Hidden gems","Culture","Wellness","Romantic"],"moods":["calm","hidden","romantic","beautiful","premium"],"best":"Weekday late morning","dur":120,"crowd":"Low","price":"$$ (suggested)","dress":"Smart casual","hours":"10am–4:30pm","resv":"No","photo":"The Cuxa Cloister garden colonnade","cafe":"New Leaf Café","dinner":"Saggio, Hudson Heights","insider":"Pair with Fort Tryon's heather garden — almost no tourists make it this far north.","worth":"You want hushed beauty and a true escape from crowds.","skip":"You're short on time — it's 45 min from Midtown.","badges":["Quiet Luxury","Local Favorite","Editor's Pick"],"scores":{"b":5,"u":5,"e":3,"c":5,"v":4,"l":4},"rain":true,"img":"cloister"},
-{"id":6,"name":"SUMMIT One Vanderbilt","area":"Midtown","vibe":"A mirrored dream above Grand Central — the most cinematic deck in the city.","styles":["Luxury","Photography","Iconic","Nightlife"],"moods":["premium","photo","iconic","beautiful","classy"],"best":"Arrive 75 min before sunset","dur":90,"crowd":"High","price":"$$$","dress":"Light colours photograph best","hours":"9am–10pm","resv":"Yes — timed ticket","photo":"The mirrored 'Air' room","cafe":"Joe Coffee, Grand Central","dinner":"Le Pavillon (downstairs)","insider":"Book the last slot before sunset — daylight, golden hour and city lights in one ticket.","worth":"You want a designed, picture-perfect skyline experience.","skip":"You prefer raw classic views — Top of the Rock is simpler.","badges":["Best at Sunset","Worth the Price","Reservation Essential"],"scores":{"b":5,"u":5,"e":4,"c":2,"v":4,"l":5},"rain":true,"img":"skyline"},
-{"id":7,"name":"The Frick Collection","area":"Upper East Side","vibe":"A Gilded-Age mansion of Vermeers — art the way a billionaire once lived with it.","styles":["Luxury","Culture","Hidden gems","Romantic"],"moods":["premium","calm","romantic","beautiful","culture"],"best":"Weekday afternoon","dur":90,"crowd":"Low","price":"$$$","dress":"Smart","hours":"10am–6pm (closed Mon)","resv":"Recommended","photo":"The Garden Court fountain","cafe":"Via Quadronno","dinner":"Daniel","insider":"Sit in the Garden Court ten minutes, phone away. That's the experience.","worth":"You want quiet, world-class art in an opulent setting.","skip":"You want blockbuster shows — this is small and serene by design.","badges":["Quiet Luxury","Best for Couples","Worth the Price"],"scores":{"b":5,"u":5,"e":4,"c":5,"v":4,"l":5},"rain":true,"img":"art"},
-{"id":8,"name":"Little Island","area":"Hudson River Park","vibe":"A floating garden on tulip-stem pylons — whimsical, romantic, and free.","styles":["Hidden gems","Romantic","Nature & views","Photography"],"moods":["beautiful","romantic","photo","calm","hidden"],"best":"Sunset","dur":60,"crowd":"Moderate","price":"Free","dress":"Comfortable","hours":"6am–11pm","resv":"No","photo":"The southwest overlook at golden hour","cafe":"The café on the island","dinner":"Pastis, Meatpacking","insider":"Climb the highest 'hill' on the west side for the Hudson sunset — most people miss it.","worth":"You want something genuinely new, lovely and free at golden hour.","skip":"You expect a big attraction — it's small; pair with the High Line.","badges":["Editor's Pick","Best at Sunset","Local Favorite"],"scores":{"b":5,"u":5,"e":5,"c":4,"v":5,"l":4},"rain":false,"img":"park"},
-{"id":9,"name":"Grand Central Terminal","area":"Midtown","vibe":"A Beaux-Arts cathedral to travel — the ceiling alone is worth the detour.","styles":["Iconic","Culture","Photography"],"moods":["iconic","beautiful","photo","quick"],"best":"Mid-morning, fewer commuters","dur":45,"crowd":"High","price":"Free","dress":"Anything","hours":"5:15am–2am","resv":"No","photo":"The west balcony, down the main concourse","cafe":"Cipriani Dolci balcony","dinner":"The Grill nearby","insider":"Find the Whispering Gallery by the Oyster Bar — speak into the corner, a friend hears across the arch.","worth":"You want a free, jaw-dropping interior in 30 minutes.","skip":"Nothing — it's free and on the way to everything.","badges":["First-Timer","Editor's Pick"],"scores":{"b":5,"u":4,"e":5,"c":3,"v":5,"l":3},"rain":true,"img":"grandcentral"},
-{"id":10,"name":"Top of the Rock","area":"Rockefeller Center","vibe":"The view with the Empire State in it — the classic skyline shot.","styles":["Iconic","Photography","Nature & views"],"moods":["iconic","photo","beautiful","premium"],"best":"45 min before sunset","dur":75,"crowd":"High","price":"$$$","dress":"A warm layer (it's windy)","hours":"9am–11pm","resv":"Yes — timed","photo":"South deck: Empire State; north: Central Park","cafe":"Blue Bottle, Rock Center","dinner":"Lodi, Rockefeller Center","insider":"The open-air top deck has no glass — shoot south, then turn for Central Park.","worth":"You want the postcard skyline with the Empire State in frame.","skip":"You've already done SUMMIT — the views overlap.","badges":["Best at Sunset","First-Timer","Worth the Price"],"scores":{"b":5,"u":4,"e":4,"c":2,"v":4,"l":4},"rain":false,"img":"skyline"},
-{"id":11,"name":"New York Public Library","area":"Midtown","vibe":"Marble lions, a painted-sky reading room, and the hush of a century.","styles":["Culture","Hidden gems","Photography"],"moods":["beautiful","calm","culture","photo","hidden"],"best":"Weekday late morning","dur":50,"crowd":"Moderate","price":"Free","dress":"Anything","hours":"10am–6pm (varies)","resv":"No","photo":"The Rose Main Reading Room ceiling","cafe":"Bryant Park kiosks next door","dinner":"Bryant Park Grill","insider":"The Rose Reading Room is free and largely tourist-free — pair with Bryant Park beside it.","worth":"You love beautiful interiors and quiet grandeur, for free.","skip":"Almost never — it's free, central and stunning.","badges":["Quiet Luxury","Local Favorite","Editor's Pick"],"scores":{"b":5,"u":4,"e":5,"c":4,"v":5,"l":4},"rain":true,"img":"library"},
-{"id":12,"name":"Whitney Museum","area":"Meatpacking District","vibe":"American art with terraces that frame the Hudson and the High Line below.","styles":["Culture","Photography","Nature & views"],"moods":["culture","beautiful","photo","premium"],"best":"Friday evening (pay-what-you-wish)","dur":120,"crowd":"Moderate","price":"$$$","dress":"Smart casual","hours":"10:30am–6pm (closed Tue)","resv":"Recommended","photo":"The outdoor terraces, river + High Line","cafe":"Frenchette Bakery","dinner":"Frenchette / Pastis","insider":"Ride to the top and work down via the terraces — the building is half the art.","worth":"You like modern art and want river-view terraces.","skip":"You're not into contemporary work — try the Met.","badges":["Editor's Pick","Best at Sunset"],"scores":{"b":4,"u":5,"e":4,"c":3,"v":4,"l":4},"rain":true,"img":"art"},
-{"id":13,"name":"Brooklyn Heights Promenade","area":"Brooklyn Heights","vibe":"A quiet balcony over the East River with the whole skyline laid before you.","styles":["Hidden gems","Romantic","Nature & views","Photography"],"moods":["romantic","beautiful","photo","calm","avoid-crowds"],"best":"Blue hour, just after sunset","dur":45,"crowd":"Low","price":"Free","dress":"Comfortable","hours":"24h","resv":"No","photo":"Mid-promenade, skyline + Brooklyn Bridge","cafe":"Iris Café","dinner":"Colonie, Atlantic Ave","insider":"Walk the leafy Heights first (Willow St) — film-set brownstones, no tourists.","worth":"You want the skyline view locals love, for free.","skip":"You want to be in the action — this is calm and residential.","badges":["Quiet Luxury","Best for Couples","Local Favorite"],"scores":{"b":5,"u":4,"e":5,"c":5,"v":5,"l":4},"rain":false,"img":"skyline"},
-{"id":14,"name":"Brooklyn Botanic Garden","area":"Prospect Heights","vibe":"Cherry esplanades, a Japanese pond, and a glasshouse — the gentlest morning.","styles":["Nature & views","Wellness","Romantic","Family"],"moods":["calm","beautiful","romantic","wellness","hidden"],"best":"Spring mornings (cherry blossom)","dur":120,"crowd":"Moderate","price":"$$","dress":"Comfortable","hours":"10am–6pm (closed Mon)","resv":"Recommended","photo":"The Japanese Hill-and-Pond torii","cafe":"Yellow Magnolia Café","dinner":"Olmsted, Prospect Heights","insider":"Go at opening in blossom season — by noon it's full. Pair with the Brooklyn Museum next door.","worth":"You want a restorative, slow, beautiful morning.","skip":"It's deep winter — the grounds are bare.","badges":["Quiet Luxury","Best for Couples"],"scores":{"b":5,"u":4,"e":4,"c":3,"v":4,"l":4},"rain":false,"img":"garden"},
-{"id":15,"name":"The Oculus","area":"Financial District","vibe":"A soaring white rib-cage of marble — part transit hall, part cathedral of light.","styles":["Photography","Iconic","Shopping"],"moods":["photo","iconic","beautiful","quick"],"best":"Sunny midday","dur":30,"crowd":"Moderate","price":"Free","dress":"Anything","hours":"Daily","resv":"No","photo":"Floor-centre looking up the spine","cafe":"Le District nearby","dinner":"Manhatta (60 floors up)","insider":"Any clear noon is dramatic as light pours through the ribs.","worth":"You love architecture and want a quick, free, striking shot.","skip":"You're not into modern architecture — it's a beautiful mall.","badges":["Editor's Pick","First-Timer"],"scores":{"b":4,"u":5,"e":5,"c":4,"v":5,"l":3},"rain":true,"img":"architecture"},
-{"id":16,"name":"Bryant Park","area":"Midtown","vibe":"A perfect green room behind the library — Parisian chairs and quiet corners.","styles":["Nature & views","Food & cafés","Family"],"moods":["calm","beautiful","quick","romantic"],"best":"Late afternoon","dur":45,"crowd":"Moderate","price":"Free","dress":"Anything","hours":"7am–10pm","resv":"No","photo":"The lawn toward the library facade","cafe":"Bryant Park kiosks","dinner":"Bryant Park Grill","insider":"Grab a green chair on the library side with a coffee — the best free seat in Midtown.","worth":"You want a calm, pretty pause between Midtown stops.","skip":"You want a destination — this is a lovely in-between.","badges":["Local Favorite","Quiet Luxury"],"scores":{"b":4,"u":3,"e":5,"c":4,"v":5,"l":3},"rain":false,"img":"park"},
-{"id":17,"name":"Roosevelt Island Tram","area":"East River","vibe":"A four-minute cable-car glide over the river — the city's cheapest great view.","styles":["Hidden gems","Photography","Romantic","Family"],"moods":["photo","romantic","hidden","quick","beautiful"],"best":"Sunset, eastbound then back","dur":40,"crowd":"Low","price":"$ (a subway swipe)","dress":"Anything","hours":"6am–2am","resv":"No","photo":"Front of the cabin, looking back at Midtown","cafe":"Granny Annie's","dinner":"Sutton Place spots","insider":"Use OMNY/MetroCard — same price as the subway for a skyline cable-car ride.","worth":"You want a delightful, cheap, uncrowded view few tourists know.","skip":"You're afraid of heights — it climbs high over the river.","badges":["Quiet Luxury","Local Favorite","Best at Sunset"],"scores":{"b":4,"u":5,"e":5,"c":5,"v":5,"l":3},"rain":true,"img":"newyork"},
-{"id":18,"name":"The Morgan Library","area":"Murray Hill","vibe":"J.P. Morgan's private study — a jewel-box of manuscripts and gilt ceilings.","styles":["Culture","Hidden gems","Luxury"],"moods":["calm","premium","culture","hidden","beautiful"],"best":"Weekday afternoon","dur":75,"crowd":"Low","price":"$$$","dress":"Smart","hours":"10:30am–5pm (closed Mon)","resv":"Recommended","photo":"Mr. Morgan's Study, red silk walls","cafe":"The Morgan Café","dinner":"Scarpetta nearby","insider":"The three-tiered original library room is breathtaking and almost always empty.","worth":"You love rare beauty and quiet, opulent rooms.","skip":"You want something lively or large — this is small and scholarly.","badges":["Quiet Luxury","Worth the Price","Local Favorite"],"scores":{"b":5,"u":5,"e":4,"c":5,"v":4,"l":5},"rain":true,"img":"library"},
-{"id":19,"name":"The Battery & Sea Glass Carousel","area":"Lower Manhattan","vibe":"Harbour gardens at the island's tip, with a glowing carousel at dusk.","styles":["Nature & views","Family","Romantic"],"moods":["calm","romantic","beautiful","family","quick"],"best":"Sunset over the harbour","dur":60,"crowd":"Moderate","price":"Free (carousel $)","dress":"Comfortable","hours":"Daily","resv":"No","photo":"Harbour rail with the Statue of Liberty beyond","cafe":"Brookfield Place cafés","dinner":"Crown Shy (FiDi)","insider":"Skip the ferry queue — enjoy the gardens and Liberty view from shore at golden hour.","worth":"You want harbour air, Liberty views and a charming dusk stroll.","skip":"You specifically want to visit the Statue — that needs a ferry ticket.","badges":["Local Favorite","Best at Sunset"],"scores":{"b":4,"u":4,"e":4,"c":4,"v":5,"l":3},"rain":false,"img":"newyork"},
-{"id":20,"name":"Conservatory Garden","area":"Central Park (105th St)","vibe":"Central Park's only formal garden — wisteria, fountains, and almost no one.","styles":["Hidden gems","Romantic","Wellness","Nature & views"],"moods":["calm","romantic","hidden","beautiful","wellness"],"best":"Late spring morning","dur":45,"crowd":"Low","price":"Free","dress":"Comfortable","hours":"8am–dusk","resv":"No","photo":"The Italian garden's wisteria pergola","cafe":"Clarke's on 5th","dinner":"Le Veau d'Or","insider":"Enter at the Vanderbilt Gate (105th & 5th) — a designated quiet zone, genuinely peaceful.","worth":"You want a secret, formal, romantic corner with no crowds.","skip":"It's mid-winter — beds are bare; come spring–autumn.","badges":["Quiet Luxury","Best for Couples","Local Favorite"],"scores":{"b":5,"u":5,"e":4,"c":5,"v":5,"l":4},"rain":false,"img":"garden"}
+ {
+  "id": 1,
+  "name": "Central Park — Bethesda Terrace",
+  "area": "Central Park",
+  "vibe": "A cathedral of elms opening onto the city's most romantic fountain.",
+  "styles": [
+   "Iconic",
+   "Romantic",
+   "Nature & views",
+   "Photography"
+  ],
+  "moods": [
+   "beautiful",
+   "romantic",
+   "calm",
+   "iconic",
+   "photo"
+  ],
+  "best": "Golden hour, 1 hr before sunset",
+  "dur": 90,
+  "crowd": "Moderate",
+  "price": "Free",
+  "dress": "Comfortable",
+  "hours": "6am–1am",
+  "resv": "No",
+  "photo": "Bethesda Terrace arcade, toward the fountain",
+  "cafe": "Le Pain Quotidien (Mineral Springs)",
+  "dinner": "Tavern on the Green",
+  "insider": "Enter at 72nd & 5th and walk the Mall north — the reveal of the terrace is the whole point.",
+  "worth": "You want the quintessential, genuinely beautiful NYC walk.",
+  "skip": "You only have time for one skyline view — go up high instead.",
+  "badges": [
+   "Editor's Pick",
+   "Best at Sunset",
+   "Best for Couples"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 4,
+   "e": 5,
+   "c": 3,
+   "v": 5,
+   "l": 4
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1568515387631-8b650bbcdb90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxDZW50cmFsJTIwUGFyayUyME5ldyUyMFlvcmt8ZW58MXwwfHx8MTc4MDc4NTk3OXww&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Jermaine Ee / Unsplash",
+  "imgLink": "https://unsplash.com/photos/new-york-central-park-A2CChTZvzTE"
+ },
+ {
+  "id": 2,
+  "name": "The Met",
+  "area": "Upper East Side",
+  "vibe": "The encyclopaedic museum where you could lose a lifetime — so don't try to see it all.",
+  "styles": [
+   "Culture",
+   "Iconic",
+   "Photography"
+  ],
+  "moods": [
+   "beautiful",
+   "calm",
+   "iconic",
+   "culture",
+   "premium"
+  ],
+  "best": "Weekday morning at opening",
+  "dur": 150,
+  "crowd": "High",
+  "price": "$$ (suggested)",
+  "dress": "Smart casual",
+  "hours": "10am–5pm (closed Wed)",
+  "resv": "No",
+  "photo": "The Temple of Dendur gallery",
+  "cafe": "The Met's Balcony Bar",
+  "dinner": "Cafe Boulud",
+  "insider": "Skip the Great Hall crush — go straight to the Rooftop Garden Bar for skyline + martinis.",
+  "worth": "You love art and want one of the world's great museums.",
+  "skip": "You dislike big crowds and want something intimate — try the Frick.",
+  "badges": [
+   "Editor's Pick",
+   "First-Timer",
+   "Tourist Heavy"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 3,
+   "c": 2,
+   "v": 5,
+   "l": 4
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1570639386318-935e99090f27?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw4fHxUaGUlMjBNZXQlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5ODB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Sudan Ouyang / Unsplash",
+  "imgLink": "https://unsplash.com/photos/rectangular-white-wooden-board-V01HenIVcmY"
+ },
+ {
+  "id": 3,
+  "name": "The High Line",
+  "area": "Chelsea",
+  "vibe": "A wildflower railway in the sky, threading between galleries and the Hudson.",
+  "styles": [
+   "Iconic",
+   "Nature & views",
+   "Photography",
+   "Romantic"
+  ],
+  "moods": [
+   "beautiful",
+   "romantic",
+   "iconic",
+   "photo",
+   "calm"
+  ],
+  "best": "Late afternoon into golden hour",
+  "dur": 75,
+  "crowd": "High",
+  "price": "Free",
+  "dress": "Comfortable",
+  "hours": "7am–10pm",
+  "resv": "No",
+  "photo": "The 10th Ave overlook amphitheatre",
+  "cafe": "Empire Diner",
+  "dinner": "L'Artusi or Don Angie nearby",
+  "insider": "Start at the Whitney (south) and walk north — it empties out toward Hudson Yards.",
+  "worth": "You want an effortless, scenic walk with design and views.",
+  "skip": "You're after solitude — weekends are shoulder-to-shoulder.",
+  "badges": [
+   "Editor's Pick",
+   "Best at Sunset",
+   "Tourist Heavy"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 4,
+   "c": 2,
+   "v": 5,
+   "l": 3
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1656477716212-237ba33b529c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwyfHxUaGUlMjBIaWdoJTIwTGluZSUyME5ldyUyMFlvcmt8ZW58MXwwfHx8MTc4MDc4NTk4MXww&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Bernd 📷 Dittrich / Unsplash",
+  "imgLink": "https://unsplash.com/photos/a-street-with-cars-and-trees-VnGzMSPv2_A"
+ },
+ {
+  "id": 4,
+  "name": "Brooklyn Bridge at Dawn",
+  "area": "DUMBO / Lower Manhattan",
+  "vibe": "The most photographed walk in America — silent and golden if you go early.",
+  "styles": [
+   "Iconic",
+   "Photography",
+   "Romantic",
+   "Nature & views"
+  ],
+  "moods": [
+   "iconic",
+   "photo",
+   "romantic",
+   "beautiful",
+   "avoid-crowds"
+  ],
+  "best": "Sunrise (truly empty)",
+  "dur": 60,
+  "crowd": "High",
+  "price": "Free",
+  "dress": "Layers, comfy shoes",
+  "hours": "24h",
+  "resv": "No",
+  "photo": "Under the Manhattan Bridge on Washington St",
+  "cafe": "Butler, DUMBO",
+  "dinner": "Cecconi's, DUMBO",
+  "insider": "Walk Brooklyn→Manhattan at sunrise. By 9am crowds make photos impossible.",
+  "worth": "You'll go early and want the iconic shot in peace.",
+  "skip": "You can only go midday — it's a river of selfie sticks.",
+  "badges": [
+   "Best at Sunset",
+   "Avoid Peak Hours",
+   "First-Timer"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 4,
+   "e": 4,
+   "c": 2,
+   "v": 5,
+   "l": 3
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxCcm9va2x5biUyMEJyaWRnZSUyMGF0JTIwRGF3biUyME5ldyUyMFlvcmt8ZW58MXwwfHx8MTc4MDc4NTk4MXww&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Matteo Catanese / Unsplash",
+  "imgLink": "https://unsplash.com/photos/lighted-cable-bridge-near-high-rise-buildings-dVCGpKZB_E8"
+ },
+ {
+  "id": 5,
+  "name": "The Met Cloisters",
+  "area": "Fort Tryon Park",
+  "vibe": "A medieval monastery transplanted above the Hudson — the city's quietest escape.",
+  "styles": [
+   "Hidden gems",
+   "Culture",
+   "Wellness",
+   "Romantic"
+  ],
+  "moods": [
+   "calm",
+   "hidden",
+   "romantic",
+   "beautiful",
+   "premium"
+  ],
+  "best": "Weekday late morning",
+  "dur": 120,
+  "crowd": "Low",
+  "price": "$$ (suggested)",
+  "dress": "Smart casual",
+  "hours": "10am–4:30pm",
+  "resv": "No",
+  "photo": "The Cuxa Cloister garden colonnade",
+  "cafe": "New Leaf Café",
+  "dinner": "Saggio, Hudson Heights",
+  "insider": "Pair with Fort Tryon's heather garden — almost no tourists make it this far north.",
+  "worth": "You want hushed beauty and a true escape from crowds.",
+  "skip": "You're short on time — it's 45 min from Midtown.",
+  "badges": [
+   "Quiet Luxury",
+   "Local Favorite",
+   "Editor's Pick"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 3,
+   "c": 5,
+   "v": 4,
+   "l": 4
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1603802639773-329f672b9d04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxUaGUlMjBNZXQlMjBDbG9pc3RlcnMlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Antoinette Plessis / Unsplash",
+  "imgLink": "https://unsplash.com/photos/brown-wooden-table-and-chairs--_Bte8Whhuk"
+ },
+ {
+  "id": 6,
+  "name": "SUMMIT One Vanderbilt",
+  "area": "Midtown",
+  "vibe": "A mirrored dream above Grand Central — the most cinematic deck in the city.",
+  "styles": [
+   "Luxury",
+   "Photography",
+   "Iconic",
+   "Nightlife"
+  ],
+  "moods": [
+   "premium",
+   "photo",
+   "iconic",
+   "beautiful",
+   "classy"
+  ],
+  "best": "Arrive 75 min before sunset",
+  "dur": 90,
+  "crowd": "High",
+  "price": "$$$",
+  "dress": "Light colours photograph best",
+  "hours": "9am–10pm",
+  "resv": "Yes — timed ticket",
+  "photo": "The mirrored 'Air' room",
+  "cafe": "Joe Coffee, Grand Central",
+  "dinner": "Le Pavillon (downstairs)",
+  "insider": "Book the last slot before sunset — daylight, golden hour and city lights in one ticket.",
+  "worth": "You want a designed, picture-perfect skyline experience.",
+  "skip": "You prefer raw classic views — Top of the Rock is simpler.",
+  "badges": [
+   "Best at Sunset",
+   "Worth the Price",
+   "Reservation Essential"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 4,
+   "c": 2,
+   "v": 4,
+   "l": 5
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1749342729594-df8aa8e5fccd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw4fHxTVU1NSVQlMjBPbmUlMjBWYW5kZXJiaWx0JTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg1OTgzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Somer B / Unsplash",
+  "imgLink": "https://unsplash.com/photos/a-fashion-show-is-taking-place-with-mirrors-4ocZ0SilUic"
+ },
+ {
+  "id": 7,
+  "name": "The Frick Collection",
+  "area": "Upper East Side",
+  "vibe": "A Gilded-Age mansion of Vermeers — art the way a billionaire once lived with it.",
+  "styles": [
+   "Luxury",
+   "Culture",
+   "Hidden gems",
+   "Romantic"
+  ],
+  "moods": [
+   "premium",
+   "calm",
+   "romantic",
+   "beautiful",
+   "culture"
+  ],
+  "best": "Weekday afternoon",
+  "dur": 90,
+  "crowd": "Low",
+  "price": "$$$",
+  "dress": "Smart",
+  "hours": "10am–6pm (closed Mon)",
+  "resv": "Recommended",
+  "photo": "The Garden Court fountain",
+  "cafe": "Via Quadronno",
+  "dinner": "Daniel",
+  "insider": "Sit in the Garden Court ten minutes, phone away. That's the experience.",
+  "worth": "You want quiet, world-class art in an opulent setting.",
+  "skip": "You want blockbuster shows — this is small and serene by design.",
+  "badges": [
+   "Quiet Luxury",
+   "Best for Couples",
+   "Worth the Price"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 4,
+   "c": 5,
+   "v": 4,
+   "l": 5
+  },
+  "rain": true,
+  "img": "art"
+ },
+ {
+  "id": 8,
+  "name": "Little Island",
+  "area": "Hudson River Park",
+  "vibe": "A floating garden on tulip-stem pylons — whimsical, romantic, and free.",
+  "styles": [
+   "Hidden gems",
+   "Romantic",
+   "Nature & views",
+   "Photography"
+  ],
+  "moods": [
+   "beautiful",
+   "romantic",
+   "photo",
+   "calm",
+   "hidden"
+  ],
+  "best": "Sunset",
+  "dur": 60,
+  "crowd": "Moderate",
+  "price": "Free",
+  "dress": "Comfortable",
+  "hours": "6am–11pm",
+  "resv": "No",
+  "photo": "The southwest overlook at golden hour",
+  "cafe": "The café on the island",
+  "dinner": "Pastis, Meatpacking",
+  "insider": "Climb the highest 'hill' on the west side for the Hudson sunset — most people miss it.",
+  "worth": "You want something genuinely new, lovely and free at golden hour.",
+  "skip": "You expect a big attraction — it's small; pair with the High Line.",
+  "badges": [
+   "Editor's Pick",
+   "Best at Sunset",
+   "Local Favorite"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 5,
+   "c": 4,
+   "v": 5,
+   "l": 4
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1589755151449-72fdc1cab156?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwzfHxMaXR0bGUlMjBJc2xhbmQlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5ODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Pierre Bouyer / Unsplash",
+  "imgLink": "https://unsplash.com/photos/people-on-beach-near-city-buildings-during-daytime-7sLh4VWzh_4"
+ },
+ {
+  "id": 9,
+  "name": "Grand Central Terminal",
+  "area": "Midtown",
+  "vibe": "A Beaux-Arts cathedral to travel — the ceiling alone is worth the detour.",
+  "styles": [
+   "Iconic",
+   "Culture",
+   "Photography"
+  ],
+  "moods": [
+   "iconic",
+   "beautiful",
+   "photo",
+   "quick"
+  ],
+  "best": "Mid-morning, fewer commuters",
+  "dur": 45,
+  "crowd": "High",
+  "price": "Free",
+  "dress": "Anything",
+  "hours": "5:15am–2am",
+  "resv": "No",
+  "photo": "The west balcony, down the main concourse",
+  "cafe": "Cipriani Dolci balcony",
+  "dinner": "The Grill nearby",
+  "insider": "Find the Whispering Gallery by the Oyster Bar — speak into the corner, a friend hears across the arch.",
+  "worth": "You want a free, jaw-dropping interior in 30 minutes.",
+  "skip": "Nothing — it's free and on the way to everything.",
+  "badges": [
+   "First-Timer",
+   "Editor's Pick"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 4,
+   "e": 5,
+   "c": 3,
+   "v": 5,
+   "l": 3
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1633012252261-9863fe792fb3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwzfHxHcmFuZCUyMENlbnRyYWwlMjBUZXJtaW5hbCUyME5ldyUyMFlvcmt8ZW58MXwwfHx8MTc4MDc4NTk4NXww&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Afif Ramdhasuma / Unsplash",
+  "imgLink": "https://unsplash.com/photos/a-group-of-people-standing-inside-of-a-train-station-w_cBo1T3gOc"
+ },
+ {
+  "id": 10,
+  "name": "Top of the Rock",
+  "area": "Rockefeller Center",
+  "vibe": "The view with the Empire State in it — the classic skyline shot.",
+  "styles": [
+   "Iconic",
+   "Photography",
+   "Nature & views"
+  ],
+  "moods": [
+   "iconic",
+   "photo",
+   "beautiful",
+   "premium"
+  ],
+  "best": "45 min before sunset",
+  "dur": 75,
+  "crowd": "High",
+  "price": "$$$",
+  "dress": "A warm layer (it's windy)",
+  "hours": "9am–11pm",
+  "resv": "Yes — timed",
+  "photo": "South deck: Empire State; north: Central Park",
+  "cafe": "Blue Bottle, Rock Center",
+  "dinner": "Lodi, Rockefeller Center",
+  "insider": "The open-air top deck has no glass — shoot south, then turn for Central Park.",
+  "worth": "You want the postcard skyline with the Empire State in frame.",
+  "skip": "You've already done SUMMIT — the views overlap.",
+  "badges": [
+   "Best at Sunset",
+   "First-Timer",
+   "Worth the Price"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 4,
+   "e": 4,
+   "c": 2,
+   "v": 4,
+   "l": 4
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1756677028564-02420405126d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw4fHxUb3AlMjBvZiUyMHRoZSUyMFJvY2slMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5ODV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Maney Imagination / Unsplash",
+  "imgLink": "https://unsplash.com/photos/new-york-city-skyline-at-dusk-with-empire-state-building-vBRj9gq_3ik"
+ },
+ {
+  "id": 11,
+  "name": "New York Public Library",
+  "area": "Midtown",
+  "vibe": "Marble lions, a painted-sky reading room, and the hush of a century.",
+  "styles": [
+   "Culture",
+   "Hidden gems",
+   "Photography"
+  ],
+  "moods": [
+   "beautiful",
+   "calm",
+   "culture",
+   "photo",
+   "hidden"
+  ],
+  "best": "Weekday late morning",
+  "dur": 50,
+  "crowd": "Moderate",
+  "price": "Free",
+  "dress": "Anything",
+  "hours": "10am–6pm (varies)",
+  "resv": "No",
+  "photo": "The Rose Main Reading Room ceiling",
+  "cafe": "Bryant Park kiosks next door",
+  "dinner": "Bryant Park Grill",
+  "insider": "The Rose Reading Room is free and largely tourist-free — pair with Bryant Park beside it.",
+  "worth": "You love beautiful interiors and quiet grandeur, for free.",
+  "skip": "Almost never — it's free, central and stunning.",
+  "badges": [
+   "Quiet Luxury",
+   "Local Favorite",
+   "Editor's Pick"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 4,
+   "e": 5,
+   "c": 4,
+   "v": 5,
+   "l": 4
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1630953640696-b9277b51d278?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw4fHxOZXclMjBZb3JrJTIwUHVibGljJTIwTGlicmFyeSUyME5ldyUyMFlvcmt8ZW58MXwwfHx8MTc4MDc4NTk4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Ran Ding / Unsplash",
+  "imgLink": "https://unsplash.com/photos/people-sitting-on-chairs-inside-building--zsvDFQrHOk"
+ },
+ {
+  "id": 12,
+  "name": "Whitney Museum",
+  "area": "Meatpacking District",
+  "vibe": "American art with terraces that frame the Hudson and the High Line below.",
+  "styles": [
+   "Culture",
+   "Photography",
+   "Nature & views"
+  ],
+  "moods": [
+   "culture",
+   "beautiful",
+   "photo",
+   "premium"
+  ],
+  "best": "Friday evening (pay-what-you-wish)",
+  "dur": 120,
+  "crowd": "Moderate",
+  "price": "$$$",
+  "dress": "Smart casual",
+  "hours": "10:30am–6pm (closed Tue)",
+  "resv": "Recommended",
+  "photo": "The outdoor terraces, river + High Line",
+  "cafe": "Frenchette Bakery",
+  "dinner": "Frenchette / Pastis",
+  "insider": "Ride to the top and work down via the terraces — the building is half the art.",
+  "worth": "You like modern art and want river-view terraces.",
+  "skip": "You're not into contemporary work — try the Met.",
+  "badges": [
+   "Editor's Pick",
+   "Best at Sunset"
+  ],
+  "scores": {
+   "b": 4,
+   "u": 5,
+   "e": 4,
+   "c": 3,
+   "v": 4,
+   "l": 4
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1659354867955-34be80d410be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxXaGl0bmV5JTIwTXVzZXVtJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg1OTg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Claudio Schwarz / Unsplash",
+  "imgLink": "https://unsplash.com/photos/a-white-building-with-a-window-ipcsI15th5I"
+ },
+ {
+  "id": 13,
+  "name": "Brooklyn Heights Promenade",
+  "area": "Brooklyn Heights",
+  "vibe": "A quiet balcony over the East River with the whole skyline laid before you.",
+  "styles": [
+   "Hidden gems",
+   "Romantic",
+   "Nature & views",
+   "Photography"
+  ],
+  "moods": [
+   "romantic",
+   "beautiful",
+   "photo",
+   "calm",
+   "avoid-crowds"
+  ],
+  "best": "Blue hour, just after sunset",
+  "dur": 45,
+  "crowd": "Low",
+  "price": "Free",
+  "dress": "Comfortable",
+  "hours": "24h",
+  "resv": "No",
+  "photo": "Mid-promenade, skyline + Brooklyn Bridge",
+  "cafe": "Iris Café",
+  "dinner": "Colonie, Atlantic Ave",
+  "insider": "Walk the leafy Heights first (Willow St) — film-set brownstones, no tourists.",
+  "worth": "You want the skyline view locals love, for free.",
+  "skip": "You want to be in the action — this is calm and residential.",
+  "badges": [
+   "Quiet Luxury",
+   "Best for Couples",
+   "Local Favorite"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 4,
+   "e": 5,
+   "c": 5,
+   "v": 5,
+   "l": 4
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1628000725462-5eae18ba6646?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw3fHxCcm9va2x5biUyMEhlaWdodHMlMjBQcm9tZW5hZGUlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5ODd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Evgenii Vasilenko / Unsplash",
+  "imgLink": "https://unsplash.com/photos/city-skyline-during-night-time-qEZGXvd3oZM"
+ },
+ {
+  "id": 14,
+  "name": "Brooklyn Botanic Garden",
+  "area": "Prospect Heights",
+  "vibe": "Cherry esplanades, a Japanese pond, and a glasshouse — the gentlest morning.",
+  "styles": [
+   "Nature & views",
+   "Wellness",
+   "Romantic",
+   "Family"
+  ],
+  "moods": [
+   "calm",
+   "beautiful",
+   "romantic",
+   "wellness",
+   "hidden"
+  ],
+  "best": "Spring mornings (cherry blossom)",
+  "dur": 120,
+  "crowd": "Moderate",
+  "price": "$$",
+  "dress": "Comfortable",
+  "hours": "10am–6pm (closed Mon)",
+  "resv": "Recommended",
+  "photo": "The Japanese Hill-and-Pond torii",
+  "cafe": "Yellow Magnolia Café",
+  "dinner": "Olmsted, Prospect Heights",
+  "insider": "Go at opening in blossom season — by noon it's full. Pair with the Brooklyn Museum next door.",
+  "worth": "You want a restorative, slow, beautiful morning.",
+  "skip": "It's deep winter — the grounds are bare.",
+  "badges": [
+   "Quiet Luxury",
+   "Best for Couples"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 4,
+   "e": 4,
+   "c": 3,
+   "v": 4,
+   "l": 4
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1712612304858-0c21b2a02945?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw0fHxCcm9va2x5biUyMEJvdGFuaWMlMjBHYXJkZW4lMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Yuhan Du / Unsplash",
+  "imgLink": "https://unsplash.com/photos/the-branches-of-a-tree-with-pink-flowers-against-a-blue-sky-DygE8ON9pgw"
+ },
+ {
+  "id": 15,
+  "name": "The Oculus",
+  "area": "Financial District",
+  "vibe": "A soaring white rib-cage of marble — part transit hall, part cathedral of light.",
+  "styles": [
+   "Photography",
+   "Iconic",
+   "Shopping"
+  ],
+  "moods": [
+   "photo",
+   "iconic",
+   "beautiful",
+   "quick"
+  ],
+  "best": "Sunny midday",
+  "dur": 30,
+  "crowd": "Moderate",
+  "price": "Free",
+  "dress": "Anything",
+  "hours": "Daily",
+  "resv": "No",
+  "photo": "Floor-centre looking up the spine",
+  "cafe": "Le District nearby",
+  "dinner": "Manhatta (60 floors up)",
+  "insider": "Any clear noon is dramatic as light pours through the ribs.",
+  "worth": "You love architecture and want a quick, free, striking shot.",
+  "skip": "You're not into modern architecture — it's a beautiful mall.",
+  "badges": [
+   "Editor's Pick",
+   "First-Timer"
+  ],
+  "scores": {
+   "b": 4,
+   "u": 5,
+   "e": 5,
+   "c": 4,
+   "v": 5,
+   "l": 3
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1751367673950-af4ed091d18b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxUaGUlMjBPY3VsdXMlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Koon Chakhatrakan / Unsplash",
+  "imgLink": "https://unsplash.com/photos/the-oculus-interior-features-striking-white-architecture-XHXTr-SxS4Q"
+ },
+ {
+  "id": 16,
+  "name": "Bryant Park",
+  "area": "Midtown",
+  "vibe": "A perfect green room behind the library — Parisian chairs and quiet corners.",
+  "styles": [
+   "Nature & views",
+   "Food & cafés",
+   "Family"
+  ],
+  "moods": [
+   "calm",
+   "beautiful",
+   "quick",
+   "romantic"
+  ],
+  "best": "Late afternoon",
+  "dur": 45,
+  "crowd": "Moderate",
+  "price": "Free",
+  "dress": "Anything",
+  "hours": "7am–10pm",
+  "resv": "No",
+  "photo": "The lawn toward the library facade",
+  "cafe": "Bryant Park kiosks",
+  "dinner": "Bryant Park Grill",
+  "insider": "Grab a green chair on the library side with a coffee — the best free seat in Midtown.",
+  "worth": "You want a calm, pretty pause between Midtown stops.",
+  "skip": "You want a destination — this is a lovely in-between.",
+  "badges": [
+   "Local Favorite",
+   "Quiet Luxury"
+  ],
+  "scores": {
+   "b": 4,
+   "u": 3,
+   "e": 5,
+   "c": 4,
+   "v": 5,
+   "l": 3
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1664990601633-a4ab61f1f2e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxCcnlhbnQlMjBQYXJrJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg1OTg5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "David Vives / Unsplash",
+  "imgLink": "https://unsplash.com/photos/a-group-of-people-in-a-park-h9lmvT1D7lc"
+ },
+ {
+  "id": 17,
+  "name": "Roosevelt Island Tram",
+  "area": "East River",
+  "vibe": "A four-minute cable-car glide over the river — the city's cheapest great view.",
+  "styles": [
+   "Hidden gems",
+   "Photography",
+   "Romantic",
+   "Family"
+  ],
+  "moods": [
+   "photo",
+   "romantic",
+   "hidden",
+   "quick",
+   "beautiful"
+  ],
+  "best": "Sunset, eastbound then back",
+  "dur": 40,
+  "crowd": "Low",
+  "price": "$ (a subway swipe)",
+  "dress": "Anything",
+  "hours": "6am–2am",
+  "resv": "No",
+  "photo": "Front of the cabin, looking back at Midtown",
+  "cafe": "Granny Annie's",
+  "dinner": "Sutton Place spots",
+  "insider": "Use OMNY/MetroCard — same price as the subway for a skyline cable-car ride.",
+  "worth": "You want a delightful, cheap, uncrowded view few tourists know.",
+  "skip": "You're afraid of heights — it climbs high over the river.",
+  "badges": [
+   "Quiet Luxury",
+   "Local Favorite",
+   "Best at Sunset"
+  ],
+  "scores": {
+   "b": 4,
+   "u": 5,
+   "e": 5,
+   "c": 5,
+   "v": 5,
+   "l": 3
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1558845530-c0fe1ae1cb02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwyfHxSb29zZXZlbHQlMjBJc2xhbmQlMjBUcmFtJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg1OTkwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Patrick T'Kindt / Unsplash",
+  "imgLink": "https://unsplash.com/photos/cable-car-above-vehicles-on-crossing-road-1nZL-AwSp8k"
+ },
+ {
+  "id": 18,
+  "name": "The Morgan Library",
+  "area": "Murray Hill",
+  "vibe": "J.P. Morgan's private study — a jewel-box of manuscripts and gilt ceilings.",
+  "styles": [
+   "Culture",
+   "Hidden gems",
+   "Luxury"
+  ],
+  "moods": [
+   "calm",
+   "premium",
+   "culture",
+   "hidden",
+   "beautiful"
+  ],
+  "best": "Weekday afternoon",
+  "dur": 75,
+  "crowd": "Low",
+  "price": "$$$",
+  "dress": "Smart",
+  "hours": "10:30am–5pm (closed Mon)",
+  "resv": "Recommended",
+  "photo": "Mr. Morgan's Study, red silk walls",
+  "cafe": "The Morgan Café",
+  "dinner": "Scarpetta nearby",
+  "insider": "The three-tiered original library room is breathtaking and almost always empty.",
+  "worth": "You love rare beauty and quiet, opulent rooms.",
+  "skip": "You want something lively or large — this is small and scholarly.",
+  "badges": [
+   "Quiet Luxury",
+   "Worth the Price",
+   "Local Favorite"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 4,
+   "c": 5,
+   "v": 4,
+   "l": 5
+  },
+  "rain": true,
+  "img": "https://images.unsplash.com/photo-1752035197023-d6c5550e2244?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw3fHxUaGUlMjBNb3JnYW4lMjBMaWJyYXJ5JTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg1OTkwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Intricate Explorer / Unsplash",
+  "imgLink": "https://unsplash.com/photos/an-elegant-library-shows-many-books-on-shelves-7AEFNoZDy6Q"
+ },
+ {
+  "id": 19,
+  "name": "The Battery & Sea Glass Carousel",
+  "area": "Lower Manhattan",
+  "vibe": "Harbour gardens at the island's tip, with a glowing carousel at dusk.",
+  "styles": [
+   "Nature & views",
+   "Family",
+   "Romantic"
+  ],
+  "moods": [
+   "calm",
+   "romantic",
+   "beautiful",
+   "family",
+   "quick"
+  ],
+  "best": "Sunset over the harbour",
+  "dur": 60,
+  "crowd": "Moderate",
+  "price": "Free (carousel $)",
+  "dress": "Comfortable",
+  "hours": "Daily",
+  "resv": "No",
+  "photo": "Harbour rail with the Statue of Liberty beyond",
+  "cafe": "Brookfield Place cafés",
+  "dinner": "Crown Shy (FiDi)",
+  "insider": "Skip the ferry queue — enjoy the gardens and Liberty view from shore at golden hour.",
+  "worth": "You want harbour air, Liberty views and a charming dusk stroll.",
+  "skip": "You specifically want to visit the Statue — that needs a ferry ticket.",
+  "badges": [
+   "Local Favorite",
+   "Best at Sunset"
+  ],
+  "scores": {
+   "b": 4,
+   "u": 4,
+   "e": 4,
+   "c": 4,
+   "v": 5,
+   "l": 3
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1541270941907-3f7143c8c7a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxUaGUlMjBCYXR0ZXJ5JTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg1OTkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "David Groves / Unsplash",
+  "imgLink": "https://unsplash.com/photos/lighted-high-rise-buildings-raXnREhb-uI"
+ },
+ {
+  "id": 20,
+  "name": "Conservatory Garden",
+  "area": "Central Park (105th St)",
+  "vibe": "Central Park's only formal garden — wisteria, fountains, and almost no one.",
+  "styles": [
+   "Hidden gems",
+   "Romantic",
+   "Wellness",
+   "Nature & views"
+  ],
+  "moods": [
+   "calm",
+   "romantic",
+   "hidden",
+   "beautiful",
+   "wellness"
+  ],
+  "best": "Late spring morning",
+  "dur": 45,
+  "crowd": "Low",
+  "price": "Free",
+  "dress": "Comfortable",
+  "hours": "8am–dusk",
+  "resv": "No",
+  "photo": "The Italian garden's wisteria pergola",
+  "cafe": "Clarke's on 5th",
+  "dinner": "Le Veau d'Or",
+  "insider": "Enter at the Vanderbilt Gate (105th & 5th) — a designated quiet zone, genuinely peaceful.",
+  "worth": "You want a secret, formal, romantic corner with no crowds.",
+  "skip": "It's mid-winter — beds are bare; come spring–autumn.",
+  "badges": [
+   "Quiet Luxury",
+   "Best for Couples",
+   "Local Favorite"
+  ],
+  "scores": {
+   "b": 5,
+   "u": 5,
+   "e": 4,
+   "c": 5,
+   "v": 5,
+   "l": 4
+  },
+  "rain": false,
+  "img": "https://images.unsplash.com/photo-1653860469518-95cd878db548?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHw0fHxDb25zZXJ2YXRvcnklMjBHYXJkZW4lMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODU5OTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+  "imgAttr": "Brett Wharton / Unsplash",
+  "imgLink": "https://unsplash.com/photos/a-couple-of-people-walking-down-a-street-next-to-plants-iWXVAEJ1WeQ"
+ }
 ]
