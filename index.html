@@ -264,6 +264,12 @@ a{color:var(--pur)}
 .dsig span{color:#8a8a72;font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.6px;margin-right:3px}
 .docc{display:flex;gap:5px;flex-wrap:wrap}
 .ochip{font-size:9px;font-weight:700;color:#b9b9cc;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:2px 8px;border-radius:20px}
+.fchip{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#ffd8a8;background:rgba(245,159,11,.14);border:1px solid rgba(245,159,11,.32);padding:2px 8px;border-radius:20px}
+.poster.dine{overflow:hidden}
+.poster.dine .dimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.card:hover .poster.dine .dimg{transform:scale(1.07)}
+.poster.dine .pscrim,.poster.dine .rope,.poster.dine .badge-rating{z-index:2}
+.poster.dine .pscrim{background:linear-gradient(to top,rgba(6,6,11,.97) 16%,rgba(6,6,11,.55) 58%,rgba(6,6,11,.08))}
 .controls span[id$=Controls]{display:contents}
 </style>
 </head>
@@ -566,6 +572,8 @@ let diningCuisine="all", diningOccasion="all", diningRope="all";
 const ROPE={1:"Walk right in",2:"Plan ahead",3:"Book the drop",4:"Hard to get",5:"Near impossible"};
 const DACC={"Italian":["#b91c1c","#5b1414"],"Italian-American":["#b91c1c","#5b1414"],"Italian Seafood":["#9f1239","#3f0a1a"],"French":["#3730a3","#1a1840"],"French-American":["#3730a3","#1a1840"],"Japanese":["#334155","#0f172a"],"Sushi":["#334155","#0f172a"],"Korean":["#9f1239","#3f0a1a"],"Korean Steakhouse":["#9f1239","#3f0a1a"],"Steakhouse":["#7c2d12","#3a1206"],"American":["#92400e","#3a1f06"],"American Chophouse":["#7c2d12","#3a1206"],"Seafood":["#0f766e","#062f2b"],"New American":["#6d28d9","#2e1065"],"Nordic":["#475569","#1e293b"],"Indian":["#c2410c","#5c1d06"],"South Indian":["#c2410c","#5c1d06"],"Mexican":["#15803d","#06301a"],"Spanish":["#b45309","#5c2a06"],"Sichuan":["#a16207","#3f2706"],"Cantonese":["#a16207","#3f2706"],"Cantonese-American":["#a16207","#3f2706"],"Pizza":["#b91c1c","#450a0a"],"Jewish Deli":["#a16207","#3f2706"],"Afro-Caribbean American":["#7e22ce","#3b0764"]};
 function dacc(c){ return DACC[c]||["#3f3f46","#18181b"]; }
+const FOODKW={"Italian":"pasta","Italian-American":"pasta","Italian Seafood":"seafood","French":"french","French-American":"french","Japanese":"sushi","Sushi":"sushi","Korean":"korean","Korean Steakhouse":"barbecue","Steakhouse":"steak","American":"burger","American Chophouse":"steak","Seafood":"seafood","New American":"plating","Nordic":"seafood","Indian":"curry","South Indian":"curry","Mexican":"tacos","Spanish":"tapas","Sichuan":"dumplings","Cantonese":"dumplings","Cantonese-American":"dumplings","Pizza":"pizza","Jewish Deli":"sandwich","Afro-Caribbean American":"caribbean"};
+function foodImg(r){ const kw=FOODKW[r.cuisine]||"restaurant"; return "https://loremflickr.com/440/320/"+kw+"?lock="+(r.id||1); }
 const QUESTIONS_DINE=[
  {id:"food", label:"How was the food?", opts:[["Exceptional",3],["Very good",2],["Fine",1],["Disappointing",0]]},
  {id:"vibe", label:"Vibe & service?", opts:[["Flawless",3],["Good",2],["A bit off",1],["Poor",0]]},
@@ -614,17 +622,17 @@ function diningCardHTML(item){
   const ratingBadge=(t&&t.status==="watched"&&t.rating!=null)?'<div class="badge-rating">'+Number(t.rating).toFixed(1)+'</div>':"";
   const rope=ROPE[r.rope];
   const meta=(r.cuisine||"")+" · "+(r.neighborhood||"")+(price?" · "+price:"");
-  const occ=(r.occasion||[]).slice(0,2).map(o=>'<span class="ochip">'+o+'</span>').join("");
+  const chips=(r.format?'<span class="fchip">'+r.format+'</span>':'')+(r.occasion||[]).slice(0,2).map(o=>'<span class="ochip">'+o+'</span>').join("");
   return '<div class="card">'
     +'<div class="poster dine" style="background:linear-gradient(155deg,'+a[0]+','+a[1]+')">'
-      +'<div class="ptype">'+(r.format||"")+'</div>'
+      +'<img class="dimg" loading="lazy" src="'+foodImg(r)+'" alt="" onerror="this.remove()">'
       +(rope?'<div class="rope r'+r.rope+'">'+rope+'</div>':'')
       +ratingBadge
       +'<div class="pscrim">'+(r.recognition?'<div class="dped">'+r.recognition+'</div>':'')+'<div class="ptitle">'+r.name+'</div><div class="pmeta">'+meta+'</div></div>'
     +'</div>'
     +'<div class="cbody">'
-      +(r.signature?'<div class="dsig"><span>Order</span>'+r.signature+'</div>':'')
-      +(occ?'<div class="docc">'+occ+'</div>':'')
+      +(chips?'<div class="docc">'+chips+'</div>':'')
+      +(r.signature?'<div class="dsig"><span>Order</span> '+r.signature+'</div>':'')
       +statusButtons(item)
     +'</div></div>';
 }
