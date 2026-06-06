@@ -245,6 +245,26 @@ a{color:var(--pur)}
 .tcard .tt{font-size:13.5px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);line-height:1.2}
 .tcard .ts2{font-size:10.5px;color:rgba(255,255,255,.82);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
 .tlock{position:absolute;z-index:2;top:10px;right:11px;font-size:12px;opacity:.85}
+
+/* ===== DINING ===== */
+.cat-title-bar .ic{display:inline-flex}
+.cat-title-bar .ic svg{width:22px;height:22px;color:#cfcfe0}
+.cat-title-bar .loc{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(255,211,107,.12);border:1px solid rgba(255,211,107,.3);padding:2px 8px;border-radius:20px;margin-left:4px}
+.cat-tile.ready{border-color:rgba(245,158,11,.45);background:linear-gradient(165deg,rgba(245,158,11,.16),rgba(239,68,68,.05))}
+.cat-tile .newbadge{position:absolute;top:11px;right:11px;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#0a0a0f;background:linear-gradient(135deg,#f59e0b,#ef4444);padding:2px 8px;border-radius:20px}
+.poster.dine .ptitle{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;letter-spacing:.3px}
+.poster .dped{font-size:9.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 6px rgba(0,0,0,.7);margin-bottom:2px}
+.rope{position:absolute;top:10px;right:10px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:3px 8px;border-radius:20px;backdrop-filter:blur(6px)}
+.rope.r1{background:rgba(47,158,68,.22);color:#8ce99a;border:1px solid rgba(47,158,68,.45)}
+.rope.r2{background:rgba(255,255,255,.12);color:#e9ecef;border:1px solid rgba(255,255,255,.22)}
+.rope.r3{background:rgba(34,139,230,.2);color:#a5d8ff;border:1px solid rgba(34,139,230,.45)}
+.rope.r4{background:rgba(245,159,11,.22);color:#ffd8a8;border:1px solid rgba(245,159,11,.5)}
+.rope.r5{background:rgba(236,72,153,.22);color:#ffe08a;border:1px solid rgba(255,215,120,.55);box-shadow:0 0 16px rgba(236,72,153,.4)}
+.dsig{font-size:11.5px;color:#d7c08a;font-weight:600;line-height:1.35}
+.dsig span{color:#8a8a72;font-weight:700;text-transform:uppercase;font-size:9px;letter-spacing:.6px;margin-right:3px}
+.docc{display:flex;gap:5px;flex-wrap:wrap}
+.ochip{font-size:9px;font-weight:700;color:#b9b9cc;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:2px 8px;border-radius:20px}
+.controls span[id$=Controls]{display:contents}
 </style>
 </head>
 <body>
@@ -297,7 +317,7 @@ a{color:var(--pur)}
   <div class="wrap">
     <header class="cat-header">
       <button class="homebtn" id="homeBtn">← Hub</button>
-      <div class="cat-title-bar"><span class="ic" style="display:inline-flex"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8.5" width="18" height="12" rx="2"/><path d="M3.4 8.5 6 4.2l3.2 2.1L11.4 4l3.2 2.1L17.8 4l2.8 4.5"/></svg></span> Entertainment</div>
+      <div class="cat-title-bar" id="catTitle"></div>
       <div class="headright">
         <div class="tabs" id="tabs">
           <button data-tab="discover" class="active">Discover</button>
@@ -311,12 +331,26 @@ a{color:var(--pur)}
     <section id="discover">
       <div class="controls">
         <input type="search" id="search" placeholder="Search any movie or show (live from TMDB)…">
-        <div class="seg" id="typeSeg">
-          <button data-type="all" class="active">All</button>
-          <button data-type="movie">Movies</button>
-          <button data-type="tv">TV</button>
-        </div>
-        <select id="genreSel"></select>
+        <span id="entControls">
+          <div class="seg" id="typeSeg">
+            <button data-type="all" class="active">All</button>
+            <button data-type="movie">Movies</button>
+            <button data-type="tv">TV</button>
+          </div>
+          <select id="genreSel"></select>
+        </span>
+        <span id="dinControls" style="display:none">
+          <select id="cuisineSel"></select>
+          <select id="occasionSel"></select>
+          <select id="ropeSel">
+            <option value="all">Any difficulty</option>
+            <option value="5">Near impossible</option>
+            <option value="4">Hard to get</option>
+            <option value="3">Book the drop</option>
+            <option value="2">Plan ahead</option>
+            <option value="1">Walk right in</option>
+          </select>
+        </span>
         <span class="count" id="discoverCount"></span>
       </div>
       <div class="grid" id="discoverGrid"></div>
@@ -380,6 +414,7 @@ const QUESTIONS = [
  {id:"recommend", label:"Would you recommend or rewatch it?", opts:[["Yes, eagerly",2],["Maybe",1],["No",0]]},
  {id:"stuck", label:"Did it stick with you afterward?", opts:[["A lot",2],["Somewhat",1],["Not really",0]]}
 ];
+let curQuestions=QUESTIONS;
 
 function el(id){ return document.getElementById(id); }
 function starsSimple(r10){ const full=Math.round(r10/2); return "★".repeat(full)+"☆".repeat(5-full); }
@@ -453,7 +488,16 @@ function updateHubCounts(){
   const n=CATALOG_FILE.length;
   el("entSub").textContent = n ? (n.toLocaleString()+" titles") : "Movies & TV";
 }
-function enterCategory(){ hideScreens(); el("category").classList.remove("hidden"); showTab("discover"); }
+async function enterCategory(v){
+  vertical=v||"entertainment";
+  hideScreens(); el("category").classList.remove("hidden");
+  filterType="all"; filterGenre="all"; searchQ=""; el("search").value="";
+  diningCuisine="all"; diningOccasion="all"; diningRope="all"; libStatus="watched";
+  if(vertical==="dining" && !DINING.length) await loadDining();
+  setupVertical(vertical);
+  await loadTracked();
+  showTab("discover");
+}
 el("homeBtn").addEventListener("click", showHub);
 const SVGW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">';
 const ICONS={
@@ -466,7 +510,7 @@ const ICONS={
 };
 const CATS=[
  {v:"entertainment",name:"Entertainment",sub:"Movies & TV",a:["#8b5cf6","#ec4899"],glow:"rgba(139,92,246,.55)",icon:ICONS.clap,active:true},
- {v:"dining",name:"Dining",sub:"Restaurants",a:["#f59e0b","#ef4444"],glow:"rgba(245,158,11,.5)",icon:ICONS.fork},
+ {v:"dining",name:"Dining",sub:"New York · 50 tables",a:["#f59e0b","#ef4444"],glow:"rgba(245,158,11,.5)",icon:ICONS.fork,ready:true},
  {v:"places",name:"Places",sub:"Spots to go",a:["#14b8a6","#06b6d4"],glow:"rgba(20,184,166,.5)",icon:ICONS.pin},
  {v:"theater",name:"Theater",sub:"Broadway & live",a:["#fb7185","#e11d48"],glow:"rgba(251,113,133,.5)",icon:ICONS.mask},
  {v:"music",name:"Music",sub:"Albums & gigs",a:["#6366f1","#22d3ee"],glow:"rgba(99,102,241,.5)",icon:ICONS.note},
@@ -475,12 +519,19 @@ const CATS=[
 function medallion(c,big){ return '<span class="cat-medallion'+(big?' big':'')+'" style="--c1:'+c.a[0]+';--c2:'+c.a[1]+';--glow:'+c.glow+'">'+c.icon+'</span>'; }
 function renderHubTiles(){
   el("catGrid").innerHTML=CATS.map(c=>{
-    const base='class="cat-tile '+(c.active?'active':'soon')+'" data-v="'+c.v+'" data-name="'+c.name+'"';
-    if(c.active) return '<button '+base+'>'+medallion(c)+'<span class="cat-name">'+c.name+'</span><span class="cat-sub" id="entSub">'+c.sub+'</span><span class="enter">Enter</span></button>';
+    const enterable=c.active||c.ready;
+    const cls='cat-tile '+(c.active?'active':c.ready?'ready':'soon');
+    const base='class="'+cls+'" data-v="'+c.v+'" data-name="'+c.name+'"';
+    if(enterable){
+      const badge=c.ready?'<span class="newbadge">New</span>':'';
+      const subId=c.v==="entertainment"?' id="entSub"':'';
+      return '<button '+base+'>'+badge+medallion(c)+'<span class="cat-name">'+c.name+'</span><span class="cat-sub"'+subId+'>'+c.sub+'</span><span class="enter">Enter</span></button>';
+    }
     return '<button '+base+'><span class="lock">Soon</span>'+medallion(c)+'<span class="cat-name">'+c.name+'</span><span class="cat-sub">'+c.sub+'</span></button>';
   }).join("");
   document.querySelectorAll("#catGrid .cat-tile").forEach(t=> t.addEventListener("click", ()=>{
-    if(t.dataset.v==="entertainment") enterCategory(); else showTeaser(t.dataset.v);
+    const c=CATS.find(x=>x.v===t.dataset.v);
+    if(c && (c.active||c.ready)) enterCategory(t.dataset.v); else showTeaser(t.dataset.v);
   }));
   updateHubCounts();
 }
@@ -509,6 +560,75 @@ function showTeaser(v){
   window.scrollTo(0,0);
 }
 
+/* ===== DINING ===== */
+let DINING=[], DINING_BY_ID={};
+let diningCuisine="all", diningOccasion="all", diningRope="all";
+const ROPE={1:"Walk right in",2:"Plan ahead",3:"Book the drop",4:"Hard to get",5:"Near impossible"};
+const DACC={"Italian":["#b91c1c","#5b1414"],"Italian-American":["#b91c1c","#5b1414"],"Italian Seafood":["#9f1239","#3f0a1a"],"French":["#3730a3","#1a1840"],"French-American":["#3730a3","#1a1840"],"Japanese":["#334155","#0f172a"],"Sushi":["#334155","#0f172a"],"Korean":["#9f1239","#3f0a1a"],"Korean Steakhouse":["#9f1239","#3f0a1a"],"Steakhouse":["#7c2d12","#3a1206"],"American":["#92400e","#3a1f06"],"American Chophouse":["#7c2d12","#3a1206"],"Seafood":["#0f766e","#062f2b"],"New American":["#6d28d9","#2e1065"],"Nordic":["#475569","#1e293b"],"Indian":["#c2410c","#5c1d06"],"South Indian":["#c2410c","#5c1d06"],"Mexican":["#15803d","#06301a"],"Spanish":["#b45309","#5c2a06"],"Sichuan":["#a16207","#3f2706"],"Cantonese":["#a16207","#3f2706"],"Cantonese-American":["#a16207","#3f2706"],"Pizza":["#b91c1c","#450a0a"],"Jewish Deli":["#a16207","#3f2706"],"Afro-Caribbean American":["#7e22ce","#3b0764"]};
+function dacc(c){ return DACC[c]||["#3f3f46","#18181b"]; }
+const QUESTIONS_DINE=[
+ {id:"food", label:"How was the food?", opts:[["Exceptional",3],["Very good",2],["Fine",1],["Disappointing",0]]},
+ {id:"vibe", label:"Vibe & service?", opts:[["Flawless",3],["Good",2],["A bit off",1],["Poor",0]]},
+ {id:"worth", label:"Worth it for the price?", opts:[["Absolutely",2],["Yes",1],["Not really",0]]},
+ {id:"return", label:"Would you go back or send a friend?", opts:[["Already planning",2],["Maybe",1],["No",0]]}
+];
+async function loadDining(){
+  try{
+    const r=await fetch("./dining.json?_="+Date.now()); const arr=await r.json();
+    DINING=arr.map(x=>Object.assign({},x,{tmdb_id:x.id,media_type:"dining",title:x.name,genres:[x.cuisine,x.format,x.neighborhood]}));
+    DINING_BY_ID={}; DINING.forEach(x=>DINING_BY_ID[x.id]=x);
+    const cuis=[...new Set(DINING.map(x=>x.cuisine))].sort();
+    el("cuisineSel").innerHTML='<option value="all">All cuisines</option>'+cuis.map(c=>'<option value="'+c+'">'+c+'</option>').join("");
+    const occs=[...new Set(DINING.flatMap(x=>x.occasion))].sort();
+    el("occasionSel").innerHTML='<option value="all">Any occasion</option>'+occs.map(o=>'<option value="'+o+'">'+o+'</option>').join("");
+  }catch(e){ DINING=[]; }
+}
+function setupVertical(v){
+  const c=CATS.find(x=>x.v===v);
+  el("catTitle").innerHTML='<span class="ic">'+c.icon+'</span> '+c.name+(v==="dining"?' <span class="loc">New York</span>':'');
+  const ent=v==="entertainment";
+  el("entControls").style.display=ent?"contents":"none";
+  el("dinControls").style.display=v==="dining"?"contents":"none";
+  el("search").placeholder=v==="dining"?"Search NYC restaurants…":"Search any movie or show (live from TMDB)…";
+  if(ent){ document.querySelectorAll("#typeSeg button").forEach(b=>b.classList.toggle("active",b.dataset.type==="all")); if(el("genreSel")) el("genreSel").value="all"; }
+  else if(v==="dining"){ el("cuisineSel").value="all"; el("occasionSel").value="all"; el("ropeSel").value="all"; }
+  const lib=v==="dining"?{watched:"Been",watching:"Booked",want:"Want to go"}:{watched:"Watched",watching:"Watching",want:"Watchlist"};
+  document.querySelectorAll("#libSeg button").forEach(b=>{ b.textContent=lib[b.dataset.status]; b.classList.toggle("active",b.dataset.status==="watched"); });
+}
+function renderDiningDiscover(){
+  if(!DINING.length){ el("discoverGrid").innerHTML='<div class="empty">Loading restaurants…</div>'; el("discoverCount").textContent=""; return; }
+  const q=searchQ.toLowerCase();
+  let items=DINING.filter(r=>{
+    if(diningCuisine!=="all" && r.cuisine!==diningCuisine) return false;
+    if(diningOccasion!=="all" && !r.occasion.includes(diningOccasion)) return false;
+    if(diningRope!=="all" && String(r.rope)!==diningRope) return false;
+    if(q.length>1 && !r.name.toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b)=> b.rope-a.rope || a.name.localeCompare(b.name));
+  renderGrid(items);
+}
+function diningCardHTML(item){
+  const r=DINING_BY_ID[item.tmdb_id]||item;
+  const a=dacc(r.cuisine||""); const price="$".repeat(r.price||0);
+  const t=tracked["dining:"+(r.id||item.tmdb_id)];
+  const ratingBadge=(t&&t.status==="watched"&&t.rating!=null)?'<div class="badge-rating">'+Number(t.rating).toFixed(1)+'</div>':"";
+  const rope=ROPE[r.rope];
+  const meta=(r.cuisine||"")+" · "+(r.neighborhood||"")+(price?" · "+price:"");
+  const occ=(r.occasion||[]).slice(0,2).map(o=>'<span class="ochip">'+o+'</span>').join("");
+  return '<div class="card">'
+    +'<div class="poster dine" style="background:linear-gradient(155deg,'+a[0]+','+a[1]+')">'
+      +'<div class="ptype">'+(r.format||"")+'</div>'
+      +(rope?'<div class="rope r'+r.rope+'">'+rope+'</div>':'')
+      +ratingBadge
+      +'<div class="pscrim">'+(r.recognition?'<div class="dped">'+r.recognition+'</div>':'')+'<div class="ptitle">'+r.name+'</div><div class="pmeta">'+meta+'</div></div>'
+    +'</div>'
+    +'<div class="cbody">'
+      +(r.signature?'<div class="dsig"><span>Order</span>'+r.signature+'</div>':'')
+      +(occ?'<div class="docc">'+occ+'</div>':'')
+      +statusButtons(item)
+    +'</div></div>';
+}
+
 /* ===== TMDB ===== */
 async function tmdb(path, params){
   const url=new URL("https://api.themoviedb.org/3/"+path);
@@ -530,6 +650,7 @@ async function loadCatalogFile(){
   catch(e){ CATALOG_FILE=[]; }
 }
 function loadDiscover(){
+  if(vertical==="dining") return renderDiningDiscover();
   const grid=el("discoverGrid");
   if(searchQ.length>1) return liveSearch();
   if(!CATALOG_FILE.length){ grid.innerHTML='<div class="empty">Catalog is loading… <b>try a search</b> to pull live from TMDB.</div>'; el("discoverCount").textContent=""; return; }
@@ -591,12 +712,15 @@ function posterHTML(item){
 }
 function statusButtons(item){
   const t=tracked[item.media_type+":"+item.tmdb_id], s=t?t.status:null;
+  const dine=item.media_type==="dining";
+  const L=dine?{want:"Want to go",watching:"Booked",watched:"Been"}:{want:"Watchlist",watching:"Watching",watched:"Watched"};
   return '<div class="statusrow" data-key="'+item.media_type+":"+item.tmdb_id+'">'
-    +'<button class="want '+(s==="want"?"on":"")+'" data-s="want">Watchlist</button>'
-    +'<button class="watching '+(s==="watching"?"on":"")+'" data-s="watching">Watching</button>'
-    +'<button class="watched '+(s==="watched"?"on":"")+'" data-s="watched">Watched</button></div>';
+    +'<button class="want '+(s==="want"?"on":"")+'" data-s="want">'+L.want+'</button>'
+    +'<button class="watching '+(s==="watching"?"on":"")+'" data-s="watching">'+L.watching+'</button>'
+    +'<button class="watched '+(s==="watched"?"on":"")+'" data-s="watched">'+L.watched+'</button></div>';
 }
 function cardHTML(item){
+  if(item.media_type==="dining") return diningCardHTML(item);
   const gl=(item.genres&&item.genres.length)?item.genres.slice(0,3).join(" · "):"";
   const gline=gl?'<div class="cgenres">'+gl+'</div>':'';
   return '<div class="card">'+posterHTML(item)+'<div class="cbody">'+gline+statusButtons(item)+'</div></div>';
@@ -610,7 +734,7 @@ function renderGrid(items){
   const grid=el("discoverGrid"); viewIndex={};
   items.forEach(it=> viewIndex[it.media_type+":"+it.tmdb_id]=it);
   grid.innerHTML=items.length?items.map(cardHTML).join(""):'<div class="empty">No titles found.</div>';
-  el("discoverCount").textContent=items.length+(searchQ.length>1?" results":" titles");
+  el("discoverCount").textContent=items.length+" "+(vertical==="dining"?"places":(searchQ.length>1?"results":"titles"));
 }
 
 /* ===== LIBRARY ===== */
@@ -618,12 +742,13 @@ let libStatus="watched";
 function renderLibrary(){
   const body=el("libraryBody");
   const items=Object.values(tracked).filter(t=>t.status===libStatus);
-  el("libCount").textContent=items.length+" title"+(items.length===1?"":"s");
-  if(!items.length){ const l=libStatus==="watched"?"watched":libStatus==="watching"?"currently watching":"on your watchlist";
-    body.innerHTML='<div class="empty">Nothing '+l+' yet.<br><b>Head to Discover</b> to add titles.</div>'; return; }
+  const dine=vertical==="dining";
+  el("libCount").textContent=items.length+" "+(dine?"place":"title")+(items.length===1?"":"s");
+  if(!items.length){ const lE={watched:"watched",watching:"currently watching",want:"on your watchlist"}, lD={watched:"visited",watching:"booked",want:"on your go-to list"};
+    body.innerHTML='<div class="empty">Nothing '+(dine?lD:lE)[libStatus]+' yet.<br><b>Head to Discover</b> to add '+(dine?"places":"titles")+'.</div>'; return; }
   const groups={}; items.forEach(t=>{ const g=(t.genres&&t.genres[0])||"Other"; (groups[g]=groups[g]||[]).push(t); });
   body.innerHTML=Object.keys(groups).sort().map(g=>{
-    const c=colorFor(g); let arr=groups[g].slice();
+    const c=dine?dacc(g):colorFor(g); let arr=groups[g].slice();
     if(libStatus==="watched") arr.sort((x,y)=>(y.rating||0)-(x.rating||0)); else arr.sort((x,y)=>(y.year||0)-(x.year||0));
     return '<div class="shelf"><h2><span class="dot" style="background:linear-gradient(135deg,'+c[0]+','+c[1]+')"></span>'+g+' <span class="n">'+arr.length+'</span></h2><div class="grid">'+arr.map(t=>cardHTML(asItem(t))).join("")+'</div></div>';
   }).join("");
@@ -636,17 +761,18 @@ function renderStats(){
   const rated=watched.filter(t=>t.rating!=null);
   const avg=rated.length?rated.reduce((s,t)=>s+Number(t.rating),0)/rated.length:0;
   let top="—"; if(rated.length) top=rated.slice().sort((a,b)=>Number(b.rating)-Number(a.rating))[0].title;
+  const dine=vertical==="dining";
   el("statCards").innerHTML=
-     '<div class="stat"><div class="v">'+watched.length+'</div><div class="l">Watched</div></div>'
-    +'<div class="stat"><div class="v">'+watching+'</div><div class="l">Watching now</div></div>'
-    +'<div class="stat"><div class="v">'+want+'</div><div class="l">On watchlist</div></div>'
+     '<div class="stat"><div class="v">'+watched.length+'</div><div class="l">'+(dine?"Been":"Watched")+'</div></div>'
+    +'<div class="stat"><div class="v">'+watching+'</div><div class="l">'+(dine?"Booked":"Watching now")+'</div></div>'
+    +'<div class="stat"><div class="v">'+want+'</div><div class="l">'+(dine?"Want to go":"On watchlist")+'</div></div>'
     +'<div class="stat"><div class="v">'+(avg?avg.toFixed(1):"–")+'</div><div class="l">Avg rating /10</div></div>';
   const gc={}; watched.forEach(t=>(t.genres||[]).forEach(g=>gc[g]=(gc[g]||0)+1));
   const entries=Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,8), max=entries.length?entries[0][1]:1;
   const bars=el("genreBars");
-  if(!watched.length){ bars.innerHTML='<h3>Your taste</h3><div class="empty" style="padding:30px">Rate a few watched titles to see your taste profile.</div>'; return; }
-  bars.innerHTML='<h3>What you watch most '+(top!=="—"?'· top pick: <span style="color:#c4b5fd">'+top+'</span>':'')+'</h3>'
-    +entries.map(function(en){ const g=en[0],n=en[1],c=colorFor(g);
+  if(!watched.length){ bars.innerHTML='<h3>Your taste</h3><div class="empty" style="padding:30px">'+(dine?"Mark a few visits to see your taste profile.":"Rate a few watched titles to see your taste profile.")+'</div>'; return; }
+  bars.innerHTML='<h3>'+(dine?"What you go for most":"What you watch most")+' '+(top!=="—"?'· top pick: <span style="color:#c4b5fd">'+top+'</span>':'')+'</h3>'
+    +entries.map(function(en){ const g=en[0],n=en[1],c=dine?dacc(g):colorFor(g);
       return '<div class="bar"><div class="bl">'+g+'</div><div class="btrack"><div class="bfill" style="width:'+Math.round(n/max*100)+'%;background:linear-gradient(90deg,'+c[0]+','+c[1]+')"></div></div><div class="bn">'+n+'</div></div>'; }).join("");
 }
 
@@ -655,8 +781,8 @@ document.body.addEventListener("click", function(e){
   const btn=e.target.closest(".statusrow button"); if(!btn) return;
   const k=btn.parentElement.dataset.key, s=btn.dataset.s, inTracked=tracked[k];
   let item=viewIndex[k]||(inTracked?asItem(inTracked):null);
-  if(!item){ const card=btn.closest(".card"), title=card.querySelector(".ct").textContent, parts=k.split(":");
-    item={media_type:parts[0],tmdb_id:parseInt(parts[1],10),title,year:null,genres:[],poster_path:null}; }
+  if(!item){ const card=btn.closest(".card"), tn=card.querySelector(".ct")||card.querySelector(".ptitle"), parts=k.split(":");
+    item={media_type:parts[0],tmdb_id:parseInt(parts[1],10),title:tn?tn.textContent:"",year:null,genres:[],poster_path:null}; }
   if(s==="watched"){ if(inTracked&&inTracked.status==="watched"){ setStatus(item,"watched"); return; } openRatingModal(item); return; }
   setStatus(item,s);
 });
@@ -665,13 +791,16 @@ document.body.addEventListener("click", function(e){
 let modalItem=null, answers={};
 function openRatingModal(item){
   modalItem=item; answers={};
+  const dine=item.media_type==="dining";
+  curQuestions = dine?QUESTIONS_DINE:QUESTIONS;
+  el("modalSave").textContent = dine?"Mark as Been":"Save to Watched";
   el("modalTitle").textContent=item.title+(item.year?(" ("+item.year+")"):"");
-  el("modalQuestions").innerHTML=QUESTIONS.map(function(q){
+  el("modalQuestions").innerHTML=curQuestions.map(function(q){
     return '<div class="q"><div class="ql">'+q.label+'</div><div class="opts">'+q.opts.map(function(o){ return '<label><input type="radio" name="'+q.id+'" value="'+o[1]+'"> '+o[0]+'</label>'; }).join("")+'</div></div>'; }).join("");
   updateLive(); el("overlay").classList.add("show");
 }
 function updateLive(){
-  const answered=Object.keys(answers).length, total=QUESTIONS.length, raw=Object.values(answers).reduce((s,v)=>s+v,0);
+  const answered=Object.keys(answers).length, total=curQuestions.length, raw=Object.values(answers).reduce((s,v)=>s+v,0);
   if(answered===total){ el("liveScore").textContent=raw.toFixed(1); el("liveStars").textContent=starsSimple(raw); el("modalSave").disabled=false; }
   else { el("liveScore").textContent=answered+"/"+total; el("liveStars").textContent=starsSimple(raw); el("modalSave").disabled=true; }
 }
@@ -680,7 +809,7 @@ el("modalQuestions").addEventListener("change", function(e){
     const opts=e.target.closest(".opts"); opts.querySelectorAll("label").forEach(l=>l.classList.remove("sel")); e.target.closest("label").classList.add("sel"); updateLive(); }
 });
 el("modalSave").addEventListener("click", async function(){
-  if(Object.keys(answers).length<QUESTIONS.length) return;
+  if(Object.keys(answers).length<curQuestions.length) return;
   const rating=Object.values(answers).reduce((s,v)=>s+v,0);
   el("modalSave").disabled=true; await saveWatched(modalItem,rating,answers); closeModal();
 });
@@ -703,6 +832,9 @@ el("libSeg").addEventListener("click",function(e){ const b=e.target.closest("but
 el("genreSel").addEventListener("change",function(e){ filterGenre=e.target.value; loadDiscover(); });
 let searchTimer=null;
 el("search").addEventListener("input",function(e){ searchQ=e.target.value.trim(); clearTimeout(searchTimer); searchTimer=setTimeout(loadDiscover,350); });
+el("cuisineSel").addEventListener("change",function(e){ diningCuisine=e.target.value; renderDiningDiscover(); });
+el("occasionSel").addEventListener("change",function(e){ diningOccasion=e.target.value; renderDiningDiscover(); });
+el("ropeSel").addEventListener("change",function(e){ diningRope=e.target.value; renderDiningDiscover(); });
 function refresh(){
   if(tab==="discover"){ if(searchQ.length>1) renderGrid(Object.values(viewIndex)); else loadDiscover(); }
   if(tab==="library") renderLibrary(); if(tab==="stats") renderStats();
