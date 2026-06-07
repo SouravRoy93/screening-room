@@ -1,25 +1,20 @@
-// Aesthetic photo selector for Places — WIKIMEDIA-FIRST (accurate + storable).
-// For each place it:
-//   1. takes the VERIFIED Wikipedia article photo as the anchor candidate (index 0)
-//   2. adds Unsplash candidates as aesthetic alternatives
-//   3. asks the vision model to keep #0 unless another image is CLEARLY the same place AND prettier
-//   4. writes the winning URL + attribution into places.json
-// Sends small thumbnails to the model to keep cost low.
+// Place photos — WIKIMEDIA-DIRECT (accurate first). For each place it uses the
+// verified Wikipedia article photo (skipping logos/SVGs). Only if a place has no
+// Wikipedia photo does it fall back to Unsplash (+ optional vision pick).
 //
-// Env (GitHub Actions secrets):
-//   UNSPLASH_ACCESS_KEY   - optional; adds aesthetic alternatives
-//   AI_PROVIDER           - "anthropic" or "openai" (optional; without it, Wikimedia photo is used as-is)
-//   ANTHROPIC_API_KEY / OPENAI_API_KEY
+// Optional env (only used for the Unsplash fallback):
+//   UNSPLASH_ACCESS_KEY, AI_PROVIDER ("anthropic"/"openai"), ANTHROPIC_API_KEY / OPENAI_API_KEY
+// With Wikimedia-direct, the 20 NYC landmarks need NO keys and cost $0.
 import { readFileSync, writeFileSync } from "node:fs";
 
 const UNSPLASH = process.env.UNSPLASH_ACCESS_KEY;
 const PROVIDER = (process.env.AI_PROVIDER || "").toLowerCase();
 
-// Exact Wikipedia article titles → guarantees the correct, verified photo for every place.
+// Exact Wikipedia article titles → the correct, verified photo for every place.
 const WIKI = {
   1:"Central Park", 2:"Metropolitan Museum of Art", 3:"High Line", 4:"Brooklyn Bridge",
   5:"The Cloisters", 6:"One Vanderbilt", 7:"Frick Collection", 8:"Little Island (park)",
-  9:"Grand Central Terminal", 10:"Rockefeller Center", 11:"New York Public Library Main Branch",
+  9:"Grand Central Terminal", 10:"30 Rockefeller Plaza", 11:"New York Public Library Main Branch",
   12:"Whitney Museum of American Art", 13:"Brooklyn Heights Promenade", 14:"Brooklyn Botanic Garden",
   15:"World Trade Center station (PATH)", 16:"Bryant Park", 17:"Roosevelt Island Tramway",
   18:"Morgan Library & Museum", 19:"The Battery (Manhattan)", 20:"Conservatory Garden"
@@ -32,8 +27,9 @@ async function wikimedia(title){
     const d = await r.json();
     const pages = (d.query && d.query.pages) || {}; const pg = pages[Object.keys(pages)[0]];
     const o = pg && (pg.original || pg.thumbnail); if(!o || !o.source) return null;
-    return { url:o.source, thumb:(pg.thumbnail && pg.thumbnail.source) || o.source, w:o.width||1200, h:o.height||800,
-      attr:"via Wikimedia Commons", link:"https://en.wikipedia.org/wiki/" + encodeURIComponent(title), src:"wikimedia" };
+    if(/\.svg(\?|$)/i.test(o.source)) return null;                 // skip logos / vector graphics
+    const url = (o.width && o.width > 2600 && pg.thumbnail) ? pg.thumbnail.source : o.source; // avoid huge files
+    return { url, attr:"via Wikimedia Commons", link:"https://en.wikipedia.org/wiki/" + encodeURIComponent(title), src:"wikimedia" };
   }catch(e){ return null; }
 }
 async function unsplash(query){
@@ -44,7 +40,7 @@ async function unsplash(query){
     if(!r.ok) return [];
     const d = await r.json();
     return (d.results || []).filter(p => p.width >= p.height && p.width >= 800).map(p => ({
-      url:p.urls.regular, thumb:(p.urls.small || p.urls.thumb), w:p.width, h:p.height,
+      url:p.urls.regular, thumb:(p.urls.small || p.urls.thumb),
       attr:(p.user && p.user.name ? p.user.name : "Unsplash") + " / Unsplash",
       link:(p.links && p.links.html) || "https://unsplash.com",
       dl:(p.links && p.links.download_location) || null, src:"unsplash" }));
@@ -52,7 +48,7 @@ async function unsplash(query){
 }
 async function visionPick(name, list){
   if(!PROVIDER) return 0;
-  const prompt = 'Choose the best hero photo for "' + name + '" in New York. Image 0 is a VERIFIED photo of this exact place. Only choose a different image if it CLEARLY shows the same place AND is noticeably more beautiful (better light/composition); if you are not sure another image is the same place, answer 0. Never choose maps, logos, menus, interiors of unrelated rooms, or crowd selfies. Reply with ONLY the index number.';
+  const prompt = 'Pick the most beautiful, accurate hero photo of "' + name + '" in New York. Avoid maps, logos, menus, and crowd selfies. Reply with ONLY the index number.';
   try{
     if(PROVIDER === "anthropic"){
       const key = process.env.ANTHROPIC_API_KEY; if(!key) return 0;
@@ -72,18 +68,16 @@ const places = JSON.parse(readFileSync("places.json", "utf8"));
 let updated = 0;
 for(const p of places){
   const base = p.name.split("—")[0].split("&")[0].trim();
-  const wiki = await wikimedia(WIKI[p.id] || base);     // verified, accurate anchor
-  let cands = [];
-  if(wiki) cands.push(wiki);                              // index 0 = correct place
-  const uns = await unsplash(base + " New York");
-  cands = cands.concat(uns.slice(0, 6));
-  if(!cands.length){ console.warn("no candidates:", p.name); continue; }
-  let idx = (cands.length > 1) ? await visionPick(p.name, cands) : 0;
-  const best = cands[idx] || cands[0];
+  let best = await wikimedia(WIKI[p.id] || base);          // accurate landmark photo first
+  if(!best){                                                // only if Wikipedia has no photo
+    const uns = await unsplash(base + " New York");
+    if(uns.length){ const i = uns.length > 1 ? await visionPick(p.name, uns) : 0; best = uns[i]; }
+  }
+  if(!best){ console.warn("no photo:", p.name); continue; }
   p.img = best.url; p.imgAttr = best.attr; p.imgLink = best.link;
   if(best.src === "unsplash" && best.dl){ try{ await fetch(best.dl + "?client_id=" + UNSPLASH); }catch(e){} }
   updated++;
-  console.log(p.name, "→", best.src, "#" + idx);
+  console.log(p.name, "→", best.src);
 }
 writeFileSync("places.json", JSON.stringify(places, null, 1));
 console.log("Updated " + updated + " / " + places.length + " places.");
