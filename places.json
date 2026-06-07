@@ -44,7 +44,7 @@
    "l": 4
   },
   "rain": false,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Global_Citizen_Festival_Central_Park_New_York_City_from_NYonAir_%2815351915006%29.jpg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Global_Citizen_Festival_Central_Park_New_York_City_from_NYonAir_%2815351915006%29.jpg/1920px-Global_Citizen_Festival_Central_Park_New_York_City_from_NYonAir_%2815351915006%29.jpg",
   "imgAttr": "via Wikimedia Commons",
   "imgLink": "https://en.wikipedia.org/wiki/Central%20Park"
  },
@@ -92,7 +92,7 @@
    "l": 4
   },
   "rain": true,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/3/30/Metropolitan_Museum_of_Art_%28The_Met%29_-_Central_Park%2C_NYC.jpg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Metropolitan_Museum_of_Art_%28The_Met%29_-_Central_Park%2C_NYC.jpg/1920px-Metropolitan_Museum_of_Art_%28The_Met%29_-_Central_Park%2C_NYC.jpg",
   "imgAttr": "via Wikimedia Commons",
   "imgLink": "https://en.wikipedia.org/wiki/Metropolitan%20Museum%20of%20Art"
  },
@@ -190,7 +190,7 @@
    "l": 3
   },
   "rain": false,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Brooklyn_Bridge_and_the_Lower_Manhattan_skyline_from_Pebble_Beach%2C_New_York.jpg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Brooklyn_Bridge_and_the_Lower_Manhattan_skyline_from_Pebble_Beach%2C_New_York.jpg/1920px-Brooklyn_Bridge_and_the_Lower_Manhattan_skyline_from_Pebble_Beach%2C_New_York.jpg",
   "imgAttr": "via Wikimedia Commons",
   "imgLink": "https://en.wikipedia.org/wiki/Brooklyn%20Bridge"
  },
@@ -239,7 +239,7 @@
    "l": 4
   },
   "rain": true,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/a/ac/The_Met_Cloisters.jpg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/The_Met_Cloisters.jpg/1920px-The_Met_Cloisters.jpg",
   "imgAttr": "via Wikimedia Commons",
   "imgLink": "https://en.wikipedia.org/wiki/The%20Cloisters"
  },
@@ -288,7 +288,7 @@
    "l": 5
   },
   "rain": true,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/0/00/One_Vanderbilt_April_2023.jpg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/One_Vanderbilt_April_2023.jpg/1920px-One_Vanderbilt_April_2023.jpg",
   "imgAttr": "via Wikimedia Commons",
   "imgLink": "https://en.wikipedia.org/wiki/One%20Vanderbilt"
  },
@@ -337,7 +337,7 @@
    "l": 5
   },
   "rain": true,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/8/84/Frick_Collection_New_York_cour.jpg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Frick_Collection_New_York_cour.jpg/1920px-Frick_Collection_New_York_cour.jpg",
   "imgAttr": "via Wikimedia Commons",
   "imgLink": "https://en.wikipedia.org/wiki/Frick%20Collection"
  },
@@ -432,7 +432,7 @@
    "l": 3
   },
   "rain": true,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/7/71/Image-Grand_central_Station_Outside_Night_2.jpg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Image-Grand_central_Station_Outside_Night_2.jpg/1920px-Image-Grand_central_Station_Outside_Night_2.jpg",
   "imgAttr": "via Wikimedia Commons",
   "imgLink": "https://en.wikipedia.org/wiki/Grand%20Central%20Terminal"
  },
@@ -479,9 +479,9 @@
    "l": 4
   },
   "rain": false,
-  "img": "https://upload.wikimedia.org/wikipedia/commons/8/82/Rockefeller_Center_logo.svg",
+  "img": "https://upload.wikimedia.org/wikipedia/commons/2/2f/30_Rockefeller_Plaza_viewed_from_5th_Avenue%2C_August_29%2C_2024_%28cropped%29.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/Rockefeller%20Center"
+  "imgLink": "https://en.wikipedia.org/wiki/30%20Rockefeller%20Plaza"
  },
  {
   "id": 11,
@@ -762,7 +762,7 @@
    "l": 3
   },
   "rain": false,
-  "img": "https://images.unsplash.com/photo-1664990601633-a4ab61f1f2e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxCcnlhbnQlMjBQYXJrJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg3MTc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+  "img": "https://images.unsplash.com/photo-1664990601633-a4ab61f1f2e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxCcnlhbnQlMjBQYXJrJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwODU3NDAxfDA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "David Vives / Unsplash",
   "imgLink": "https://unsplash.com/photos/a-group-of-people-in-a-park-h9lmvT1D7lc"
  },
