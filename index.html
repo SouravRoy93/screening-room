@@ -789,7 +789,7 @@ let prof=LS("pl_prof")||{styles:[],pace:""}, saved=LS("pl_saved")||{};
 let mood="all",trap=false,lux=false,pview="home",isWet=false,pdMood="Romantic evening",pick=new Set();
 let WXCACHE=null;
 const R=()=>document.getElementById("places");
-const plImg=p=>"https://loremflickr.com/640/480/"+p.img+"?lock="+p.id;
+const plImg=p=>(p.img&&/^https?:/.test(p.img))?p.img:("https://loremflickr.com/640/480/"+(p.img||"newyork")+"?lock="+p.id);
 const saveLS=()=>{localStorage.setItem("pl_prof",JSON.stringify(prof));localStorage.setItem("pl_saved",JSON.stringify(saved));};
 
 function enterPlaces(){ try{ hideScreens(); R().classList.remove("hidden"); window.scrollTo(0,0); if(prof.styles&&prof.styles.length){ renderShell(); } else { renderOnb(); } }catch(e){ console.error(e); } }
