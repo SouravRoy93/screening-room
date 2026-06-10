@@ -194,27 +194,30 @@ const pick = (arr, allowed, min, max) => {
   return v.length ? v.slice(0, max) : allowed.slice(0, min);
 };
 const clamp = n => Math.max(1, Math.min(5, Math.round(+n || 3)));
+// Security: strip < and > so model/Wikipedia-derived text can never carry HTML
+// markup into places.json (the app also sanitizes at load — defense in depth).
+const txt = s => String(s == null ? "" : s).replace(/[<>]/g, "").trim();
 
 function normalize(e) {
   const s = e.scores || {};
   return {
-    area: String(e.area || "").trim() || "—",
-    vibe: String(e.vibe || "").trim(),
+    area: txt(e.area) || "—",
+    vibe: txt(e.vibe),
     styles: pick(e.styles, STYLES, 2, 4),
     moods: pick(e.moods, MOODS, 3, 5),
-    best: String(e.best || "Anytime").trim(),
+    best: txt(e.best) || "Anytime",
     dur: Math.max(20, Math.min(240, parseInt(e.dur, 10) || 60)),
     crowd: CROWD.includes(e.crowd) ? e.crowd : "Moderate",
-    price: String(e.price || "Free").trim(),
-    dress: String(e.dress || "Comfortable").trim(),
-    hours: String(e.hours || "Varies").trim(),
-    resv: String(e.resv || "No").trim(),
-    photo: String(e.photo || "").trim(),
-    cafe: String(e.cafe || "A café nearby").trim(),
-    dinner: String(e.dinner || "Dinner nearby").trim(),
-    insider: String(e.insider || "").trim(),
-    worth: String(e.worth || "").trim(),
-    skip: String(e.skip || "").trim(),
+    price: txt(e.price) || "Free",
+    dress: txt(e.dress) || "Comfortable",
+    hours: txt(e.hours) || "Varies",
+    resv: txt(e.resv) || "No",
+    photo: txt(e.photo),
+    cafe: txt(e.cafe) || "A café nearby",
+    dinner: txt(e.dinner) || "Dinner nearby",
+    insider: txt(e.insider),
+    worth: txt(e.worth),
+    skip: txt(e.skip),
     badges: pick(e.badges, BADGES, 1, 3),
     scores: { b: clamp(s.b), u: clamp(s.u), e: clamp(s.e), c: clamp(s.c), v: clamp(s.v), l: clamp(s.l) },
     rain: !!e.rain
@@ -259,7 +262,7 @@ async function main() {
         const e = normalize(await enrich(c, city));
         maxId += 1;
         places.push({
-          id: maxId, name: c.name, city: city.short, country: city.country, ...e,
+          id: maxId, name: txt(c.name), city: city.short, country: city.country, ...e,
           lat: c.lat, lng: c.lng,
           img: photo.img, imgAttr: "via Wikimedia Commons", imgLink: c.article, wd: c.qid
         });
