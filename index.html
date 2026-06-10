@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Content-Security-Policy: only known origins may run scripts, receive data, or
+     serve styles/fonts. 'unsafe-inline' for script-src is required (the whole app is
+     one inline script) — XSS defense comes from sanitizing all data at load (see
+     SECURITY HELPERS). img-src stays broad: posters/photos come from many hosts. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' https: data: blob:; connect-src 'self' https://jxqtggajabevmpzpxhtk.supabase.co wss://jxqtggajabevmpzpxhtk.supabase.co https://api.themoviedb.org https://api.open-meteo.com https://maps.googleapis.com https://maps.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>Screening Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -621,7 +626,10 @@ a{color:var(--pur)}
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Pinned version + SRI hash: a compromised CDN can no longer inject arbitrary JS.
+     To upgrade: bump the version AND recompute the integrity hash from the npm package
+     (openssl dgst -sha384 -binary dist/umd/supabase.js | base64). -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js" integrity="sha384-EjUdIVmzWliPzdzhxZ9ZoO0etXLKWuUPUftAGxP6qH6Lm4oLwoLaJR0Ba4pIDiDL" crossorigin="anonymous"></script>
 <script>
 /* ===== CONFIG ===== */
 const SUPABASE_URL = "https://jxqtggajabevmpzpxhtk.supabase.co";
@@ -650,6 +658,26 @@ function el(id){ return document.getElementById(id); }
 function starsSimple(r10){ const full=Math.round(r10/2); return "★".repeat(full)+"☆".repeat(5-full); }
 function yearOf(d){ return d?parseInt(String(d).slice(0,4),10):null; }
 
+/* ===== SECURITY HELPERS =====
+   All external data (catalog JSON, TMDB, Supabase rows, Google Places, user
+   metadata) is sanitized ONCE at the load boundary with sanitizeDeep (strips
+   < and > so markup can never be injected via innerHTML — idempotent, safe to
+   re-save to the DB). escAttr / safeUrl protect attribute contexts (quotes,
+   crafted URLs). */
+function stripTags(s){ return String(s).replace(/[<>]/g,""); }
+function sanitizeDeep(v){
+  if(typeof v==="string") return stripTags(v);
+  if(Array.isArray(v)) return v.map(sanitizeDeep);
+  if(v && typeof v==="object"){ const o={}; for(const k in v) o[k]=sanitizeDeep(v[k]); return o; }
+  return v;
+}
+function escAttr(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function safeUrl(u){
+  u=String(u||"").trim();
+  if(!/^https?:\/\//i.test(u)) return "";
+  return u.replace(/"/g,"%22").replace(/'/g,"%27").replace(/</g,"%3C").replace(/>/g,"%3E").replace(/\s/g,"%20");
+}
+
 let session=null, tracked={}, vertical="entertainment", tab="discover";
 let filterType="all", filterGenre="all", searchQ="";
 let CATALOG_FILE=[], viewIndex={}, hubIntroPlayed=false;
@@ -677,7 +705,7 @@ function mapGooglePlace(place){
   const vicinity=place.vicinity||"";
   const neighborhood=vicinity.split(",").slice(-2)[0].trim();
   const recognition=place.rating?"★ "+Number(place.rating).toFixed(1)+" ("+fmtCount(place.user_ratings_total)+")":null;
-  return {
+  return sanitizeDeep({
     id:place.place_id, tmdb_id:place.place_id, media_type:"dining",
     name:place.name, title:place.name, cuisine, neighborhood,
     price:place.price_level||0, google_rating:place.rating||null,
@@ -686,7 +714,7 @@ function mapGooglePlace(place){
     lat:place.geometry&&place.geometry.location?place.geometry.location.lat():null,
     lng:place.geometry&&place.geometry.location?place.geometry.location.lng():null,
     rope:null, occasion:[], format:null, recognition, signature:null, isGooglePlace:true
-  };
+  });
 }
 
 function dLoadTrending(){
@@ -894,13 +922,13 @@ async function loadDining(){
     // Try dining.json first (friend's file name), fall back to dining-catalog.json
     let resp=await fetch("./dining.json?_="+Date.now());
     if(!resp.ok) resp=await fetch("./dining-catalog.json?_="+Date.now());
-    const r=resp; const arr=await r.json();
+    const r=resp; const arr=sanitizeDeep(await r.json());
     DINING=arr.map(x=>Object.assign({},x,{tmdb_id:x.id,media_type:"dining",title:x.name,genres:[x.cuisine,x.format,x.neighborhood]}));
     DINING_BY_ID={}; DINING.forEach(x=>DINING_BY_ID[x.id]=x);
     const cuis=[...new Set(DINING.map(x=>x.cuisine))].sort();
-    el("cuisineSel").innerHTML='<option value="all">All cuisines</option>'+cuis.map(c=>'<option value="'+c+'">'+c+'</option>').join("");
+    el("cuisineSel").innerHTML='<option value="all">All cuisines</option>'+cuis.map(c=>'<option value="'+escAttr(c)+'">'+c+'</option>').join("");
     const occs=[...new Set(DINING.flatMap(x=>x.occasion||[]))].sort();
-    el("occasionSel").innerHTML='<option value="all">Any occasion</option>'+occs.map(o=>'<option value="'+o+'">'+o+'</option>').join("");
+    el("occasionSel").innerHTML='<option value="all">Any occasion</option>'+occs.map(o=>'<option value="'+escAttr(o)+'">'+o+'</option>').join("");
   }catch(e){ DINING=[]; }
 }
 
@@ -980,7 +1008,7 @@ const MOODS=[["all","Everything"],["beautiful","Something beautiful"],["romantic
 const WX={0:["Clear","☀"],1:["Mainly clear","🌤"],2:["Partly cloudy","⛅"],3:["Overcast","☁"],45:["Foggy","🌫"],48:["Foggy","🌫"],51:["Light drizzle","🌦"],53:["Drizzle","🌦"],55:["Drizzle","🌦"],61:["Light rain","🌧"],63:["Rain","🌧"],65:["Heavy rain","🌧"],71:["Snow","🌨"],73:["Snow","🌨"],75:["Snow","🌨"],80:["Showers","🌦"],81:["Showers","🌦"],82:["Showers","🌧"],95:["Thunderstorm","⛈"]};
 let PLACES=[], PB={};   // catalog is loaded entirely from places.json
 let placesLoaded=false;
-async function loadPlaces(){ if(placesLoaded) return; try{ const r=await fetch("./places.json?_="+Date.now()); const d=await r.json(); if(Array.isArray(d)&&d.length){ PLACES=d; PB={}; PLACES.forEach(p=>PB[p.id]=p); placesLoaded=true; } }catch(e){ console.warn("places.json failed to load:",e); } }
+async function loadPlaces(){ if(placesLoaded) return; try{ const r=await fetch("./places.json?_="+Date.now()); const d=await r.json(); if(Array.isArray(d)&&d.length){ PLACES=sanitizeDeep(d); PB={}; PLACES.forEach(p=>PB[p.id]=p); placesLoaded=true; } }catch(e){ console.warn("places.json failed to load:",e); } }
 // Itinerary themes are CRITERIA, not fixed places — they pick live from whatever places.json holds.
 const PD_THEMES={"Romantic evening":p=>p.moods.includes("romantic"),"Quiet & restorative":p=>p.crowd==="Low"||p.moods.includes("calm"),"Iconic first-timer":p=>p.badges.includes("First-Timer")||p.moods.includes("iconic"),"Art & culture":p=>p.styles.includes("Culture"),"Golden-hour photo":p=>p.badges.includes("Best at Sunset")||p.moods.includes("photo")};
 function pdPick(theme){ const f=PD_THEMES[theme]||(function(){return true;}); let m=PLACES.filter(f); if(m.length<3) m=m.concat(PLACES.filter(function(p){return m.indexOf(p)<0;})); const out=[]; for(let i=0;i<m.length&&out.length<3;i++){ if(out.indexOf(m[i])<0) out.push(m[i]); } return out; }
@@ -992,7 +1020,7 @@ let WXCACHE=null;
 const R=()=>document.getElementById("places");
 const PL_PLACEHOLDER="data:image/svg+xml;charset=utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='640'%20height='480'%3E%3Cdefs%3E%3ClinearGradient%20id='g'%20x1='0'%20y1='0'%20x2='1'%20y2='1'%3E%3Cstop%20offset='0'%20stop-color='%23262335'/%3E%3Cstop%20offset='1'%20stop-color='%23120f1c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='640'%20height='480'%20fill='url(%23g)'/%3E%3C/svg%3E";
 // Photos come ONLY from places.json (http/https URLs). No inline image data, no loremflickr.
-const plImg=p=>(p&&p.img&&/^https?:/.test(p.img))?p.img:PL_PLACEHOLDER;
+const plImg=p=>{ const u=p&&p.img?safeUrl(p.img):""; return u||PL_PLACEHOLDER; };
 const saveLS=()=>{localStorage.setItem("pl_prof",JSON.stringify(prof));localStorage.setItem("pl_saved",JSON.stringify(saved));};
 
 async function enterPlaces(){ try{ hideScreens(); R().classList.remove("hidden"); window.scrollTo(0,0); R().innerHTML='<div class="ploading"><div class="pspin"></div><div>Loading the city…</div></div>'; await loadPlaces(); if(prof.styles&&prof.styles.length){ renderShell(); } else { renderOnb(); } }catch(e){ console.error(e); R().innerHTML='<div class="pempty">Couldn\'t load the catalog. Check your connection and reopen Places.</div>'; } }
@@ -1009,7 +1037,7 @@ function renderShell(){
   renderBody();
 }
 // ---- dynamic identity & location (no hardcoded name/city) ----
-function userName(){ try{ const u=session&&session.user; if(!u) return ""; const m=u.user_metadata||{}; let n=m.full_name||m.name||m.given_name; if(!n&&u.email){ n=u.email.split("@")[0].split(/[._\d]+/)[0]; } if(!n) return ""; n=String(n).trim(); return n.charAt(0).toUpperCase()+n.slice(1); }catch(e){ return ""; } }
+function userName(){ try{ const u=session&&session.user; if(!u) return ""; const m=u.user_metadata||{}; let n=m.full_name||m.name||m.given_name; if(!n&&u.email){ n=u.email.split("@")[0].split(/[._\d]+/)[0]; } if(!n) return ""; n=stripTags(String(n).trim()); return n.charAt(0).toUpperCase()+n.slice(1); }catch(e){ return ""; } }
 function currentCity(){ if(!PLACES.length) return ""; const c={}; PLACES.forEach(p=>{ const k=p.city||""; if(k) c[k]=(c[k]||0)+1; }); let best="",n=-1; for(const k in c){ if(c[k]>n){ n=c[k]; best=k; } } return best; }
 function cityCenter(){ const city=currentCity(); const pts=PLACES.filter(p=>(p.city||"")===city && typeof p.lat==="number" && typeof p.lng==="number"); if(!pts.length) return {lat:40.7128,lng:-74.006,city:city||"New York"}; return {lat:pts.reduce((s,p)=>s+p.lat,0)/pts.length, lng:pts.reduce((s,p)=>s+p.lng,0)/pts.length, city:city}; }
 function greetTxt(){ const h=new Date().getHours(); const part=h<12?"Good morning":h<17?"Good afternoon":"Good evening"; const n=userName(); return part+(n?(", "+n):"")+"."; }
@@ -1071,7 +1099,7 @@ function initMap(pts){
 async function loadWeather(){ try{ const ctr=cityCenter(); const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+ctr.lat.toFixed(4)+"&longitude="+ctr.lng.toFixed(4)+"&current=temperature_2m,weather_code&temperature_unit=fahrenheit"); const d=await r.json(); const c=d.current.weather_code,t=Math.round(d.current.temperature_2m),wx=WX[c]||["","🌡"]; isWet=[51,53,55,61,63,65,80,81,82,95,71,73,75].includes(c); const note=isWet?"a fine day for galleries and grand interiors.":t>=60?"a beautiful day for a rooftop or a park.":"crisp — bundle up for that skyline view."; WXCACHE=wx[1]+' &nbsp;<b>'+t+'°·'+wx[0]+'</b>&nbsp; '+(ctr.city||"")+' — '+note; const w=document.getElementById("pWx"); if(w) w.innerHTML=WXCACHE; renderSections(); }catch(e){} }
 function fct(k,v){ return '<div class="pfact"><div class="pk">'+k+'</div><div class="pv">'+v+'</div></div>'; }
 function scb(k,v){ return '<div class="psc"><div class="pk">'+k+'</div><div class="pbar"><div class="pfill" style="width:'+(v*20)+'%"></div></div></div>'; }
-function openDetail(id){ const p=PB[id], s=!!saved[id]; document.getElementById("pDetail").innerHTML='<div class="psheet"><div class="phero"><img src="'+plImg(p)+'" alt=""><button class="px" data-pclose="pDetail">×</button><div class="phtext"><div class="pharea">'+p.area+'</div><h2>'+p.name+'</h2><div class="phvibe">'+p.vibe+'</div>'+(p.imgLink?'<a class="phcredit" href="'+p.imgLink+'" target="_blank" rel="noopener">Photo · '+p.imgAttr+'</a>':'')+'</div></div><div class="psbody"><div class="pbadges">'+p.badges.map(b=>'<span class="pbpill">'+b+'</span>').join("")+'</div><div class="pfacts">'+fct("Best time",p.best)+fct("Ideal duration",p.dur+" minutes")+fct("Crowd level",p.crowd)+fct("Price",p.price)+fct("Dress code",p.dress)+fct("Hours",p.hours)+fct("Reservation",p.resv)+fct("Best photo",p.photo)+'</div><div class="pverdict"><div class="pv1"><b>Worth it if</b>'+p.worth+'</div><div class="pv2"><b>Skip if</b>'+p.skip+'</div></div><div class="pinsider"><b>Insider tip</b>'+p.insider+'</div><div class="pscores">'+scb("Beauty",p.scores.b)+scb("Unique",p.scores.u)+scb("Ease",p.scores.e)+scb("Calm",p.scores.c)+scb("Value",p.scores.v)+scb("Luxury",p.scores.l)+'</div><div class="pnearby"><b>Coffee nearby:</b> '+p.cafe+'<br><b>Dinner after:</b> '+p.dinner+'</div><div class="psact"><button class="'+(s?"on":"")+'" data-save="'+id+'">'+(s?"✓ Saved":"♡ Save")+'</button><button data-map="'+encodeURIComponent(p.name+" "+(p.city||""))+'">Open in Maps</button></div></div></div>'; document.getElementById("pDetail").classList.add("show"); }
+function openDetail(id){ const p=PB[id], s=!!saved[id]; document.getElementById("pDetail").innerHTML='<div class="psheet"><div class="phero"><img src="'+plImg(p)+'" alt=""><button class="px" data-pclose="pDetail">×</button><div class="phtext"><div class="pharea">'+p.area+'</div><h2>'+p.name+'</h2><div class="phvibe">'+p.vibe+'</div>'+(safeUrl(p.imgLink)?'<a class="phcredit" href="'+safeUrl(p.imgLink)+'" target="_blank" rel="noopener">Photo · '+p.imgAttr+'</a>':'')+'</div></div><div class="psbody"><div class="pbadges">'+p.badges.map(b=>'<span class="pbpill">'+b+'</span>').join("")+'</div><div class="pfacts">'+fct("Best time",p.best)+fct("Ideal duration",p.dur+" minutes")+fct("Crowd level",p.crowd)+fct("Price",p.price)+fct("Dress code",p.dress)+fct("Hours",p.hours)+fct("Reservation",p.resv)+fct("Best photo",p.photo)+'</div><div class="pverdict"><div class="pv1"><b>Worth it if</b>'+p.worth+'</div><div class="pv2"><b>Skip if</b>'+p.skip+'</div></div><div class="pinsider"><b>Insider tip</b>'+p.insider+'</div><div class="pscores">'+scb("Beauty",p.scores.b)+scb("Unique",p.scores.u)+scb("Ease",p.scores.e)+scb("Calm",p.scores.c)+scb("Value",p.scores.v)+scb("Luxury",p.scores.l)+'</div><div class="pnearby"><b>Coffee nearby:</b> '+p.cafe+'<br><b>Dinner after:</b> '+p.dinner+'</div><div class="psact"><button class="'+(s?"on":"")+'" data-save="'+id+'">'+(s?"✓ Saved":"♡ Save")+'</button><button data-map="'+encodeURIComponent(p.name+" "+(p.city||""))+'">Open in Maps</button></div></div></div>'; document.getElementById("pDetail").classList.add("show"); }
 function openPd(){ const pace=prof.pace||"Balanced", themes=Object.keys(PD_THEMES); if(!themes.includes(pdMood)) pdMood=themes[0]; const day=pdPick(pdMood), times=PD_TIMES[pace]||PD_TIMES.Balanced; if(!day.length){ document.getElementById("pPd").innerHTML='<div class="pdsheet"><div class="pdhead"><button class="px" data-pclose="pPd">×</button><h2>Your perfect day</h2></div><div class="pempty">The catalog is still filling in — check back soon.</div></div>'; document.getElementById("pPd").classList.add("show"); return; } const steps=day.map(function(p,i){return '<div class="pstep"><div class="pdot"></div><div class="pt">'+(times[i]||"")+'</div><div class="pd"><h4>'+p.name+'</h4><p>'+p.vibe+'</p></div></div>';}).join("")+'<div class="pstep"><div class="pdot"></div><div class="pt">'+(pace==="Packed"?"7:30 PM":"8:00 PM")+'</div><div class="pd"><h4>Dinner</h4><p>'+((day[day.length-1]||{}).dinner||"A table near your last stop")+' — near your last stop.</p></div></div>'; const outfit=isWet?"Bring a handsome umbrella and a layer.":"Light layers; comfortable shoes for the walks."; const wxnote=isWet?"Rain expected — this plan leans on covered, beautiful interiors.":"Clear skies — your golden-hour stops will shine."; document.getElementById("pPd").innerHTML='<div class="pdsheet"><div class="pdhead"><button class="px" data-pclose="pPd">×</button><h2>Your perfect day</h2><div class="pdsub">'+pace+' pace · '+(currentCity()||"")+'</div></div><div class="pdctrl">'+themes.map(t=>'<button class="'+(t===pdMood?"on":"")+'" data-pdtheme="'+t+'">'+t+'</button>').join("")+'</div><div class="ptl">'+steps+'</div><div class="pdfoot"><b>Outfit:</b> '+outfit+'<br><b>Weather:</b> '+wxnote+'<br><b>Tip:</b> book your sunset stop and dinner now — the rest is walk-up.</div></div>'; document.getElementById("pPd").classList.add("show"); }
 
 document.addEventListener("click", function(e){
@@ -1103,14 +1131,14 @@ async function tmdb(path, params){
   const url=new URL("https://api.themoviedb.org/3/"+path);
   url.searchParams.set("api_key",TMDB_KEY);
   Object.keys(params||{}).forEach(k=>url.searchParams.set(k,params[k]));
-  const r=await fetch(url.toString()); if(!r.ok) throw new Error("TMDB "+r.status); return r.json();
+  const r=await fetch(url.toString()); if(!r.ok) throw new Error("TMDB "+r.status); return sanitizeDeep(await r.json());
 }
 function mapTmdb(it, mt){
   const date=it.release_date||it.first_air_date;
   return {tmdb_id:it.id,media_type:mt,title:it.title||it.name,year:yearOf(date),genres:genreNames(it,mt),poster_path:it.poster_path||null,vote_average:it.vote_average||null,popularity:it.popularity||null,release_date:date||null};
 }
 async function loadCatalogFile(){
-  try{ const r=await fetch("./catalog.json?_="+Date.now()); CATALOG_FILE=await r.json(); }
+  try{ const r=await fetch("./catalog.json?_="+Date.now()); CATALOG_FILE=sanitizeDeep(await r.json()); }
   catch(e){ CATALOG_FILE=[]; }
 }
 function loadDiscover(){
@@ -1133,14 +1161,14 @@ async function liveSearch(){
     if(filterType!=="all") items=items.filter(i=>i.media_type===filterType);
     if(filterGenre!=="all") items=items.filter(i=>(i.genres||[]).includes(filterGenre));
     renderGrid(items);
-  }catch(e){ grid.innerHTML='<div class="empty">Search failed: '+e.message+'</div>'; }
+  }catch(e){ grid.innerHTML='<div class="empty">Search failed: '+stripTags(e.message)+'</div>'; }
 }
 
 /* ===== TRACKED ITEMS ===== */
 async function loadTracked(){
   tracked={};
   const {data,error}=await sb.from("tracked_items").select("*").eq("vertical",vertical);
-  if(!error&&data){ data.forEach(r=>tracked[r.media_type+":"+r.tmdb_id]=r); }
+  if(!error&&data){ data.forEach(r=>{ r=sanitizeDeep(r); tracked[r.media_type+":"+r.tmdb_id]=r; }); }
 }
 async function setStatus(item, status){
   const k=item.media_type+":"+item.tmdb_id, existing=tracked[k];
@@ -1168,7 +1196,7 @@ function posterHTML(item){
   const voteBadge=item.vote_average?'<div class="badge-vote">★ '+Number(item.vote_average).toFixed(1)+'</div>':"";
   const typeBadge='<div class="ptype">'+(item.media_type==="tv"?"TV":"Film")+'</div>';
   let bg;
-  if(item.poster_path){ bg='<img loading="lazy" src="'+IMG+item.poster_path+'" alt="">'; }
+  if(item.poster_path){ bg='<img loading="lazy" src="'+escAttr(IMG+item.poster_path)+'" alt="">'; }
   else{ const g=(item.genres&&item.genres[0])||""; const c=colorFor(g); bg='<div class="fallback" style="background:linear-gradient(150deg,'+c[0]+','+c[1]+')"></div>'; }
   const meta=item.year?'<div class="pmeta">'+item.year+'</div>':'';
   const scrim='<div class="pscrim"><div class="ptitle">'+item.title+'</div>'+meta+'</div>';
@@ -1419,9 +1447,9 @@ function renderNotesSection(item, t){
   detailRecommend=[...tags];
   el("detNotesBlock").innerHTML=
     '<div class="det-section-head">Your notes</div>'
-    +'<textarea id="detNotes" placeholder="How was it? Any thoughts…">'+((meta.notes)||"")+'</textarea>'
-    +'<input type="text" id="detDishNotes" placeholder="Standout dishes (e.g. the duck, black truffle pasta)" value="'+((meta.dish_notes)||"")+'">'
-    +'<input type="text" id="detWentWith" placeholder="Who did you go with?" value="'+((meta.went_with)||"")+'">'
+    +'<textarea id="detNotes" placeholder="How was it? Any thoughts…">'+escAttr(meta.notes||"")+'</textarea>'
+    +'<input type="text" id="detDishNotes" placeholder="Standout dishes (e.g. the duck, black truffle pasta)" value="'+escAttr(meta.dish_notes||"")+'">'
+    +'<input type="text" id="detWentWith" placeholder="Who did you go with?" value="'+escAttr(meta.went_with||"")+'">'
     +'<div class="det-section-head" style="margin-top:4px">Tag it</div>'
     +'<div class="det-recommend-wrap">'+RECOMMEND_TAGS.map(tag=>'<span class="rtag'+(tags.includes(tag)?" on":"")+'" data-tag="'+tag+'">'+tag+'</span>').join("")+'</div>'
     +'<button class="det-save-btn" id="detSaveNotes">Save notes</button>';
@@ -1474,30 +1502,30 @@ function fetchAndRenderPlaceDetails(placeId, item){
     }
     // Photos carousel
     if(place.photos&&place.photos.length){
-      el("detPhotos").innerHTML=place.photos.slice(0,10).map(p=>'<img src="'+p.getUrl({maxWidth:700,maxHeight:400})+'" alt="" onerror="this.remove()">').join("");
+      el("detPhotos").innerHTML=place.photos.slice(0,10).map(p=>'<img src="'+escAttr(safeUrl(p.getUrl({maxWidth:700,maxHeight:400})))+'" alt="" onerror="this.remove()">').join("");
     } else {
       el("detPhotos").innerHTML='<img src="'+foodImg(item)+'" style="height:280px;min-width:100%;object-fit:cover">';
     }
     // Reserve link
-    if(place.website){ const a=el("detReserve"); a.href=place.website; a.classList.remove("hidden-link"); }
+    if(place.website){ const u=safeUrl(place.website); if(u){ const a=el("detReserve"); a.href=u; a.classList.remove("hidden-link"); } }
     // Info block
     const rows=[];
-    if(place.formatted_address) rows.push({l:"Address",v:place.formatted_address});
-    if(place.international_phone_number) rows.push({l:"Phone",v:place.international_phone_number});
+    if(place.formatted_address) rows.push({l:"Address",v:stripTags(place.formatted_address)});
+    if(place.international_phone_number) rows.push({l:"Phone",v:stripTags(place.international_phone_number)});
     if(place.opening_hours&&place.opening_hours.weekday_text){
       const day=new Date().getDay(), todayStr=place.opening_hours.weekday_text[(day+6)%7]||"";
       const hours=todayStr.replace(/^[^:]+:\s*/,"");
-      rows.push({l:"Today",v:hours});
+      rows.push({l:"Today",v:stripTags(hours)});
     }
-    if(place.website) rows.push({l:"Website",v:'<a href="'+place.website+'" target="_blank">'+place.website.replace(/^https?:\/\/(www\.)?/,"").split("/")[0]+'</a>'});
-    if(place.url) rows.push({l:"Maps",v:'<a href="'+place.url+'" target="_blank">Open in Google Maps ↗</a>'});
+    if(place.website&&safeUrl(place.website)) rows.push({l:"Website",v:'<a href="'+safeUrl(place.website)+'" target="_blank" rel="noopener">'+stripTags(place.website.replace(/^https?:\/\/(www\.)?/,"").split("/")[0])+'</a>'});
+    if(place.url&&safeUrl(place.url)) rows.push({l:"Maps",v:'<a href="'+safeUrl(place.url)+'" target="_blank" rel="noopener">Open in Google Maps ↗</a>'});
     if(rows.length){
       el("detInfoBlock").innerHTML=rows.map(r=>'<div class="det-info-row"><div class="di-label">'+r.l+'</div><div class="di-val">'+r.v+'</div></div>').join("");
       el("detInfoBlock").classList.add("has-data");
     }
     // Reviews
     if(place.reviews&&place.reviews.length){
-      const revs=place.reviews.slice(0,3).map(rv=>'<div class="det-review-card"><div class="rv-author">'+rv.author_name+' &nbsp;'+'★'.repeat(Math.round(rv.rating||0))+'</div><div class="rv-text">'+rv.text+'</div></div>').join("");
+      const revs=place.reviews.slice(0,3).map(rv=>'<div class="det-review-card"><div class="rv-author">'+stripTags(rv.author_name||"")+' &nbsp;'+'★'.repeat(Math.round(rv.rating||0))+'</div><div class="rv-text">'+stripTags(rv.text||"")+'</div></div>').join("");
       el("detReviewsBlock").innerHTML='<div class="det-section-head">Google reviews</div>'+revs;
       el("detReviewsBlock").classList.add("has-reviews");
     }
