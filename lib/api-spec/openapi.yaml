@@ -1,22 +1,25 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Screening Room API — TMDB proxy and notifications
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: tmdb
+    description: TMDB proxy endpoints
+  - name: notifications
+    description: Episode notification checks
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +27,140 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /tmdb/movie/{tmdb_id}:
+    get:
+      operationId: getMovieDetail
+      tags: [tmdb]
+      summary: Get movie details with credits and videos
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Movie detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaDetail"
+        "404":
+          description: Not found
+
+  /tmdb/movie/{tmdb_id}/recommendations:
+    get:
+      operationId: getMovieRecommendations
+      tags: [tmdb]
+      summary: Get movie recommendations
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of recommended movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaCard"
+
+  /tmdb/tv/{tmdb_id}:
+    get:
+      operationId: getTvDetail
+      tags: [tmdb]
+      summary: Get TV show details with credits and videos
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: TV show detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaDetail"
+        "404":
+          description: Not found
+
+  /tmdb/tv/{tmdb_id}/recommendations:
+    get:
+      operationId: getTvRecommendations
+      tags: [tmdb]
+      summary: Get TV show recommendations
+      parameters:
+        - name: tmdb_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of recommended TV shows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaCard"
+
+  /tmdb/search:
+    get:
+      operationId: searchMedia
+      tags: [tmdb]
+      summary: Search movies and TV shows
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [all, movie, tv]
+            default: all
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaCard"
+
+  /notifications/episodes:
+    post:
+      operationId: checkNewEpisodes
+      tags: [notifications]
+      summary: Check for new episodes for a list of TV shows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EpisodeCheckInput"
+      responses:
+        "200":
+          description: List of shows with new episodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EpisodeAlert"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +171,150 @@ components:
       required:
         - status
 
+    MediaCard:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+        media_type:
+          type: string
+          enum: [movie, tv]
+        title:
+          type: string
+        year:
+          type: ["integer", "null"]
+        genres:
+          type: array
+          items:
+            type: string
+        poster_path:
+          type: ["string", "null"]
+        vote_average:
+          type: ["number", "null"]
+        popularity:
+          type: ["number", "null"]
+      required:
+        - tmdb_id
+        - media_type
+        - title
+        - genres
+
+    CastMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        character:
+          type: string
+        profile_path:
+          type: ["string", "null"]
+        order:
+          type: integer
+      required:
+        - id
+        - name
+        - character
+        - order
+
+    VideoResult:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        site:
+          type: string
+        type:
+          type: string
+      required:
+        - key
+        - name
+        - site
+        - type
+
+    MediaDetail:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+        media_type:
+          type: string
+          enum: [movie, tv]
+        title:
+          type: string
+        overview:
+          type: ["string", "null"]
+        year:
+          type: ["integer", "null"]
+        genres:
+          type: array
+          items:
+            type: string
+        poster_path:
+          type: ["string", "null"]
+        backdrop_path:
+          type: ["string", "null"]
+        vote_average:
+          type: ["number", "null"]
+        runtime:
+          type: ["integer", "null"]
+        status:
+          type: ["string", "null"]
+        tagline:
+          type: ["string", "null"]
+        cast:
+          type: array
+          items:
+            $ref: "#/components/schemas/CastMember"
+        trailer:
+          oneOf:
+            - $ref: "#/components/schemas/VideoResult"
+            - type: "null"
+        number_of_seasons:
+          type: ["integer", "null"]
+        next_episode_to_air:
+          type: ["object", "null"]
+      required:
+        - tmdb_id
+        - media_type
+        - title
+        - genres
+        - cast
+
+    EpisodeCheckInput:
+      type: object
+      properties:
+        tmdb_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - tmdb_ids
+
+    EpisodeAlert:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+        title:
+          type: string
+        season_number:
+          type: integer
+        episode_number:
+          type: integer
+        episode_name:
+          type: string
+        air_date:
+          type: string
+        poster_path:
+          type: ["string", "null"]
+      required:
+        - tmdb_id
+        - title
+        - season_number
+        - episode_number
+        - episode_name
+        - air_date

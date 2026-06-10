@@ -1,0 +1,20 @@
+[
+ { "name": "New York City",  "short": "New York",      "country": "United States",  "wikidata": "Q60" },
+ { "name": "London",         "short": "London",        "country": "United Kingdom", "wikidata": "Q84" },
+ { "name": "Paris",          "short": "Paris",         "country": "France",         "wikidata": "Q90" },
+ { "name": "Tokyo",          "short": "Tokyo",         "country": "Japan",          "wikidata": "Q1490" },
+ { "name": "Rome",           "short": "Rome",          "country": "Italy",          "wikidata": "Q220" },
+ { "name": "Barcelona",      "short": "Barcelona",     "country": "Spain",          "wikidata": "Q1492" },
+ { "name": "Amsterdam",      "short": "Amsterdam",     "country": "Netherlands",    "wikidata": "Q727" },
+ { "name": "San Francisco",  "short": "San Francisco", "country": "United States",  "wikidata": "Q62" },
+ { "name": "Los Angeles",    "short": "Los Angeles",   "country": "United States",  "wikidata": "Q65" },
+ { "name": "Chicago",        "short": "Chicago",       "country": "United States",  "wikidata": "Q1297" },
+ { "name": "Dubai",          "short": "Dubai",         "country": "United Arab Emirates", "wikidata": "Q612" },
+ { "name": "Singapore",      "short": "Singapore",     "country": "Singapore",      "wikidata": "Q334" },
+ { "name": "Hong Kong",      "short": "Hong Kong",     "country": "China",          "wikidata": "Q8646" },
+ { "name": "Istanbul",       "short": "Istanbul",      "country": "Türkiye",        "wikidata": "Q406" },
+ { "name": "Venice",         "short": "Venice",        "country": "Italy",          "wikidata": "Q641" },
+ { "name": "Kyoto",          "short": "Kyoto",         "country": "Japan",          "wikidata": "Q34600" },
+ { "name": "Vienna",         "short": "Vienna",        "country": "Austria",        "wikidata": "Q1741" },
+ { "name": "Sydney",         "short": "Sydney",        "country": "Australia",      "wikidata": "Q3130" }
+]

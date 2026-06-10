@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Screening Room"
+version = "1.0.0"
+id = "artifacts/screening-room"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24459
+
+[services.development]
+run = "pnpm --filter @workspace/screening-room run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/screening-room", "run", "build" ]
+publicDir = "artifacts/screening-room/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24459"
+BASE_PATH = "/"

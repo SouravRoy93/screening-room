@@ -27,9 +27,19 @@ externalPort = 80
 localPort = 8081
 externalPort = 8081
 
+[[ports]]
+localPort = 24459
+externalPort = 3000
+
 [userenv]
 
 [userenv.shared]
 VITE_SUPABASE_URL = "https://jxqtggajabevmpzpxhtk.supabase.co"
 VITE_TMDB_KEY = "f55148eb9c5f84d935845bc4510abe6e"
 VITE_GOOGLE_PLACES_KEY = "AIzaSyAD3vr_u-0NJkRURtf8nxWbXeil-WtJviI"
+VITE_SUPABASE_ANON_KEY = "sb_publishable_TJ8ChS2A0qlBNPE6JwsKnA_b382P3AR"
+TMDB_KEY = "f55148eb9c5f84d935845bc4510abe6e"
+VITE_API_URL = "/api"
+
+[nix]
+channel = "stable-25_05"
