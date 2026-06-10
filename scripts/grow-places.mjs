@@ -66,15 +66,22 @@ async function jget(url, headers = {}) {
   return r.json();
 }
 
-// Find notable POIs inside a city (by Wikidata QID), with photo + enwiki article.
+// Turn a Wikidata image value (Commons file) into a stable, sized photo URL.
+const commonsUrl = file => "https://commons.wikimedia.org/wiki/Special:FilePath/" +
+  encodeURIComponent(file) + "?width=1600";
+// Bare Commons filename (used as the conflict key — same file = same picture).
+const fileKey = u => { try { return decodeURIComponent(u.split("/").pop().split("?")[0]).toLowerCase(); } catch { return u; } };
+
+// Find notable POIs inside a city (by Wikidata QID), with photo, coords + enwiki article.
 async function cityCandidates(cityQID) {
   const values = TYPES.map(t => "wd:" + t).join(" ");
   const q = `
-    SELECT ?item ?itemLabel ?img ?article ?links WHERE {
+    SELECT ?item ?itemLabel ?img ?coord ?article ?links WHERE {
       ?item wdt:P131* wd:${cityQID} .
       VALUES ?type { ${values} }
       ?item wdt:P31 ?type .
       ?item wdt:P18 ?img .
+      OPTIONAL { ?item wdt:P625 ?coord . }
       ?item wikibase:sitelinks ?links .
       ?article schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> .
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
@@ -87,17 +94,42 @@ async function cityCandidates(cityQID) {
   for (const b of d.results.bindings) {
     const qid = b.item.value.split("/").pop();
     if (seen.has(qid)) continue; seen.add(qid);
+    let lat = null, lng = null;
+    if (b.coord && /Point\(([-\d.]+) ([-\d.]+)\)/.test(b.coord.value)) {
+      const m = b.coord.value.match(/Point\(([-\d.]+) ([-\d.]+)\)/);
+      lng = +m[1]; lat = +m[2];
+    }
+    const file = b.img.value.split("/").pop();
     out.push({
       qid,
       name: b.itemLabel.value,
       title: decodeURIComponent(b.article.value.split("/wiki/").pop()).replace(/_/g, " "),
-      img: "https://commons.wikimedia.org/wiki/Special:FilePath/" +
-           encodeURIComponent(b.img.value.split("/").pop()) + "?width=1600",
+      img: commonsUrl(file),
+      imgKey: fileKey(file),
       article: b.article.value,
+      lat, lng,
       links: parseInt(b.links.value, 10) || 0
     });
   }
   return out;
+}
+
+// Conflict resolver: if a place's photo is already used, find a DIFFERENT one from
+// the same Wikipedia article's media. Returns {img,key} or null if no unique photo.
+async function uniquePhoto(cand, usedKeys) {
+  if (!usedKeys.has(cand.imgKey)) return { img: cand.img, key: cand.imgKey };
+  try {
+    const d = await jget("https://en.wikipedia.org/api/rest_v1/page/media-list/" + encodeURIComponent(cand.title));
+    for (const it of (d.items || [])) {
+      if (it.type !== "image" || !it.title) continue;
+      const file = it.title.replace(/^File:/i, "");
+      const key = fileKey(file);
+      if (/\.(svg|gif)$/i.test(file)) continue;          // skip logos / icons
+      if (usedKeys.has(key)) continue;                    // still taken
+      return { img: commonsUrl(file), key };
+    }
+  } catch {}
+  return null;  // no unique photo available → caller skips this place
 }
 
 // Short factual grounding text for the LLM.
@@ -202,6 +234,8 @@ async function main() {
 
   const haveNames = new Set(places.map(p => (p.name || "").toLowerCase().trim()));
   const haveQids  = new Set(places.map(p => p.wd).filter(Boolean));
+  // every photo already in the catalog — the conflict ledger (no two places share a picture)
+  const usedKeys  = new Set(places.map(p => fileKey(p.img || "")).filter(Boolean));
   let maxId = places.reduce((m, p) => Math.max(m, +p.id || 0), 0);
 
   let added = 0;
@@ -219,13 +253,17 @@ async function main() {
     for (const c of fresh) {
       if (added >= NEW_PER_RUN) break;
       try {
+        // resolve a UNIQUE photo first — skip the place if it can't get one
+        const photo = await uniquePhoto(c, usedKeys);
+        if (!photo) { console.warn("  ~ skipped (no unique photo):", c.name); continue; }
         const e = normalize(await enrich(c, city));
         maxId += 1;
         places.push({
           id: maxId, name: c.name, city: city.short, country: city.country, ...e,
-          img: c.img, imgAttr: "via Wikimedia Commons", imgLink: c.article, wd: c.qid
+          lat: c.lat, lng: c.lng,
+          img: photo.img, imgAttr: "via Wikimedia Commons", imgLink: c.article, wd: c.qid
         });
-        haveNames.add(c.name.toLowerCase().trim()); haveQids.add(c.qid);
+        haveNames.add(c.name.toLowerCase().trim()); haveQids.add(c.qid); usedKeys.add(photo.key);
         added += 1;
         console.log("  + [" + maxId + "] " + c.name + "  (" + city.short + ")");
       } catch (err) {
