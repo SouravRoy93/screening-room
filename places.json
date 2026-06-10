@@ -46,7 +46,11 @@
   "rain": false,
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Global_Citizen_Festival_Central_Park_New_York_City_from_NYonAir_%2815351915006%29.jpg/1920px-Global_Citizen_Festival_Central_Park_New_York_City_from_NYonAir_%2815351915006%29.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/Central%20Park"
+  "imgLink": "https://en.wikipedia.org/wiki/Central%20Park",
+  "lat": 40.774,
+  "lng": -73.9709,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 2,
@@ -94,7 +98,11 @@
   "rain": true,
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Metropolitan_Museum_of_Art_%28The_Met%29_-_Central_Park%2C_NYC.jpg/1920px-Metropolitan_Museum_of_Art_%28The_Met%29_-_Central_Park%2C_NYC.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/Metropolitan%20Museum%20of%20Art"
+  "imgLink": "https://en.wikipedia.org/wiki/Metropolitan%20Museum%20of%20Art",
+  "lat": 40.7794,
+  "lng": -73.9632,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 3,
@@ -143,7 +151,11 @@
   "rain": false,
   "img": "https://upload.wikimedia.org/wikipedia/commons/5/5a/High_Line_Park%2C_Section_1a.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/High%20Line"
+  "imgLink": "https://en.wikipedia.org/wiki/High%20Line",
+  "lat": 40.748,
+  "lng": -74.0048,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 4,
@@ -192,7 +204,11 @@
   "rain": false,
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Brooklyn_Bridge_and_the_Lower_Manhattan_skyline_from_Pebble_Beach%2C_New_York.jpg/1920px-Brooklyn_Bridge_and_the_Lower_Manhattan_skyline_from_Pebble_Beach%2C_New_York.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/Brooklyn%20Bridge"
+  "imgLink": "https://en.wikipedia.org/wiki/Brooklyn%20Bridge",
+  "lat": 40.7061,
+  "lng": -73.9969,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 5,
@@ -241,7 +257,11 @@
   "rain": true,
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/The_Met_Cloisters.jpg/1920px-The_Met_Cloisters.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/The%20Cloisters"
+  "imgLink": "https://en.wikipedia.org/wiki/The%20Cloisters",
+  "lat": 40.8649,
+  "lng": -73.9319,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 6,
@@ -290,7 +310,11 @@
   "rain": true,
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/One_Vanderbilt_April_2023.jpg/1920px-One_Vanderbilt_April_2023.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/One%20Vanderbilt"
+  "imgLink": "https://en.wikipedia.org/wiki/One%20Vanderbilt",
+  "lat": 40.7527,
+  "lng": -73.9787,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 7,
@@ -339,7 +363,11 @@
   "rain": true,
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Frick_Collection_New_York_cour.jpg/1920px-Frick_Collection_New_York_cour.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/Frick%20Collection"
+  "imgLink": "https://en.wikipedia.org/wiki/Frick%20Collection",
+  "lat": 40.7711,
+  "lng": -73.9672,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 8,
@@ -388,7 +416,11 @@
   "rain": false,
   "img": "https://images.unsplash.com/photo-1706875589438-545d1724aba1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxMaXR0bGUlMjBJc2xhbmQlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODcxNzV8MA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Danny Policarpo / Unsplash",
-  "imgLink": "https://unsplash.com/photos/a-row-of-concrete-planters-sitting-on-top-of-a-river-Amp_WCZTbeA"
+  "imgLink": "https://unsplash.com/photos/a-row-of-concrete-planters-sitting-on-top-of-a-river-Amp_WCZTbeA",
+  "lat": 40.7424,
+  "lng": -74.011,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 9,
@@ -434,7 +466,11 @@
   "rain": true,
   "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Image-Grand_central_Station_Outside_Night_2.jpg/1920px-Image-Grand_central_Station_Outside_Night_2.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/Grand%20Central%20Terminal"
+  "imgLink": "https://en.wikipedia.org/wiki/Grand%20Central%20Terminal",
+  "lat": 40.7527,
+  "lng": -73.9772,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 10,
@@ -481,7 +517,11 @@
   "rain": false,
   "img": "https://upload.wikimedia.org/wikipedia/commons/2/2f/30_Rockefeller_Plaza_viewed_from_5th_Avenue%2C_August_29%2C_2024_%28cropped%29.jpg",
   "imgAttr": "via Wikimedia Commons",
-  "imgLink": "https://en.wikipedia.org/wiki/30%20Rockefeller%20Plaza"
+  "imgLink": "https://en.wikipedia.org/wiki/30%20Rockefeller%20Plaza",
+  "lat": 40.7593,
+  "lng": -73.9794,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 11,
@@ -529,7 +569,11 @@
   "rain": true,
   "img": "https://images.unsplash.com/photo-1546953304-5d96f43c2e94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxOZXclMjBZb3JrJTIwUHVibGljJTIwTGlicmFyeSUyME5ldyUyMFlvcmt8ZW58MXwwfHx8MTc4MDc4NzE3Nnww&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Patrick Robert Doyle / Unsplash",
-  "imgLink": "https://unsplash.com/photos/interior-building-OvXht_wi5Ew"
+  "imgLink": "https://unsplash.com/photos/interior-building-OvXht_wi5Ew",
+  "lat": 40.7532,
+  "lng": -73.9822,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 12,
@@ -575,7 +619,11 @@
   "rain": true,
   "img": "https://images.unsplash.com/photo-1659354867955-34be80d410be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxXaGl0bmV5JTIwTXVzZXVtJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg3MTc2fDA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Claudio Schwarz / Unsplash",
-  "imgLink": "https://unsplash.com/photos/a-white-building-with-a-window-ipcsI15th5I"
+  "imgLink": "https://unsplash.com/photos/a-white-building-with-a-window-ipcsI15th5I",
+  "lat": 40.7396,
+  "lng": -74.0089,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 13,
@@ -624,7 +672,11 @@
   "rain": false,
   "img": "https://images.unsplash.com/photo-1586978495011-e80f931f237a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxCcm9va2x5biUyMEhlaWdodHMlMjBQcm9tZW5hZGUlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODcxNzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Marco Lenti / Unsplash",
-  "imgLink": "https://unsplash.com/photos/people-sitting-on-grass-field-near-bridge-during-daytime-BqXRhSoehz4"
+  "imgLink": "https://unsplash.com/photos/people-sitting-on-grass-field-near-bridge-during-daytime-BqXRhSoehz4",
+  "lat": 40.6979,
+  "lng": -73.9967,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 14,
@@ -672,7 +724,11 @@
   "rain": false,
   "img": "https://images.unsplash.com/photo-1586978495011-e80f931f237a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxCcm9va2x5biUyMEJvdGFuaWMlMjBHYXJkZW4lMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODcxNzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Marco Lenti / Unsplash",
-  "imgLink": "https://unsplash.com/photos/people-sitting-on-grass-field-near-bridge-during-daytime-BqXRhSoehz4"
+  "imgLink": "https://unsplash.com/photos/people-sitting-on-grass-field-near-bridge-during-daytime-BqXRhSoehz4",
+  "lat": 40.668,
+  "lng": -73.9632,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 15,
@@ -718,7 +774,11 @@
   "rain": true,
   "img": "https://images.unsplash.com/photo-1751367673950-af4ed091d18b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxUaGUlMjBPY3VsdXMlMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODcxNzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Koon Chakhatrakan / Unsplash",
-  "imgLink": "https://unsplash.com/photos/the-oculus-interior-features-striking-white-architecture-XHXTr-SxS4Q"
+  "imgLink": "https://unsplash.com/photos/the-oculus-interior-features-striking-white-architecture-XHXTr-SxS4Q",
+  "lat": 40.7115,
+  "lng": -74.0111,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 16,
@@ -764,7 +824,11 @@
   "rain": false,
   "img": "https://images.unsplash.com/photo-1664990601633-a4ab61f1f2e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxCcnlhbnQlMjBQYXJrJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwODU3NDAxfDA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "David Vives / Unsplash",
-  "imgLink": "https://unsplash.com/photos/a-group-of-people-in-a-park-h9lmvT1D7lc"
+  "imgLink": "https://unsplash.com/photos/a-group-of-people-in-a-park-h9lmvT1D7lc",
+  "lat": 40.7536,
+  "lng": -73.9832,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 17,
@@ -813,7 +877,11 @@
   "rain": true,
   "img": "https://images.unsplash.com/photo-1680549170814-63e21317d0b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxSb29zZXZlbHQlMjBJc2xhbmQlMjBUcmFtJTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg3MTc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Martti Salmi / Unsplash",
-  "imgLink": "https://unsplash.com/photos/a-view-of-a-city-from-the-top-of-a-bridge-ib3fG0EG-e0"
+  "imgLink": "https://unsplash.com/photos/a-view-of-a-city-from-the-top-of-a-bridge-ib3fG0EG-e0",
+  "lat": 40.7614,
+  "lng": -73.965,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 18,
@@ -861,7 +929,11 @@
   "rain": true,
   "img": "https://images.unsplash.com/photo-1546953304-5d96f43c2e94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxUaGUlMjBNb3JnYW4lMjBMaWJyYXJ5JTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg3MTc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Patrick Robert Doyle / Unsplash",
-  "imgLink": "https://unsplash.com/photos/interior-building-OvXht_wi5Ew"
+  "imgLink": "https://unsplash.com/photos/interior-building-OvXht_wi5Ew",
+  "lat": 40.7491,
+  "lng": -73.9814,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 19,
@@ -908,7 +980,11 @@
   "rain": false,
   "img": "https://images.unsplash.com/photo-1541270941907-3f7143c8c7a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxUaGUlMjBCYXR0ZXJ5JTIwTmV3JTIwWW9ya3xlbnwxfDB8fHwxNzgwNzg3MTc5fDA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "David Groves / Unsplash",
-  "imgLink": "https://unsplash.com/photos/lighted-high-rise-buildings-raXnREhb-uI"
+  "imgLink": "https://unsplash.com/photos/lighted-high-rise-buildings-raXnREhb-uI",
+  "lat": 40.7033,
+  "lng": -74.017,
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 20,
@@ -957,6 +1033,10 @@
   "rain": false,
   "img": "https://images.unsplash.com/photo-1697334581644-2b76bf302c79?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NzExNTZ8MHwxfHNlYXJjaHwxfHxDb25zZXJ2YXRvcnklMjBHYXJkZW4lMjBOZXclMjBZb3JrfGVufDF8MHx8fDE3ODA3ODcxNzl8MA&ixlib=rb-4.1.0&q=80&w=1080",
   "imgAttr": "Laura Michalski / Unsplash",
-  "imgLink": "https://unsplash.com/photos/a-large-white-building-surrounded-by-trees-and-flowers-fpM5fDmD34g"
+  "imgLink": "https://unsplash.com/photos/a-large-white-building-surrounded-by-trees-and-flowers-fpM5fDmD34g",
+  "lat": 40.7935,
+  "lng": -73.9521,
+  "city": "New York",
+  "country": "United States"
  }
 ]

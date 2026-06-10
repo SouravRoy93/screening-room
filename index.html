@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Leaflet — keyless OpenStreetMap maps for the Places vertical -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
 :root{
   --bg:#08080d; --panel:#14141d; --panel2:#1b1b26; --line:#2a2a38;
@@ -382,6 +385,21 @@ a{color:var(--pur)}
 #places .ploading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:60vh;color:#8a8175;font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.5px}
 #places .pspin{width:34px;height:34px;border-radius:50%;border:2px solid rgba(200,180,140,.25);border-top-color:#c8b48c;animation:pspin .9s linear infinite}
 @keyframes pspin{to{transform:rotate(360deg)}}
+#places .pmap{height:64vh;min-height:420px;width:100%;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 18px 50px rgba(0,0,0,.5);background:#0c0c12;margin-top:6px}
+#places .leaflet-container{background:#0c0c12;font-family:'Inter',sans-serif}
+#places .leaflet-popup-content-wrapper{background:#16161f;color:#ece7df;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08)}
+#places .leaflet-popup-tip{background:#16161f;border:1px solid rgba(255,255,255,.08)}
+#places .leaflet-popup-content{margin:0;width:230px!important}
+#places .pmappop{display:flex;flex-direction:column}
+#places .pmappop img{width:100%;height:120px;object-fit:cover;display:block;background:#1b1b26}
+#places .pmappop .pmi{padding:11px 13px 13px;display:flex;flex-direction:column;gap:3px}
+#places .pmappop .pmi b{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;line-height:1.15}
+#places .pmappop .pmi span{color:#8a8175;font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+#places .pmapbtn{margin-top:8px;background:linear-gradient(135deg,#14b8a6,#06b6d4);color:#062a2a;border:0;border-radius:9px;padding:8px 12px;font-weight:700;font-size:12.5px;cursor:pointer;letter-spacing:.3px}
+#places .leaflet-bar a{background:#16161f;color:#ece7df;border-color:rgba(255,255,255,.1)}
+#places .leaflet-bar a:hover{background:#22222e}
+#places .leaflet-control-attribution{background:rgba(10,10,16,.7);color:#6c665c}
+#places .leaflet-control-attribution a{color:#8a8175}
 /* onboarding */
 #places .ponb{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
 #places .ponbox{max-width:560px;width:100%}
@@ -800,7 +818,7 @@ const ICONS={
 const CATS=[
  {v:"entertainment",name:"Entertainment",sub:"Movies & TV",a:["#8b5cf6","#ec4899"],glow:"rgba(139,92,246,.55)",icon:ICONS.clap,active:true},
  {v:"dining",name:"Dining",sub:"New York · 50 tables",a:["#f59e0b","#ef4444"],glow:"rgba(245,158,11,.5)",icon:ICONS.fork,ready:true},
- {v:"places",name:"Places",sub:"New York · 20 spots",a:["#14b8a6","#06b6d4"],glow:"rgba(20,184,166,.5)",icon:ICONS.pin,ready:true},
+ {v:"places",name:"Places",sub:"A curated city guide",a:["#14b8a6","#06b6d4"],glow:"rgba(20,184,166,.5)",icon:ICONS.pin,ready:true},
  {v:"theater",name:"Theater",sub:"Broadway & live",a:["#fb7185","#e11d48"],glow:"rgba(251,113,133,.5)",icon:ICONS.mask},
  {v:"music",name:"Music",sub:"Albums & gigs",a:["#6366f1","#22d3ee"],glow:"rgba(99,102,241,.5)",icon:ICONS.note},
  {v:"books",name:"Books",sub:"Reads",a:["#34d399","#10b981"],glow:"rgba(52,211,153,.5)",icon:ICONS.book}
@@ -987,14 +1005,22 @@ function renderPace(){
   R().innerHTML='<div class="ponb"><div class="ponbox"><div class="peye">Almost there</div><h2>What pace do you prefer?</h2><p>Luxury is rarely rushed.</p><div class="popts">'+["Relaxed","Balanced","Packed itinerary"].map(p=>'<button class="popt'+((prof.pace&&p.indexOf(prof.pace)===0)?" on":"")+'" data-pace="'+p+'">'+p+'</button>').join("")+'</div><button class="ponbtn" data-act="onbDone"'+(prof.pace?'':' disabled')+'>Enter</button><button class="pskip" data-act="onbSkip">Skip for now</button></div></div>';
 }
 function renderShell(){
-  R().innerHTML='<div class="pwrap"><div class="ptop"><div class="pbrand">Screening Room <span>· Places</span></div><div class="pnav"><button data-nav="hub">← Hub</button><button data-nav="home" class="'+(pview==="home"?"on":"")+'">Discover</button><button data-nav="saved" class="'+(pview==="saved"?"on":"")+'">Saved</button><button class="ptoggle'+(trap?" on":"")+'" data-act="trap">Avoid tourist traps</button></div></div><div id="pBody"></div></div><div class="pov" id="pDetail"></div><div class="pov" id="pPd"></div>';
+  R().innerHTML='<div class="pwrap"><div class="ptop"><div class="pbrand">Screening Room <span>· Places</span></div><div class="pnav"><button data-nav="hub">← Hub</button><button data-nav="home" class="'+(pview==="home"?"on":"")+'">Discover</button><button data-nav="map" class="'+(pview==="map"?"on":"")+'">Map</button><button data-nav="saved" class="'+(pview==="saved"?"on":"")+'">Saved</button><button class="ptoggle'+(trap?" on":"")+'" data-act="trap">Avoid tourist traps</button></div></div><div id="pBody"></div></div><div class="pov" id="pDetail"></div><div class="pov" id="pPd"></div>';
   renderBody();
 }
-function greetTxt(){ const h=new Date().getHours(); return (h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", Rohan."; }
-function subTxt(){ const h=new Date().getHours(); return h<12?"Three quiet, beautiful ways to begin your day in New York.":h<17?"A few handpicked ways to spend your afternoon.":"Three beautiful ways to spend your evening."; }
+// ---- dynamic identity & location (no hardcoded name/city) ----
+function userName(){ try{ const u=session&&session.user; if(!u) return ""; const m=u.user_metadata||{}; let n=m.full_name||m.name||m.given_name; if(!n&&u.email){ n=u.email.split("@")[0].split(/[._\d]+/)[0]; } if(!n) return ""; n=String(n).trim(); return n.charAt(0).toUpperCase()+n.slice(1); }catch(e){ return ""; } }
+function currentCity(){ if(!PLACES.length) return ""; const c={}; PLACES.forEach(p=>{ const k=p.city||""; if(k) c[k]=(c[k]||0)+1; }); let best="",n=-1; for(const k in c){ if(c[k]>n){ n=c[k]; best=k; } } return best; }
+function cityCenter(){ const city=currentCity(); const pts=PLACES.filter(p=>(p.city||"")===city && typeof p.lat==="number" && typeof p.lng==="number"); if(!pts.length) return {lat:40.7128,lng:-74.006,city:city||"New York"}; return {lat:pts.reduce((s,p)=>s+p.lat,0)/pts.length, lng:pts.reduce((s,p)=>s+p.lng,0)/pts.length, city:city}; }
+function greetTxt(){ const h=new Date().getHours(); const part=h<12?"Good morning":h<17?"Good afternoon":"Good evening"; const n=userName(); return part+(n?(", "+n):"")+"."; }
+function subTxt(){ const h=new Date().getHours(); const city=currentCity()||"the city"; return (h<12?"Beautiful ways to begin your day in ":h<17?"Handpicked ways to spend your afternoon in ":"Beautiful ways to spend your evening in ")+city+"."; }
+// ---- runtime conflict guard: never show the same photo for two different places ----
+let _imgClaim={};
+function claimImg(p){ const u=plImg(p); if(!/^https?:/.test(u)) return u; const owner=_imgClaim[u]; if(owner===undefined){ _imgClaim[u]=p.id; return u; } return (owner===p.id)?u:PL_PLACEHOLDER; }
 function renderBody(){
   if(pview==="saved"){ renderSaved(); return; }
-  document.getElementById("pBody").innerHTML='<div class="pgreet"><h1>'+greetTxt()+'</h1><div class="psub">'+subTxt()+'</div><div class="pwx" id="pWx">'+(WXCACHE||"Reading the New York sky…")+'</div></div><div class="pmoods">'+MOODS.map(m=>'<button class="pmood'+(m[0]===mood?" on":"")+'" data-mood="'+m[0]+'">'+m[1]+'</button>').join("")+'</div><div class="pdrow"><button class="pdbtn" data-act="pd">✦ Design my perfect day</button><button class="ptoggle'+(lux?" on":"")+'" data-act="lux">Luxury nearby</button></div><div id="pSections"></div>';
+  if(pview==="map"){ renderMap(); return; }
+  document.getElementById("pBody").innerHTML='<div class="pgreet"><h1>'+greetTxt()+'</h1><div class="psub">'+subTxt()+'</div><div class="pwx" id="pWx">'+(WXCACHE||("Reading the "+(currentCity()||"city")+" sky…"))+'</div></div><div class="pmoods">'+MOODS.map(m=>'<button class="pmood'+(m[0]===mood?" on":"")+'" data-mood="'+m[0]+'">'+m[1]+'</button>').join("")+'</div><div class="pdrow"><button class="pdbtn" data-act="pd">✦ Design my perfect day</button><button class="ptoggle'+(lux?" on":"")+'" data-act="lux">Luxury nearby</button></div><div id="pSections"></div>';
   renderSections(); loadWeather();
 }
 function match(p){
@@ -1006,9 +1032,9 @@ function match(p){
   if(mood==="classy") return p.styles.includes("Nightlife")||p.styles.includes("Luxury")||p.badges.includes("Quiet Luxury");
   return p.moods.includes(mood);
 }
-function pcard(p){ const b=p.badges[0]?'<div class="pbadge">'+p.badges[0]+'</div>':''; const dot=saved[p.id]?'<div class="psaveDot">✓</div>':''; const sc=Math.round((p.scores.b+p.scores.u+p.scores.v+p.scores.l)/4*10)/5; return '<div class="pcard" data-place="'+p.id+'"><div class="pph"><img loading="lazy" src="'+plImg(p)+'" alt="">'+b+dot+'<div class="pscore">Worth it '+sc.toFixed(1)+'</div>'+(p.imgAttr?'<div class="pcredit">'+p.imgAttr+'</div>':'')+'</div><div class="pcb"><div class="parea">'+p.area+'</div><h3>'+p.name+'</h3><div class="pvibe">'+p.vibe+'</div><div class="pmeta"><span><b>'+p.dur+' min</b></span><span>'+p.crowd+' crowd</span><span>'+p.price+'</span></div></div></div>'; }
+function pcard(p){ const b=p.badges[0]?'<div class="pbadge">'+p.badges[0]+'</div>':''; const dot=saved[p.id]?'<div class="psaveDot">✓</div>':''; const sc=Math.round((p.scores.b+p.scores.u+p.scores.v+p.scores.l)/4*10)/5; return '<div class="pcard" data-place="'+p.id+'"><div class="pph"><img loading="lazy" src="'+claimImg(p)+'" alt="">'+b+dot+'<div class="pscore">Worth it '+sc.toFixed(1)+'</div>'+(p.imgAttr?'<div class="pcredit">'+p.imgAttr+'</div>':'')+'</div><div class="pcb"><div class="parea">'+p.area+'</div><h3>'+p.name+'</h3><div class="pvibe">'+p.vibe+'</div><div class="pmeta"><span><b>'+p.dur+' min</b></span><span>'+p.crowd+' crowd</span><span>'+p.price+'</span></div></div></div>'; }
 function shelf(t,l,n){ if(!l.length) return ""; return '<div class="psection"><div class="psh"><h2>'+t+'</h2>'+(n?'<span class="pmore">'+n+'</span>':'')+'</div><div class="pgrid">'+l.map(pcard).join("")+'</div></div>'; }
-function renderSections(){ const host=document.getElementById("pSections"); if(!host) return; if(!PLACES.length){ host.innerHTML='<div class="pempty">The catalog is updating — new places are added every day. Check back shortly.</div>'; return; } const base=PLACES.filter(match);
+function renderSections(){ const host=document.getElementById("pSections"); if(!host) return; _imgClaim={}; if(!PLACES.length){ host.innerHTML='<div class="pempty">The catalog is updating — new places are added every day. Check back shortly.</div>'; return; } const base=PLACES.filter(match);
   if(mood!=="all"){ const lbl=MOODS.find(m=>m[0]===mood)[1]; host.innerHTML=shelf(lbl,base)||'<div class="pempty">Nothing matches — try another mood.</div>'; return; }
   const byStyle=base.filter(p=>p.styles.some(s=>prof.styles.includes(s)));
   const out=[]; out.push(shelf("Handpicked for you",(byStyle.length?byStyle:base).slice(0,6),"based on your taste"));
@@ -1018,12 +1044,35 @@ function renderSections(){ const host=document.getElementById("pSections"); if(!
   out.push(shelf("Perfect for two hours",base.filter(p=>p.dur<=90).slice(0,6),"a beautiful in-between"));
   host.innerHTML=out.join("")||'<div class="pempty">Nothing matches — loosen a filter.</div>';
 }
-function renderSaved(){ document.getElementById("pBody").innerHTML='<div class="pgreet"><h1>Saved</h1><div class="psub">Your collection — places kept for the right moment.</div></div><div class="psection"><div class="pgrid" id="pSaved"></div></div>'; const ids=Object.keys(saved).map(Number); document.getElementById("pSaved").innerHTML=ids.length?ids.map(id=>pcard(PB[id])).join(""):'<div class="pempty">Nothing saved yet — tap ♡ on a place you love.</div>'; }
-async function loadWeather(){ try{ const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.006&current=temperature_2m,weather_code&temperature_unit=fahrenheit"); const d=await r.json(); const c=d.current.weather_code,t=Math.round(d.current.temperature_2m),wx=WX[c]||["","🌡"]; isWet=[51,53,55,61,63,65,80,81,82,95,71,73,75].includes(c); const note=isWet?"a fine evening for galleries and grand interiors.":t>=60?"a beautiful evening for a rooftop or a park.":"crisp — bundle up for that skyline view."; WXCACHE=wx[1]+' &nbsp;<b>'+t+'°·'+wx[0]+'</b>&nbsp; New York — '+note; const w=document.getElementById("pWx"); if(w) w.innerHTML=WXCACHE; renderSections(); }catch(e){} }
+function renderSaved(){ _imgClaim={}; document.getElementById("pBody").innerHTML='<div class="pgreet"><h1>Saved</h1><div class="psub">Your collection — places kept for the right moment.</div></div><div class="psection"><div class="pgrid" id="pSaved"></div></div>'; const ids=Object.keys(saved).map(Number); document.getElementById("pSaved").innerHTML=ids.length?ids.map(id=>pcard(PB[id])).join(""):'<div class="pempty">Nothing saved yet — tap ♡ on a place you love.</div>'; }
+/* ===== MAP (Leaflet, keyless OpenStreetMap/CARTO tiles) ===== */
+let _map=null;
+function renderMap(){ _imgClaim={};
+  document.getElementById("pBody").innerHTML='<div class="pgreet"><h1>The map</h1><div class="psub">Every place, located. Tap a marker to explore.</div></div><div class="pmoods">'+MOODS.map(m=>'<button class="pmood'+(m[0]===mood?" on":"")+'" data-mood="'+m[0]+'">'+m[1]+'</button>').join("")+'</div><div id="pMap" class="pmap"></div>';
+  const pts=PLACES.filter(match).filter(p=>typeof p.lat==="number"&&typeof p.lng==="number");
+  setTimeout(function(){ initMap(pts); }, 40);
+}
+function initMap(pts){
+  const host=document.getElementById("pMap"); if(!host) return;
+  if(typeof L==="undefined"){ host.innerHTML='<div class="pempty">Map couldn\'t load — check your connection.</div>'; return; }
+  if(_map){ try{ _map.remove(); }catch(e){} _map=null; }
+  const ctr=cityCenter();
+  _map=L.map("pMap",{zoomControl:true,scrollWheelZoom:false}).setView([ctr.lat,ctr.lng],12);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:"abcd",maxZoom:19}).addTo(_map);
+  const coords=[];
+  pts.forEach(function(p){
+    const m=L.marker([p.lat,p.lng]).addTo(_map);
+    m.bindPopup('<div class="pmappop"><img src="'+plImg(p)+'" alt=""><div class="pmi"><b>'+p.name+'</b><span>'+(p.area||"")+'</span><button class="pmapbtn" data-place="'+p.id+'">View details</button></div></div>');
+    coords.push([p.lat,p.lng]);
+  });
+  if(coords.length){ try{ _map.fitBounds(coords,{padding:[42,42],maxZoom:15}); }catch(e){} }
+  setTimeout(function(){ if(_map) _map.invalidateSize(); }, 80);
+}
+async function loadWeather(){ try{ const ctr=cityCenter(); const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+ctr.lat.toFixed(4)+"&longitude="+ctr.lng.toFixed(4)+"&current=temperature_2m,weather_code&temperature_unit=fahrenheit"); const d=await r.json(); const c=d.current.weather_code,t=Math.round(d.current.temperature_2m),wx=WX[c]||["","🌡"]; isWet=[51,53,55,61,63,65,80,81,82,95,71,73,75].includes(c); const note=isWet?"a fine day for galleries and grand interiors.":t>=60?"a beautiful day for a rooftop or a park.":"crisp — bundle up for that skyline view."; WXCACHE=wx[1]+' &nbsp;<b>'+t+'°·'+wx[0]+'</b>&nbsp; '+(ctr.city||"")+' — '+note; const w=document.getElementById("pWx"); if(w) w.innerHTML=WXCACHE; renderSections(); }catch(e){} }
 function fct(k,v){ return '<div class="pfact"><div class="pk">'+k+'</div><div class="pv">'+v+'</div></div>'; }
 function scb(k,v){ return '<div class="psc"><div class="pk">'+k+'</div><div class="pbar"><div class="pfill" style="width:'+(v*20)+'%"></div></div></div>'; }
-function openDetail(id){ const p=PB[id], s=!!saved[id]; document.getElementById("pDetail").innerHTML='<div class="psheet"><div class="phero"><img src="'+plImg(p)+'" alt=""><button class="px" data-pclose="pDetail">×</button><div class="phtext"><div class="pharea">'+p.area+'</div><h2>'+p.name+'</h2><div class="phvibe">'+p.vibe+'</div>'+(p.imgLink?'<a class="phcredit" href="'+p.imgLink+'" target="_blank" rel="noopener">Photo · '+p.imgAttr+'</a>':'')+'</div></div><div class="psbody"><div class="pbadges">'+p.badges.map(b=>'<span class="pbpill">'+b+'</span>').join("")+'</div><div class="pfacts">'+fct("Best time",p.best)+fct("Ideal duration",p.dur+" minutes")+fct("Crowd level",p.crowd)+fct("Price",p.price)+fct("Dress code",p.dress)+fct("Hours",p.hours)+fct("Reservation",p.resv)+fct("Best photo",p.photo)+'</div><div class="pverdict"><div class="pv1"><b>Worth it if</b>'+p.worth+'</div><div class="pv2"><b>Skip if</b>'+p.skip+'</div></div><div class="pinsider"><b>Insider tip</b>'+p.insider+'</div><div class="pscores">'+scb("Beauty",p.scores.b)+scb("Unique",p.scores.u)+scb("Ease",p.scores.e)+scb("Calm",p.scores.c)+scb("Value",p.scores.v)+scb("Luxury",p.scores.l)+'</div><div class="pnearby"><b>Coffee nearby:</b> '+p.cafe+'<br><b>Dinner after:</b> '+p.dinner+'</div><div class="psact"><button class="'+(s?"on":"")+'" data-save="'+id+'">'+(s?"✓ Saved":"♡ Save")+'</button><button data-map="'+encodeURIComponent(p.name+" New York")+'">Open in Maps</button></div></div></div>'; document.getElementById("pDetail").classList.add("show"); }
-function openPd(){ const pace=prof.pace||"Balanced", themes=Object.keys(PD_THEMES); if(!themes.includes(pdMood)) pdMood=themes[0]; const day=pdPick(pdMood), times=PD_TIMES[pace]||PD_TIMES.Balanced; if(!day.length){ document.getElementById("pPd").innerHTML='<div class="pdsheet"><div class="pdhead"><button class="px" data-pclose="pPd">×</button><h2>Your perfect day</h2></div><div class="pempty">The catalog is still filling in — check back soon.</div></div>'; document.getElementById("pPd").classList.add("show"); return; } const steps=day.map(function(p,i){return '<div class="pstep"><div class="pdot"></div><div class="pt">'+(times[i]||"")+'</div><div class="pd"><h4>'+p.name+'</h4><p>'+p.vibe+'</p></div></div>';}).join("")+'<div class="pstep"><div class="pdot"></div><div class="pt">'+(pace==="Packed"?"7:30 PM":"8:00 PM")+'</div><div class="pd"><h4>Dinner</h4><p>'+((day[day.length-1]||{}).dinner||"A table near your last stop")+' — near your last stop.</p></div></div>'; const outfit=isWet?"Bring a handsome umbrella and a layer.":"Light layers; comfortable shoes for the walks."; const wxnote=isWet?"Rain expected — this plan leans on covered, beautiful interiors.":"Clear skies — your golden-hour stops will shine."; document.getElementById("pPd").innerHTML='<div class="pdsheet"><div class="pdhead"><button class="px" data-pclose="pPd">×</button><h2>Your perfect day</h2><div class="pdsub">'+pace+' pace · New York</div></div><div class="pdctrl">'+themes.map(t=>'<button class="'+(t===pdMood?"on":"")+'" data-pdtheme="'+t+'">'+t+'</button>').join("")+'</div><div class="ptl">'+steps+'</div><div class="pdfoot"><b>Outfit:</b> '+outfit+'<br><b>Weather:</b> '+wxnote+'<br><b>Tip:</b> book your sunset stop and dinner now — the rest is walk-up.</div></div>'; document.getElementById("pPd").classList.add("show"); }
+function openDetail(id){ const p=PB[id], s=!!saved[id]; document.getElementById("pDetail").innerHTML='<div class="psheet"><div class="phero"><img src="'+plImg(p)+'" alt=""><button class="px" data-pclose="pDetail">×</button><div class="phtext"><div class="pharea">'+p.area+'</div><h2>'+p.name+'</h2><div class="phvibe">'+p.vibe+'</div>'+(p.imgLink?'<a class="phcredit" href="'+p.imgLink+'" target="_blank" rel="noopener">Photo · '+p.imgAttr+'</a>':'')+'</div></div><div class="psbody"><div class="pbadges">'+p.badges.map(b=>'<span class="pbpill">'+b+'</span>').join("")+'</div><div class="pfacts">'+fct("Best time",p.best)+fct("Ideal duration",p.dur+" minutes")+fct("Crowd level",p.crowd)+fct("Price",p.price)+fct("Dress code",p.dress)+fct("Hours",p.hours)+fct("Reservation",p.resv)+fct("Best photo",p.photo)+'</div><div class="pverdict"><div class="pv1"><b>Worth it if</b>'+p.worth+'</div><div class="pv2"><b>Skip if</b>'+p.skip+'</div></div><div class="pinsider"><b>Insider tip</b>'+p.insider+'</div><div class="pscores">'+scb("Beauty",p.scores.b)+scb("Unique",p.scores.u)+scb("Ease",p.scores.e)+scb("Calm",p.scores.c)+scb("Value",p.scores.v)+scb("Luxury",p.scores.l)+'</div><div class="pnearby"><b>Coffee nearby:</b> '+p.cafe+'<br><b>Dinner after:</b> '+p.dinner+'</div><div class="psact"><button class="'+(s?"on":"")+'" data-save="'+id+'">'+(s?"✓ Saved":"♡ Save")+'</button><button data-map="'+encodeURIComponent(p.name+" "+(p.city||""))+'">Open in Maps</button></div></div></div>'; document.getElementById("pDetail").classList.add("show"); }
+function openPd(){ const pace=prof.pace||"Balanced", themes=Object.keys(PD_THEMES); if(!themes.includes(pdMood)) pdMood=themes[0]; const day=pdPick(pdMood), times=PD_TIMES[pace]||PD_TIMES.Balanced; if(!day.length){ document.getElementById("pPd").innerHTML='<div class="pdsheet"><div class="pdhead"><button class="px" data-pclose="pPd">×</button><h2>Your perfect day</h2></div><div class="pempty">The catalog is still filling in — check back soon.</div></div>'; document.getElementById("pPd").classList.add("show"); return; } const steps=day.map(function(p,i){return '<div class="pstep"><div class="pdot"></div><div class="pt">'+(times[i]||"")+'</div><div class="pd"><h4>'+p.name+'</h4><p>'+p.vibe+'</p></div></div>';}).join("")+'<div class="pstep"><div class="pdot"></div><div class="pt">'+(pace==="Packed"?"7:30 PM":"8:00 PM")+'</div><div class="pd"><h4>Dinner</h4><p>'+((day[day.length-1]||{}).dinner||"A table near your last stop")+' — near your last stop.</p></div></div>'; const outfit=isWet?"Bring a handsome umbrella and a layer.":"Light layers; comfortable shoes for the walks."; const wxnote=isWet?"Rain expected — this plan leans on covered, beautiful interiors.":"Clear skies — your golden-hour stops will shine."; document.getElementById("pPd").innerHTML='<div class="pdsheet"><div class="pdhead"><button class="px" data-pclose="pPd">×</button><h2>Your perfect day</h2><div class="pdsub">'+pace+' pace · '+(currentCity()||"")+'</div></div><div class="pdctrl">'+themes.map(t=>'<button class="'+(t===pdMood?"on":"")+'" data-pdtheme="'+t+'">'+t+'</button>').join("")+'</div><div class="ptl">'+steps+'</div><div class="pdfoot"><b>Outfit:</b> '+outfit+'<br><b>Weather:</b> '+wxnote+'<br><b>Tip:</b> book your sunset stop and dinner now — the rest is walk-up.</div></div>'; document.getElementById("pPd").classList.add("show"); }
 
 document.addEventListener("click", function(e){
   if(!e.target.closest("#places")) return;
