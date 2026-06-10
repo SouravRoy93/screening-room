@@ -26,3 +26,10 @@ externalPort = 80
 [[ports]]
 localPort = 8081
 externalPort = 8081
+
+[userenv]
+
+[userenv.shared]
+VITE_SUPABASE_URL = "https://jxqtggajabevmpzpxhtk.supabase.co"
+VITE_TMDB_KEY = "f55148eb9c5f84d935845bc4510abe6e"
+VITE_GOOGLE_PLACES_KEY = "AIzaSyAD3vr_u-0NJkRURtf8nxWbXeil-WtJviI"
