@@ -591,13 +591,148 @@
 .pl-heading h1 { font-family: 'Oswald', sans-serif; font-size: clamp(22px,4vw,34px); font-weight: 600; color: #fff; letter-spacing: .02em; margin: 0 0 4px; }
 .pl-heading p { font-size: 13px; color: rgba(255,255,255,0.4); margin: 0; }
 
+/* Greeting */
+.pl-greeting { padding: 8px 0 10px; margin-bottom: 8px; }
+.pl-greeting-text {
+  font-size: clamp(26px, 4.5vw, 40px); font-weight: 700;
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #fff; letter-spacing: -.01em; line-height: 1.15; margin-bottom: 6px;
+}
+.pl-greeting-sub { font-size: 13.5px; color: rgba(255,255,255,0.45); margin-bottom: 16px; }
+
+/* Design my perfect day button */
+.pl-perfect-day-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 13.5px; font-weight: 700; letter-spacing: .03em;
+  color: #fff;
+  background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+  border: none; padding: 10px 22px; border-radius: 30px;
+  cursor: pointer; transition: opacity .15s, transform .12s; margin-top: 4px;
+}
+.pl-perfect-day-btn:hover { opacity: .88; transform: translateY(-1px); }
+.pl-perfect-day-btn:active { transform: translateY(0); }
+
 /* Weather strip */
 .pl-wx {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12.5px; color: rgba(255,255,255,0.5);
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-  padding: 7px 14px; border-radius: 30px; margin-bottom: 18px;
+  padding: 7px 14px; border-radius: 30px; margin-bottom: 14px;
 }
+
+/* ── Perfect Day Modal ────────────────────────────────────── */
+.pl-day-modal {
+  position: relative; width: 100%; max-width: 560px;
+  max-height: 85vh; overflow-y: auto;
+  background: #0e0e18; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px; padding: 32px 28px 28px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.7);
+}
+
+/* Step layout */
+.pl-day-step { display: flex; flex-direction: column; gap: 0; }
+.pl-day-step-label {
+  font-size: 10px; font-weight: 800; letter-spacing: .12em;
+  color: #ec4899; margin-bottom: 14px;
+}
+.pl-day-step-title {
+  font-size: 22px; font-weight: 700;
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #fff; line-height: 1.2; margin-bottom: 6px;
+}
+.pl-day-step-sub { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 24px; }
+.pl-day-back {
+  font: inherit; font-size: 12.5px; color: rgba(255,255,255,0.4);
+  background: none; border: none; padding: 0; cursor: pointer; margin-bottom: 20px; width: fit-content;
+}
+.pl-day-back:hover { color: rgba(255,255,255,0.75); }
+
+/* Option pills */
+.pl-day-opts { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 28px; }
+.pl-day-opt {
+  font: inherit; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  padding: 9px 18px; border-radius: 30px; cursor: pointer; transition: .15s;
+}
+.pl-day-opt:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+.pl-day-opt.on {
+  color: #fff; background: linear-gradient(135deg,#ec4899,#be185d);
+  border-color: transparent;
+}
+
+/* Next / Generate button */
+.pl-day-next {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 13.5px; font-weight: 700;
+  color: #fff; background: linear-gradient(135deg,#ec4899,#be185d);
+  border: none; padding: 11px 24px; border-radius: 30px; cursor: pointer;
+  transition: opacity .15s; width: fit-content;
+}
+.pl-day-next:disabled { opacity: .3; cursor: not-allowed; }
+.pl-day-next:not(:disabled):hover { opacity: .85; }
+
+/* Result layout */
+.pl-day-result { display: flex; flex-direction: column; }
+.pl-day-result-head { margin-bottom: 18px; }
+.pl-day-result-title {
+  font-size: 26px; font-weight: 700;
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #fff; margin-bottom: 4px;
+}
+.pl-day-result-sub { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+/* Type switcher in result */
+.pl-day-types { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.pl-day-type-pill {
+  font: inherit; font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  padding: 7px 15px; border-radius: 30px; cursor: pointer; transition: .15s;
+}
+.pl-day-type-pill:hover { color: rgba(255,255,255,0.8); }
+.pl-day-type-pill.on {
+  color: #fff; background: linear-gradient(135deg,#ec4899,#be185d);
+  border-color: transparent;
+}
+
+/* Divider */
+.pl-day-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 20px 0; }
+
+/* Timeline */
+.pl-day-timeline { display: flex; flex-direction: column; }
+.pl-day-stop { display: flex; gap: 16px; margin-bottom: 4px; }
+.pl-day-time {
+  width: 68px; min-width: 68px; padding-top: 3px;
+  font-size: 12.5px; font-weight: 700; color: #ec4899;
+  font-variant-numeric: tabular-nums; letter-spacing: .01em;
+}
+.pl-day-stop-right { display: flex; flex-direction: column; position: relative; flex: 1; padding-bottom: 22px; }
+.pl-day-dot {
+  position: absolute; left: -20px; top: 6px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ec4899; flex-shrink: 0;
+}
+.pl-day-line {
+  position: absolute; left: -16px; top: 14px; bottom: 0;
+  width: 1px; background: rgba(236,72,153,0.25);
+}
+.pl-day-stop-info { padding-left: 0; }
+.pl-day-stop-area {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 2px;
+}
+.pl-day-stop-name {
+  font-size: 17px; font-weight: 600;
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #fff; line-height: 1.25; margin-bottom: 4px;
+}
+.pl-day-stop-desc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+/* Footer notes */
+.pl-day-notes { display: flex; flex-direction: column; gap: 8px; }
+.pl-day-note { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+.pl-day-note span { font-weight: 700; color: rgba(255,255,255,0.85); margin-right: 5px; }
 
 /* Filter bar */
 .pl-filterbar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }

@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, MapPin, CheckCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle, ExternalLink, X, ChevronRight } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
+import { useAuth } from "@/hooks/use-auth";
 import type { PlaceItem } from "@/types";
 
 const STYLES = ["Iconic","Hidden gems","Luxury","Romantic","Food & cafés","Culture","Nature & views","Nightlife","Shopping","Wellness","Photography","Family"];
@@ -199,9 +200,184 @@ function PlaceDetail({ p, saved, onClose, onSave }: { p: PlaceItem; saved: boole
   );
 }
 
+// ─── Perfect Day ────────────────────────────────────────────────────────────
+
+const DAY_TYPES = [
+  { id: "romantic",  label: "Romantic evening",    moods: ["romantic"],         styles: [] as string[], crowd: "",    startHour: 17, outfit: "Something elevated — the evening may end at dinner.", tip: "book a restaurant for the end of the day now; tables fill after 7pm." },
+  { id: "calm",      label: "Quiet & restorative",  moods: ["calm"],             styles: [] as string[], crowd: "Low", startHour: 10, outfit: "Comfortable layers — this day is about slowing down.", tip: "weekdays are twice as good at these spots; avoid the weekend rush." },
+  { id: "iconic",    label: "Iconic first-timer",   moods: ["iconic","beautiful"],styles: [] as string[], crowd: "",    startHour: 10, outfit: "Comfortable shoes — you'll cover real ground.", tip: "arrive 20 minutes before each venue opens to beat the first rush." },
+  { id: "art",       label: "Art & culture",         moods: ["beautiful"],        styles: ["Culture"],    crowd: "",    startHour: 10, outfit: "Casual smart — galleries appreciate the effort.", tip: "many museums are free on Friday evenings after 4pm." },
+  { id: "photo",     label: "Golden-hour photo",     moods: ["photo"],            styles: ["Photography"],crowd: "",    startHour: 15, outfit: "Light layers — golden light means you need to move fast.", tip: "check tonight's sunset time and be at your last stop 30 minutes before." },
+] as const;
+
+const DURATIONS = [
+  { id: "few",  label: "A few hours",  stops: 2, dinner: false },
+  { id: "half", label: "Half a day",   stops: 3, dinner: false },
+  { id: "full", label: "Full day",     stops: 4, dinner: true  },
+];
+
+function fmtTime(h: number, m: number) {
+  const ap = h >= 12 ? "PM" : "AM";
+  const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  return `${h12}:${String(m).padStart(2, "0")} ${ap}`;
+}
+
+function buildItinerary(places: PlaceItem[], typeId: string, stops: number, addDinner: boolean) {
+  const dt = DAY_TYPES.find(d => d.id === typeId)!;
+  const scored = places
+    .map(p => ({
+      p,
+      score: dt.moods.filter(m => p.moods?.includes(m)).length * 3
+           + dt.styles.filter(s => p.styles?.includes(s)).length * 2
+           + (dt.crowd === "Low" && p.crowd === "Low" ? 2 : 0),
+    }))
+    .filter(s => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const selected = scored.slice(0, stops).map(s => s.p);
+  let hour = dt.startHour, min = 0;
+
+  const stops_out = selected.map(p => {
+    const time = fmtTime(hour, min);
+    const total = min + (p.dur || 75) + 30;
+    hour += Math.floor(total / 60);
+    min = total % 60;
+    return { time, name: p.name, desc: p.vibe || "", area: p.area || "" };
+  });
+
+  if (addDinner) {
+    const lastPlace = selected[selected.length - 1];
+    const dinnerName = lastPlace?.dinner || "a restaurant near your last stop";
+    stops_out.push({ time: fmtTime(hour, 0), name: "Dinner", desc: dinnerName, area: "" });
+  }
+
+  return { stops: stops_out, outfit: dt.outfit, tip: dt.tip };
+}
+
+function PerfectDayModal({ places, wxText, onClose }: { places: PlaceItem[]; wxText: string | null; onClose: () => void }) {
+  const [step, setStep] = useState<"type" | "duration" | "result">("type");
+  const [dayType, setDayType] = useState<string>("");
+  const [durId, setDurId] = useState<string>("");
+
+  const dur = DURATIONS.find(d => d.id === durId);
+  const itinerary = useMemo(() => {
+    if (!dayType || !dur || !places.length) return null;
+    return buildItinerary(places, dayType, dur.stops, dur.dinner);
+  }, [places, dayType, dur]);
+
+  return (
+    <div className="pl-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pl-sheet pl-day-modal">
+        <button className="pl-close" onClick={onClose}><X size={16} /></button>
+
+        {step === "type" && (
+          <div className="pl-day-step">
+            <div className="pl-day-step-label">DESIGN MY PERFECT DAY</div>
+            <h2 className="pl-day-step-title">What kind of day are you planning?</h2>
+            <p className="pl-day-step-sub">We'll build a timed itinerary just for you.</p>
+            <div className="pl-day-opts">
+              {DAY_TYPES.map(dt => (
+                <button
+                  key={dt.id}
+                  className={`pl-day-opt${dayType === dt.id ? " on" : ""}`}
+                  onClick={() => setDayType(dt.id)}
+                >
+                  {dt.label}
+                </button>
+              ))}
+            </div>
+            <button className="pl-day-next" disabled={!dayType} onClick={() => setStep("duration")}>
+              Next <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
+
+        {step === "duration" && (
+          <div className="pl-day-step">
+            <button className="pl-day-back" onClick={() => setStep("type")}>← Back</button>
+            <div className="pl-day-step-label">DESIGN MY PERFECT DAY</div>
+            <h2 className="pl-day-step-title">How long do you have?</h2>
+            <p className="pl-day-step-sub">We'll pace the day to fit your time.</p>
+            <div className="pl-day-opts">
+              {DURATIONS.map(d => (
+                <button
+                  key={d.id}
+                  className={`pl-day-opt${durId === d.id ? " on" : ""}`}
+                  onClick={() => setDurId(d.id)}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+            <button className="pl-day-next" disabled={!durId} onClick={() => setStep("result")}>
+              Build my day ✦
+            </button>
+          </div>
+        )}
+
+        {step === "result" && itinerary && (
+          <div className="pl-day-result">
+            <div className="pl-day-result-head">
+              <div>
+                <h2 className="pl-day-result-title">Your perfect day</h2>
+                <div className="pl-day-result-sub">{DURATIONS.find(d=>d.id===durId)?.label} · New York</div>
+              </div>
+            </div>
+
+            {/* Type switcher */}
+            <div className="pl-day-types">
+              {DAY_TYPES.map(dt => (
+                <button
+                  key={dt.id}
+                  className={`pl-day-type-pill${dayType === dt.id ? " on" : ""}`}
+                  onClick={() => setDayType(dt.id)}
+                >
+                  {dt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="pl-day-divider" />
+
+            {/* Timeline */}
+            <div className="pl-day-timeline">
+              {itinerary.stops.map((stop, i) => (
+                <div key={i} className="pl-day-stop">
+                  <div className="pl-day-time">{stop.time}</div>
+                  <div className="pl-day-stop-right">
+                    <div className="pl-day-dot" />
+                    <div className="pl-day-stop-info">
+                      {stop.area && <div className="pl-day-stop-area">{stop.area}</div>}
+                      <div className="pl-day-stop-name">{stop.name}</div>
+                      {stop.desc && <div className="pl-day-stop-desc">{stop.desc}</div>}
+                    </div>
+                    {i < itinerary.stops.length - 1 && <div className="pl-day-line" />}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pl-day-divider" />
+
+            {/* Footer notes */}
+            <div className="pl-day-notes">
+              <div className="pl-day-note"><span>Outfit</span> {itinerary.outfit}</div>
+              {wxText && <div className="pl-day-note"><span>Weather</span> {wxText}</div>}
+              <div className="pl-day-note"><span>Tip</span> {itinerary.tip}</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main page ───────────────────────────────────────────────────────────────
+
 export default function Places() {
   const [, nav] = useLocation();
   const { places } = usePlaces();
+  const { user } = useAuth();
 
   const [profStyles, setProfStyles] = useState<string[] | null>(() => getLS<string[] | null>("pl_styles", null));
   const [mood, setMood] = useState("all");
@@ -211,6 +387,11 @@ export default function Places() {
   const [selected, setSelected] = useState<PlaceItem | null>(null);
   const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
   const [wxText, setWxText] = useState<string | null>(null);
+  const [showPerfectDay, setShowPerfectDay] = useState(false);
+
+  const hour = new Date().getHours();
+  const salutation = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || null;
 
   function onboardDone(styles: string[], pace: string) {
     setProfStyles(styles);
@@ -245,12 +426,12 @@ export default function Places() {
     }
     const byStyle = filtered.filter(p => p.styles?.some((s: string) => profStyles?.includes(s)));
     const base = filtered;
-    return [
+    return ([
       { title: "Handpicked for you", note: "based on your taste", items: (byStyle.length ? byStyle : base).slice(0, 6) },
       { title: "Best at golden hour", note: "plan around the light", items: base.filter(p => p.badges?.includes("Best at Sunset")).slice(0, 6) },
       { title: "Quiet — less touristy", note: "where locals go", items: base.filter(p => p.crowd === "Low").slice(0, 6) },
       { title: "Perfect for two hours", note: "a beautiful in-between", items: base.filter(p => (p.dur || 999) <= 90).slice(0, 6) },
-    ].filter(s => s.items.length > 0);
+    ] as { title: string; note?: string; items: PlaceItem[] }[]).filter(s => s.items.length > 0);
   }, [places, filtered, mood, profStyles]);
 
   useEffect(() => {
@@ -342,9 +523,23 @@ export default function Places() {
         {/* Discover view */}
         {view === "home" && (
           <>
-            {wxText && (
-              <div className="pl-wx">{wxText}</div>
-            )}
+            {/* Greeting */}
+            <div className="pl-greeting">
+              <h2 className="pl-greeting-text">
+                {salutation}{displayName ? `, ${displayName}` : ""}.
+              </h2>
+              <p className="pl-greeting-sub">
+                {hour < 12
+                  ? "Beautiful ways to start your morning in the city."
+                  : hour < 17
+                  ? "The best of New York — right now."
+                  : "Beautiful ways to spend your evening in New York."}
+              </p>
+              {wxText && <div className="pl-wx">{wxText}</div>}
+              <button className="pl-perfect-day-btn" onClick={() => setShowPerfectDay(true)}>
+                ✦ Design my perfect day
+              </button>
+            </div>
 
             <div className="pl-filterbar">
               <div className="pl-moodbar">
@@ -386,6 +581,10 @@ export default function Places() {
           onClose={() => setSelected(null)}
           onSave={() => toggleSave(selected.id)}
         />
+      )}
+
+      {showPerfectDay && (
+        <PerfectDayModal places={places} wxText={wxText} onClose={() => setShowPerfectDay(false)} />
       )}
     </div>
   );
