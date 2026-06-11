@@ -1,2 +1,3 @@
 - [Screening Room architecture](screening-room-arch.md) — full stack setup: React+Vite frontend at /, Express API at /api, Supabase for auth+data
 - [Supabase tracked_items schema](supabase-schema.md) — existing table schema and upsert conflict key for media tracking
+- [Places tab patterns](places-patterns.md) — routing, localStorage keys, live Google search, dataset size
