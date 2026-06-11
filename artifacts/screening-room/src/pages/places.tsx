@@ -558,23 +558,39 @@ export default function Places() {
             {searchQ.trim() ? (
               /* Search results */
               <div className="pl-section">
-                <div className="pl-sec-head">
-                  <span className="pl-sec-title">Results for "{searchQ.trim()}"</span>
-                  <span className="pl-sec-note">{places.filter(p => {
-                    const q = searchQ.toLowerCase();
-                    return p.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) || p.vibe?.toLowerCase().includes(q);
-                  }).length} found</span>
-                </div>
-                <div className="pl-grid">
-                  {places.filter(p => {
-                    const q = searchQ.toLowerCase();
-                    return p.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) || p.vibe?.toLowerCase().includes(q);
-                  }).map(p => (
-                    <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                      onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
-                      onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
-                  ))}
-                </div>
+                {(() => {
+                  const q = searchQ.toLowerCase().trim();
+                  const results = places.filter(p =>
+                    p.name?.toLowerCase().includes(q) ||
+                    p.area?.toLowerCase().includes(q) ||
+                    p.vibe?.toLowerCase().includes(q) ||
+                    p.badges?.some((b: string) => b.toLowerCase().includes(q)) ||
+                    p.styles?.some((s: string) => s.toLowerCase().includes(q))
+                  );
+                  return (
+                    <>
+                      <div className="pl-sec-head">
+                        <span className="pl-sec-title">Results for "{searchQ.trim()}"</span>
+                        <span className="pl-sec-note">{results.length} found</span>
+                      </div>
+                      {results.length === 0 ? (
+                        <div className="pl-empty" style={{ padding: "32px 0", textAlign: "center", lineHeight: 1.6 }}>
+                          <div style={{ fontSize: 28, marginBottom: 8 }}>🔍</div>
+                          <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 14 }}>No places match <strong style={{ color: "#fff" }}>"{searchQ.trim()}"</strong></div>
+                          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginTop: 6 }}>Try a neighbourhood, vibe, or style — like "hidden" or "Brooklyn"</div>
+                        </div>
+                      ) : (
+                        <div className="pl-grid">
+                          {results.map(p => (
+                            <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
+                              onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
+                              onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             ) : (
               <>
