@@ -289,6 +289,13 @@ export default function Places() {
         <h1 className="text-lg font-bold tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>PLACES</h1>
         <span className="dc-city-badge">NEW YORK</span>
         <div style={{ flex: 1 }} />
+        <button
+          className="pl-taste-btn"
+          onClick={() => { setProfStyles(null); setLS("pl_styles", null); }}
+          title="Edit your taste profile"
+        >
+          ✦ Taste
+        </button>
         <div className="pl-viewnav">
           <button className={`pl-viewtab${view === "home" ? " on" : ""}`} onClick={() => setView("home")}>Discover</button>
           <button className={`pl-viewtab${view === "map" ? " on" : ""}`} onClick={() => setView("map")}>Map</button>
