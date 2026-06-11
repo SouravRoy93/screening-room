@@ -36,6 +36,38 @@ function photoUrl(photoName: string, maxWidth = 800): string {
   return `${PLACES_BASE}/${photoName}/media?maxWidthPx=${maxWidth}&key=${PLACES_KEY}&skipHttpRedirect=false`;
 }
 
+// In-memory thumbnail cache (per server process lifetime)
+const thumbCache = new Map<string, string | null>();
+
+router.get("/places/thumbnail/:id", async (req, res): Promise<void> => {
+  const { name, neighborhood, borough } = req.query as Record<string, string>;
+  if (!name) { res.json({ photo_url: null }); return; }
+  if (!PLACES_KEY) { res.json({ photo_url: null }); return; }
+
+  const cacheKey = name.toLowerCase().trim();
+  if (thumbCache.has(cacheKey)) {
+    res.json({ photo_url: thumbCache.get(cacheKey) ?? null });
+    return;
+  }
+
+  try {
+    const placeId = await findPlace(name, neighborhood || "", borough || "");
+    if (!placeId) { thumbCache.set(cacheKey, null); res.json({ photo_url: null }); return; }
+
+    const url = `${PLACES_BASE}/places/${placeId}?fields=photos&key=${PLACES_KEY}`;
+    const r = await fetch(url, { headers: { "X-Goog-Api-Key": PLACES_KEY, "X-Goog-FieldMask": "photos" } });
+    if (!r.ok) { thumbCache.set(cacheKey, null); res.json({ photo_url: null }); return; }
+
+    const data = await r.json() as { photos?: { name: string }[] };
+    const first = data.photos?.[0];
+    const result = first ? photoUrl(first.name, 600) : null;
+    thumbCache.set(cacheKey, result);
+    res.json({ photo_url: result });
+  } catch {
+    res.json({ photo_url: null });
+  }
+});
+
 router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
   const { id } = req.params;
   const { name, neighborhood, borough } = req.query as Record<string, string>;

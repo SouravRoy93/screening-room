@@ -1,28 +1,162 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Search, UtensilsCrossed, Bookmark, CheckCircle } from "lucide-react";
+import { ArrowLeft, Search, UtensilsCrossed } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
-import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/lib/supabase";
 import type { DiningItem } from "@/types";
 
-const OCCASION_COLORS: Record<string, string> = {
-  "date night": "#ec4899",
-  "celebration": "#ffd36b",
-  "business": "#8b5cf6",
-  "casual": "#3bc9db",
-  "family": "#69db7c",
-  "power lunch": "#f06595",
-};
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+// Module-level photo cache — persists across re-renders, cleared on page reload
+const photoCache = new Map<string, string | null>();
+const photoPending = new Map<string, Promise<string | null>>();
+
+async function fetchThumbnail(id: number, name: string, neighborhood: string, borough: string): Promise<string | null> {
+  const key = name.toLowerCase().trim();
+  if (photoCache.has(key)) return photoCache.get(key) ?? null;
+  if (photoPending.has(key)) return photoPending.get(key)!;
+
+  const p = fetch(`${API_BASE}/places/thumbnail/${id}?name=${encodeURIComponent(name)}&neighborhood=${encodeURIComponent(neighborhood)}&borough=${encodeURIComponent(borough)}`)
+    .then(r => r.ok ? r.json() : { photo_url: null })
+    .then((d: { photo_url: string | null }) => {
+      photoCache.set(key, d.photo_url);
+      photoPending.delete(key);
+      return d.photo_url;
+    })
+    .catch(() => { photoCache.set(key, null); photoPending.delete(key); return null; });
+
+  photoPending.set(key, p);
+  return p;
+}
+
+const ROPE_LABEL: Record<number, string> = { 3: "PLAN AHEAD", 4: "HARD TO GET", 5: "NEAR IMPOSSIBLE" };
+
+function priceStr(p: number) { return "$".repeat(Math.max(1, Math.min(4, p))); }
+
+function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [booked, setBooked] = useState(false);
+  const [visited, setVisited] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const fetched = useRef(false);
+
+  useEffect(() => {
+    setSaved(localStorage.getItem(`sr_dining_saved_${r.id}`) === "1");
+    setBooked(localStorage.getItem(`sr_dining_booked_${r.id}`) === "1");
+    setVisited(localStorage.getItem(`sr_dining_visited_${r.id}`) === "1");
+  }, [r.id]);
+
+  // Lazy-load photo when card enters viewport
+  useEffect(() => {
+    if (fetched.current) return;
+    const el = ref.current;
+    if (!el) return;
+
+    const obs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !fetched.current) {
+        fetched.current = true;
+        obs.disconnect();
+        fetchThumbnail(r.id, r.name, r.neighborhood || "", r.borough || "")
+          .then(url => setPhoto(url));
+      }
+    }, { rootMargin: "200px" });
+
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [r.id, r.name, r.neighborhood, r.borough]);
+
+  const toggle = (type: "saved" | "booked" | "visited", e: React.MouseEvent) => {
+    e.stopPropagation();
+    const key = type === "saved" ? `sr_dining_saved_${r.id}` : type === "booked" ? `sr_dining_booked_${r.id}` : `sr_dining_visited_${r.id}`;
+    if (type === "saved") { const v = !saved; setSaved(v); localStorage.setItem(key, v ? "1" : "0"); }
+    if (type === "booked") { const v = !booked; setBooked(v); localStorage.setItem(key, v ? "1" : "0"); }
+    if (type === "visited") { const v = !visited; setVisited(v); localStorage.setItem(key, v ? "1" : "0"); }
+  };
+
+  const ropeLabel = r.rope !== undefined ? ROPE_LABEL[r.rope] : null;
+
+  return (
+    <div ref={ref} className="dc-card" onClick={onClick}>
+      {/* Photo */}
+      <div className="dc-photo">
+        {photo ? (
+          <img
+            src={photo}
+            alt={r.name}
+            className={`dc-photo-img${photoLoaded ? " loaded" : ""}`}
+            onLoad={() => setPhotoLoaded(true)}
+          />
+        ) : (
+          <div className="dc-photo-placeholder">
+            <UtensilsCrossed size={28} color="rgba(255,255,255,0.15)" />
+          </div>
+        )}
+        <div className="dc-photo-gradient" />
+
+        {/* Difficulty badge */}
+        {ropeLabel && (
+          <div className="dc-rope-badge">{ropeLabel}</div>
+        )}
+
+        {/* Recognition over photo */}
+        {r.recognition && (
+          <div className="dc-recog">{r.recognition}</div>
+        )}
+      </div>
+
+      {/* Body */}
+      <div className="dc-body">
+        <h3 className="dc-name">{r.name}</h3>
+        <p className="dc-meta">
+          {r.cuisine}
+          {r.neighborhood ? ` · ${r.neighborhood}` : ""}
+          {` · ${priceStr(r.price)}`}
+        </p>
+
+        {/* Format chip */}
+        {r.format && (
+          <div className="dc-format-chip">{r.format.toUpperCase()}</div>
+        )}
+
+        {/* Occasions */}
+        {r.occasion && r.occasion.length > 0 && (
+          <div className="dc-occasions">
+            {r.occasion.slice(0, 2).map(occ => (
+              <span key={occ} className="dc-occ-chip">{occ}</span>
+            ))}
+          </div>
+        )}
+
+        {/* Signature order tip */}
+        {r.signature && (
+          <p className="dc-order">
+            <span className="dc-order-label">ORDER</span> {r.signature}
+          </p>
+        )}
+
+        {/* Status buttons */}
+        <div className="dc-btns" onClick={e => e.stopPropagation()}>
+          <button className={`dc-btn${saved ? " on" : ""}`} onClick={e => toggle("saved", e)}>
+            Want to go
+          </button>
+          <button className={`dc-btn${booked ? " on" : ""}`} onClick={e => toggle("booked", e)}>
+            Booked
+          </button>
+          <button className={`dc-btn${visited ? " on" : ""}`} onClick={e => toggle("visited", e)}>
+            Been
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Dining() {
   const [, nav] = useLocation();
-  const { user } = useAuth();
   const { dining } = useDining();
   const [q, setQ] = useState("");
   const [cuisineFilter, setCuisineFilter] = useState("All");
-  const [saved, setSaved] = useState<Set<number>>(new Set());
-  const [visited, setVisited] = useState<Set<number>>(new Set());
 
   const cuisines = useMemo(() => {
     const s = new Set(dining.map(d => d.cuisine));
@@ -37,29 +171,11 @@ export default function Dining() {
       items = items.filter(d =>
         d.name.toLowerCase().includes(lq) ||
         d.cuisine.toLowerCase().includes(lq) ||
-        d.neighborhood?.toLowerCase().includes(lq)
+        (d.neighborhood || "").toLowerCase().includes(lq)
       );
     }
     return items;
   }, [dining, q, cuisineFilter]);
-
-  async function toggleSaved(id: number, e: React.MouseEvent) {
-    e.stopPropagation();
-    if (!user) return;
-    const next = new Set(saved);
-    if (next.has(id)) next.delete(id); else next.add(id);
-    setSaved(next);
-  }
-
-  async function toggleVisited(id: number, e: React.MouseEvent) {
-    e.stopPropagation();
-    if (!user) return;
-    const next = new Set(visited);
-    if (next.has(id)) next.delete(id); else next.add(id);
-    setVisited(next);
-  }
-
-  const priceStr = (p: number) => "$".repeat(Math.max(1, Math.min(4, p)));
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,16 +186,18 @@ export default function Dining() {
         <button onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-lg font-bold" style={{ fontFamily: "'Oswald', sans-serif" }}>Dining</h1>
+        <UtensilsCrossed className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />
+        <h1 className="text-lg font-bold tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>DINING</h1>
+        <span className="dc-city-badge">NEW YORK</span>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-5">
         {/* Search */}
         <div className="relative mb-4">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="search"
-            placeholder="Search restaurants…"
+            placeholder="Search NYC restaurants..."
             value={q}
             onChange={e => setQ(e.target.value)}
             className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none"
@@ -88,7 +206,7 @@ export default function Dining() {
         </div>
 
         {/* Cuisine filter */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none">
           {cuisines.map(c => (
             <button
               key={c}
@@ -105,79 +223,10 @@ export default function Dining() {
           ))}
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Cards grid */}
+        <div className="dc-grid">
           {filtered.map(r => (
-            <div
-              key={r.id}
-              className="group cursor-pointer rounded-2xl overflow-hidden transition-transform hover:scale-[1.01]"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
-              onClick={() => nav(`/dining/${r.id}`)}
-            >
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground truncate">{r.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {r.cuisine} · {r.neighborhood}
-                      {r.borough ? `, ${r.borough}` : ""}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={e => toggleSaved(r.id, e)}
-                      className="p-1.5 rounded-full transition-colors"
-                      style={{ color: saved.has(r.id) ? "#ffd36b" : "#6b7280" }}
-                    >
-                      <Bookmark className={`w-4 h-4 ${saved.has(r.id) ? "fill-current" : ""}`} />
-                    </button>
-                    <button
-                      onClick={e => toggleVisited(r.id, e)}
-                      className="p-1.5 rounded-full transition-colors"
-                      style={{ color: visited.has(r.id) ? "#22c55e" : "#6b7280" }}
-                    >
-                      <CheckCircle className={`w-4 h-4 ${visited.has(r.id) ? "fill-current" : ""}`} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 mt-3">
-                  {priceStr(r.price) && (
-                    <span className="text-xs px-2 py-0.5 rounded-full font-mono" style={{ background: "rgba(255,255,255,0.08)", color: "#ffd36b" }}>
-                      {priceStr(r.price)}
-                    </span>
-                  )}
-                  {r.occasion?.slice(0, 2).map(occ => (
-                    <span
-                      key={occ}
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{
-                        background: `${OCCASION_COLORS[occ] || "#8b5cf6"}22`,
-                        color: OCCASION_COLORS[occ] || "#a78bfa",
-                        border: `1px solid ${OCCASION_COLORS[occ] || "#8b5cf6"}44`,
-                      }}
-                    >
-                      {occ}
-                    </span>
-                  ))}
-                  {r.recognition && (
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(253,224,71,0.1)", color: "#fde047" }}>
-                      ⭐ {r.recognition}
-                    </span>
-                  )}
-                </div>
-
-                {r.blurb && (
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">{r.blurb}</p>
-                )}
-
-                {r.signature && (
-                  <p className="text-xs mt-2 italic" style={{ color: "#ec4899", fontFamily: "'Cormorant Garamond', serif" }}>
-                    ✦ {r.signature}
-                  </p>
-                )}
-              </div>
-            </div>
+            <DiningCard key={r.id} r={r} onClick={() => nav(`/dining/${r.id}`)} />
           ))}
         </div>
 
@@ -185,7 +234,6 @@ export default function Dining() {
           <p className="text-center text-muted-foreground text-sm py-16">No restaurants found.</p>
         )}
       </div>
-
     </div>
   );
 }
