@@ -1,14 +1,15 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
+import { ArrowLeft, MapPin, CheckCircle, ExternalLink } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import type { PlaceItem } from "@/types";
 
 const STYLES = ["Iconic","Hidden gems","Luxury","Romantic","Food & cafés","Culture","Nature & views","Nightlife","Shopping","Wellness","Photography","Family"];
 const MOODS: [string, string][] = [
-  ["all","Everything"],["beautiful","Something beautiful"],["romantic","A romantic evening"],
-  ["calm","Something calm"],["premium","A premium experience"],["hidden","A hidden gem"],
-  ["iconic","Something iconic"],["photo","A great photo"],["quick","Only 90 minutes"],
-  ["avoid-crowds","Avoid crowds"],["classy","A classy night out"],
+  ["all","All"],["beautiful","Beautiful"],["romantic","Romantic"],
+  ["calm","Calm"],["premium","Premium"],["hidden","Hidden gems"],
+  ["iconic","Iconic"],["photo","Photo worthy"],["quick","≤ 90 min"],
+  ["avoid-crowds","Uncrowded"],["classy","Classy"],
 ];
 const WX: Record<number, [string, string]> = {
   0:["Clear","☀"],1:["Mainly clear","🌤"],2:["Partly cloudy","⛅"],3:["Overcast","☁"],
@@ -33,35 +34,35 @@ function PlacesOnboarding({ onDone }: { onDone: (styles: string[], pace: string)
   }
 
   if (step === "styles") return (
-    <div className="ponb">
-      <div className="ponbox">
-        <div className="peye">Welcome</div>
-        <h2>How do you like to explore?</h2>
-        <p>Choose a few. We'll quietly shape everything around them.</p>
-        <div className="popts">
+    <div className="pl-onb">
+      <div className="pl-onbox">
+        <div className="pl-onlabel">PLACES · NEW YORK</div>
+        <h2 className="pl-onh2">How do you like to explore?</h2>
+        <p className="pl-onp">Choose a few. We'll quietly shape everything around them.</p>
+        <div className="pl-onopts">
           {STYLES.map(s => (
-            <button key={s} className={`popt${picked.has(s) ? " on" : ""}`} onClick={() => toggleStyle(s)}>{s}</button>
+            <button key={s} className={`pl-onopt${picked.has(s) ? " on" : ""}`} onClick={() => toggleStyle(s)}>{s}</button>
           ))}
         </div>
-        <button className="ponbtn" disabled={picked.size === 0} onClick={() => setStep("pace")}>Continue</button>
-        <button className="pskip" onClick={() => onDone(["Iconic","Hidden gems","Romantic"], "Balanced")}>Skip for now</button>
+        <button className="pl-onbtn" disabled={picked.size === 0} onClick={() => setStep("pace")}>Continue</button>
+        <button className="pl-skip" onClick={() => onDone(["Iconic","Hidden gems","Romantic"], "Balanced")}>Skip for now</button>
       </div>
     </div>
   );
 
   return (
-    <div className="ponb">
-      <div className="ponbox">
-        <div className="peye">Almost there</div>
-        <h2>What pace do you prefer?</h2>
-        <p>Luxury is rarely rushed.</p>
-        <div className="popts">
+    <div className="pl-onb">
+      <div className="pl-onbox">
+        <div className="pl-onlabel">ALMOST THERE</div>
+        <h2 className="pl-onh2">What pace do you prefer?</h2>
+        <p className="pl-onp">Luxury is rarely rushed.</p>
+        <div className="pl-onopts">
           {["Relaxed","Balanced","Packed itinerary"].map(p => (
-            <button key={p} className={`popt${pace === p ? " on" : ""}`} onClick={() => setPace(p)}>{p}</button>
+            <button key={p} className={`pl-onopt${pace === p ? " on" : ""}`} onClick={() => setPace(p)}>{p}</button>
           ))}
         </div>
-        <button className="ponbtn" disabled={!pace} onClick={() => onDone([...picked], pace.replace(" itinerary",""))}>Enter</button>
-        <button className="pskip" onClick={() => onDone([...picked], "Balanced")}>Skip</button>
+        <button className="pl-onbtn" disabled={!pace} onClick={() => onDone([...picked], pace.replace(" itinerary",""))}>Enter</button>
+        <button className="pl-skip" onClick={() => onDone([...picked], "Balanced")}>Skip</button>
       </div>
     </div>
   );
@@ -78,34 +79,38 @@ function LeafletMap({ places }: { places: PlaceItem[] }) {
     (L.tileLayer as Function)("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:"© CARTO", maxZoom:19 }).addTo(map);
     places.filter(p => p.lat && p.lng).forEach(p => {
       const marker = (L.marker as Function)([p.lat!, p.lng!]).addTo(map);
-      marker.bindPopup(`<b style="color:#211d18">${p.name}</b><br/><span style="color:#5d564c">${p.area||""}</span>`);
+      marker.bindPopup(`<b>${p.name}</b><br/><small>${p.area||""}</small>`);
     });
     mapRef.current = map;
     setTimeout(() => (map as { invalidateSize: () => void }).invalidateSize(), 80);
   }, [places]);
 
-  return <div ref={ref} className="pmap" />;
+  return <div ref={ref} className="pl-map" />;
 }
 
 function PlaceCard({ p, saved, onSelect, onSave }: { p: PlaceItem; saved: boolean; onSelect: () => void; onSave: (e: React.MouseEvent) => void }) {
   const sc = p.scores ? Math.round((p.scores.b + p.scores.u + p.scores.v + p.scores.l) / 4 * 10) / 5 : null;
   return (
-    <div className="pcard" onClick={onSelect}>
-      <div className="pph">
+    <div className="pl-card" onClick={onSelect}>
+      <div className="pl-photo">
         {p.img
           ? <img src={p.img} alt={p.name} loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-          : <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#e2d9c9,#c9bfaf)" }} />
+          : <div className="pl-photo-fallback" />
         }
-        {p.badges?.[0] && <div className="pbadge">{p.badges[0]}</div>}
-        {saved && <div className="psaveDot">✓</div>}
-        {sc !== null && <div className="pscore">Worth it {sc.toFixed(1)}</div>}
+        {p.badges?.[0] && <div className="pl-badge">{p.badges[0]}</div>}
+        {saved && (
+          <button className="pl-saved-dot" onClick={onSave}>
+            <CheckCircle size={12} />
+          </button>
+        )}
+        {sc !== null && <div className="pl-score">{sc.toFixed(1)} ★</div>}
       </div>
-      <div className="pcb">
-        <div className="parea">{p.area}</div>
-        <h3>{p.name}</h3>
-        <div className="pvibe">{p.vibe}</div>
-        <div className="pmeta">
-          {p.dur && <span><b>{p.dur} min</b></span>}
+      <div className="pl-body">
+        {p.area && <div className="pl-area">{p.area}</div>}
+        <h3 className="pl-name">{p.name}</h3>
+        {p.vibe && <div className="pl-vibe">{p.vibe}</div>}
+        <div className="pl-meta">
+          {p.dur && <span>{p.dur} min</span>}
           {p.crowd && <span>{p.crowd} crowd</span>}
           {p.price && <span>{p.price}</span>}
         </div>
@@ -116,69 +121,76 @@ function PlaceCard({ p, saved, onSelect, onSave }: { p: PlaceItem; saved: boolea
 
 function PlaceDetail({ p, saved, onClose, onSave }: { p: PlaceItem; saved: boolean; onClose: () => void; onSave: () => void }) {
   return (
-    <div className="pov show" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="psheet">
-        <div className="phero">
+    <div className="pl-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pl-sheet">
+        <div className="pl-hero">
           {p.img
             ? <img src={p.img} alt={p.name} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-            : <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#b8924f,#8a6a30)" }} />
+            : <div className="pl-hero-fallback" />
           }
-          <button className="px" onClick={onClose}>×</button>
-          <div className="phtext">
-            <div className="pharea">{p.area}</div>
-            <h2>{p.name}</h2>
-            <div className="phvibe">{p.vibe}</div>
+          <div className="pl-hero-scrim" />
+          <button className="pl-close" onClick={onClose}>×</button>
+          <div className="pl-hero-text">
+            {p.area && <div className="pl-hero-area">{p.area}</div>}
+            <h2 className="pl-hero-name">{p.name}</h2>
+            {p.vibe && <div className="pl-hero-vibe">{p.vibe}</div>}
           </div>
         </div>
 
-        <div className="psbody">
+        <div className="pl-detail-body">
           {p.badges?.length > 0 && (
-            <div className="pbadges">
-              {p.badges.map((b: string) => <span key={b} className="pbpill">{b}</span>)}
+            <div className="pl-badges">
+              {p.badges.map((b: string) => <span key={b} className="pl-pill">{b}</span>)}
             </div>
           )}
 
-          <div className="pfacts">
-            {[["Best time", p.best],["Duration", p.dur ? `${p.dur} minutes` : ""],["Crowd", p.crowd],["Price", p.price],["Dress code", p.dress],["Hours", p.hours],["Reservation", p.resv],["Best photo", p.photo]]
+          <div className="pl-facts">
+            {[["Best time", p.best],["Duration", p.dur ? `${p.dur} minutes` : ""],["Crowd", p.crowd],["Price", p.price],["Dress code", p.dress],["Hours", p.hours],["Reservation", p.resv],["Best photo spot", p.photo]]
               .filter(([, v]) => v)
               .map(([k, v]) => (
-                <div key={k as string} className="pfact">
-                  <div className="pk">{k}</div>
-                  <div className="pv">{v}</div>
+                <div key={k as string} className="pl-fact">
+                  <div className="pl-fact-key">{k}</div>
+                  <div className="pl-fact-val">{v}</div>
                 </div>
               ))}
           </div>
 
           {(p.worth || p.skip) && (
-            <div className="pverdict">
-              {p.worth && <div className="pv1"><b>Worth it if</b>{p.worth}</div>}
-              {p.skip && <div className="pv2"><b>Skip if</b>{p.skip}</div>}
+            <div className="pl-verdict">
+              {p.worth && <div className="pl-worth"><span>Worth it if</span> {p.worth}</div>}
+              {p.skip && <div className="pl-skip-if"><span>Skip if</span> {p.skip}</div>}
             </div>
           )}
 
           {p.insider && (
-            <div className="pinsider"><b>Insider tip</b>{p.insider}</div>
+            <div className="pl-insider"><span>Insider tip</span> {p.insider}</div>
           )}
 
           {p.scores && (
-            <div className="pscores">
+            <div className="pl-scores">
               {[["Beauty",p.scores.b],["Unique",p.scores.u],["Calm",p.scores.c],["Ease",p.scores.e],["Value",p.scores.v],["Luxury",p.scores.l]].map(([k,v]) => (
-                <div key={k as string} className="psc">
-                  <div className="pk">{k}</div>
-                  <div className="pbar"><div className="pfill" style={{ width:`${(v as number)*20}%` }} /></div>
+                <div key={k as string} className="pl-score-row">
+                  <div className="pl-score-key">{k}</div>
+                  <div className="pl-score-bar"><div className="pl-score-fill" style={{ width:`${(v as number)*20}%` }} /></div>
+                  <div className="pl-score-num">{v}</div>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="psact">
-            <button className={saved ? "on" : ""} onClick={onSave}>
-              {saved ? "✓ Saved" : "♡ Save"}
+          <div className="pl-actions">
+            <button className={`pl-action-btn${saved ? " on" : ""}`} onClick={onSave}>
+              {saved ? <><CheckCircle size={14} /> Saved</> : "♡ Save"}
             </button>
             {p.name && (
-              <button onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+(p.area||""))}`, "_blank")}>
-                Open in Maps
-              </button>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+(p.area||""))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pl-action-btn pl-maps-btn"
+              >
+                Open in Maps <ExternalLink size={13} />
+              </a>
             )}
           </div>
         </div>
@@ -236,7 +248,7 @@ export default function Places() {
     return [
       { title: "Handpicked for you", note: "based on your taste", items: (byStyle.length ? byStyle : base).slice(0, 6) },
       { title: "Best at golden hour", note: "plan around the light", items: base.filter(p => p.badges?.includes("Best at Sunset")).slice(0, 6) },
-      { title: "Quiet luxury — less touristy", note: "where locals go", items: base.filter(p => p.crowd === "Low").slice(0, 6) },
+      { title: "Quiet — less touristy", note: "where locals go", items: base.filter(p => p.crowd === "Low").slice(0, 6) },
       { title: "Perfect for two hours", note: "a beautiful in-between", items: base.filter(p => (p.dur || 999) <= 90).slice(0, 6) },
     ].filter(s => s.items.length > 0);
   }, [places, filtered, mood, profStyles]);
@@ -253,49 +265,53 @@ export default function Places() {
         const c = d.current.weather_code, t = Math.round(d.current.temperature_2m);
         const wx = WX[c] || ["", "🌡"];
         const note = t >= 60 ? "a beautiful day for a rooftop or a park." : "crisp — bundle up for that skyline view.";
-        setWxText(`${wx[1]} \u00a0${t}°·${wx[0]} — ${note}`);
+        setWxText(`${wx[1]}\u00a0${t}°\u00b7${wx[0]} — ${note}`);
       }).catch(() => {});
   }, [places]);
 
   if (profStyles === null) {
     return (
-      <div id="places">
+      <div className="min-h-screen bg-background">
         <PlacesOnboarding onDone={onboardDone} />
       </div>
     );
   }
 
   return (
-    <div id="places">
-      <div className="pwrap">
-        {/* Top nav */}
-        <div className="ptop">
-          <div className="pbrand">Screening Room <span>· Places</span></div>
-          <div className="pnav">
-            <button onClick={() => nav("/")}>← Hub</button>
-            <button className={view === "home" ? "on" : ""} onClick={() => setView("home")}>Discover</button>
-            <button className={view === "map" ? "on" : ""} onClick={() => setView("map")}>Map</button>
-            <button className={view === "saved" ? "on" : ""} onClick={() => setView("saved")}>Saved</button>
-            <button className={`ptoggle${trap ? " on" : ""}`} onClick={() => setTrap(v => !v)}>Avoid tourist traps</button>
-          </div>
+    <div className="min-h-screen bg-background">
+      {/* Sticky header */}
+      <header className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
+        style={{ background: "rgba(8,8,13,0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <button onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <MapPin className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />
+        <h1 className="text-lg font-bold tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>PLACES</h1>
+        <span className="dc-city-badge">NEW YORK</span>
+        <div style={{ flex: 1 }} />
+        <div className="pl-viewnav">
+          <button className={`pl-viewtab${view === "home" ? " on" : ""}`} onClick={() => setView("home")}>Discover</button>
+          <button className={`pl-viewtab${view === "map" ? " on" : ""}`} onClick={() => setView("map")}>Map</button>
+          <button className={`pl-viewtab${view === "saved" ? " on" : ""}`} onClick={() => setView("saved")}>Saved</button>
         </div>
+      </header>
+
+      <div className="max-w-screen-xl mx-auto px-4 py-5">
 
         {/* Saved view */}
         {view === "saved" && (
           <>
-            <div className="pgreet">
+            <div className="pl-heading">
               <h1>Saved</h1>
-              <div className="psub">Your collection — places kept for the right moment.</div>
+              <p>Your collection — places kept for the right moment.</p>
             </div>
-            <div className="psection">
-              <div className="pgrid">
-                {Object.keys(saved).length === 0
-                  ? <div className="pempty">Nothing saved yet — tap ♡ on a place you love.</div>
-                  : places.filter(p => saved[p.id]).map(p => (
-                    <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} onSelect={() => setSelected(p)} onSave={e => { e.stopPropagation(); toggleSave(p.id); }} />
-                  ))
-                }
-              </div>
+            <div className="pl-grid">
+              {Object.keys(saved).length === 0
+                ? <div className="pl-empty">Nothing saved yet — tap ♡ on a place you love.</div>
+                : places.filter(p => saved[p.id]).map(p => (
+                  <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} onSelect={() => setSelected(p)} onSave={e => { e.stopPropagation(); toggleSave(p.id); }} />
+                ))
+              }
             </div>
           </>
         )}
@@ -303,55 +319,49 @@ export default function Places() {
         {/* Map view */}
         {view === "map" && (
           <>
-            <div className="pgreet">
+            <div className="pl-heading">
               <h1>The map</h1>
-              <div className="psub">Every place, located.</div>
+              <p>Every place, located.</p>
             </div>
-            <div className="pmoods">
+            <div className="pl-moodbar">
               {MOODS.map(([id, lbl]) => (
-                <button key={id} className={`pmood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
+                <button key={id} className={`pl-mood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
               ))}
             </div>
             <LeafletMap places={filtered} />
           </>
         )}
 
-        {/* Home / Discover view */}
+        {/* Discover view */}
         {view === "home" && (
           <>
-            <div className="pgreet">
-              <h1>Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}.</h1>
-              <div className="psub">Handpicked ways to spend your time in the city.</div>
-              {wxText && (
-                <div className="pwx" style={{ display:"inline-flex", alignItems:"center", gap:8, marginTop:14, fontSize:13, color:"#5d564c", background:"#fffdf9", border:"1px solid #e2d9c9", padding:"8px 14px", borderRadius:30 }}>
-                  <span dangerouslySetInnerHTML={{ __html: wxText }} />
-                </div>
-              )}
-            </div>
+            {wxText && (
+              <div className="pl-wx">{wxText}</div>
+            )}
 
-            <div className="pmoods">
-              {MOODS.map(([id, lbl]) => (
-                <button key={id} className={`pmood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
-              ))}
-            </div>
-
-            <div className="pdrow">
-              <button className="ptoggle" style={{ background: lux ? "#211d18" : undefined, color: lux ? "#fff" : undefined, borderColor: lux ? "#211d18" : undefined }} onClick={() => setLux(v => !v)}>
-                Luxury nearby
-              </button>
+            <div className="pl-filterbar">
+              <div className="pl-moodbar">
+                {MOODS.map(([id, lbl]) => (
+                  <button key={id} className={`pl-mood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
+                ))}
+              </div>
+              <div className="pl-toggles">
+                <button className={`pl-toggle${trap ? " on" : ""}`} onClick={() => setTrap(v => !v)}>No tourist traps</button>
+                <button className={`pl-toggle${lux ? " on" : ""}`} onClick={() => setLux(v => !v)}>Luxury only</button>
+              </div>
             </div>
 
             {places.length === 0 && (
-              <div className="pempty">The catalog is updating — check back shortly.</div>
+              <div className="pl-empty">The catalog is updating — check back shortly.</div>
             )}
 
             {sections.map(sec => (
-              <div key={sec.title} className="psection">
-                <div className="psh">
-                  <h2>{sec.title}</h2>
-                  {sec.note && <span className="pmore">{sec.note}</span>}
+              <div key={sec.title} className="pl-section">
+                <div className="pl-sec-head">
+                  <span className="pl-sec-title">{sec.title}</span>
+                  {sec.note && <span className="pl-sec-note">{sec.note}</span>}
                 </div>
-                <div className="pgrid">
+                <div className="pl-grid">
                   {sec.items.map(p => (
                     <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} onSelect={() => setSelected(p)} onSave={e => { e.stopPropagation(); toggleSave(p.id); }} />
                   ))}
@@ -362,7 +372,6 @@ export default function Places() {
         )}
       </div>
 
-      {/* Detail overlay */}
       {selected && (
         <PlaceDetail
           p={selected}
