@@ -59,6 +59,25 @@ function MoreLikeThis({ current, dining, onNav }: { current: DiningItem; dining:
       .map(s => s.d);
   }, [current, dining]);
 
+  const [thumbs, setThumbs] = useState<Record<number, string | null>>({});
+
+  useEffect(() => {
+    if (similar.length === 0) return;
+    setThumbs({});
+    similar.forEach(d => {
+      fetch(
+        `${API_BASE}/places/thumbnail/${d.id}?name=${encodeURIComponent(d.name)}&neighborhood=${encodeURIComponent(d.neighborhood || "")}&borough=${encodeURIComponent((d as any).borough || "")}`
+      )
+        .then(r => r.ok ? r.json() : null)
+        .then((data: { photo_url: string | null } | null) => {
+          if (data?.photo_url) {
+            setThumbs(prev => ({ ...prev, [d.id]: data.photo_url }));
+          }
+        })
+        .catch(() => {});
+    });
+  }, [similar]);
+
   if (similar.length === 0) return null;
 
   return (
@@ -67,11 +86,18 @@ function MoreLikeThis({ current, dining, onNav }: { current: DiningItem; dining:
       <div className="ddp-more-grid">
         {similar.map(d => (
           <button key={d.id} className="ddp-more-card" onClick={() => onNav(`/dining/${d.id}`)}>
+            <div className="ddp-more-thumb">
+              {thumbs[d.id] ? (
+                <img src={thumbs[d.id]!} alt={d.name} className="ddp-more-thumb-img" loading="lazy" />
+              ) : (
+                <div className="ddp-more-thumb-placeholder" />
+              )}
+              {d.format && <span className="ddp-more-badge">{d.format}</span>}
+            </div>
             <div className="ddp-more-info">
               <span className="ddp-more-name">{d.name}</span>
-              <span className="ddp-more-meta">{d.cuisine} · {d.neighborhood}</span>
+              <span className="ddp-more-meta">{d.cuisine}{d.neighborhood ? ` · ${d.neighborhood}` : ""}</span>
             </div>
-            <span className="ddp-more-format">{d.format}</span>
           </button>
         ))}
       </div>
