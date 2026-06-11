@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 
 const router: IRouter = Router();
-const PLACES_KEY = process.env.GOOGLE_PLACES_API_KEY || "";
+const PLACES_KEY = process.env.GOOGLE_API_KEY || process.env.GOOGLE_PLACES_API_KEY || "";
 const PLACES_BASE = "https://places.googleapis.com/v1";
 
 async function findPlace(name: string, neighborhood: string, borough: string): Promise<string | null> {
