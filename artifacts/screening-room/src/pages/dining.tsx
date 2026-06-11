@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Search, Star, UtensilsCrossed, Bookmark, CheckCircle } from "lucide-react";
+import { ArrowLeft, Search, UtensilsCrossed, Bookmark, CheckCircle } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/lib/supabase";
@@ -23,7 +23,6 @@ export default function Dining() {
   const [cuisineFilter, setCuisineFilter] = useState("All");
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [visited, setVisited] = useState<Set<number>>(new Set());
-  const [selected, setSelected] = useState<DiningItem | null>(null);
 
   const cuisines = useMemo(() => {
     const s = new Set(dining.map(d => d.cuisine));
@@ -113,7 +112,7 @@ export default function Dining() {
               key={r.id}
               className="group cursor-pointer rounded-2xl overflow-hidden transition-transform hover:scale-[1.01]"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
-              onClick={() => setSelected(r)}
+              onClick={() => nav(`/dining/${r.id}`)}
             >
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
@@ -187,84 +186,6 @@ export default function Dining() {
         )}
       </div>
 
-      {/* Detail drawer */}
-      {selected && (
-        <>
-          <div className="fixed inset-0 z-40 bg-black/60" onClick={() => setSelected(null)} />
-          <div
-            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md overflow-y-auto p-6"
-            style={{ background: "#0d0d18", borderLeft: "1px solid rgba(255,255,255,0.08)" }}
-          >
-            <button onClick={() => setSelected(null)} className="mb-6 text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div className="flex items-center gap-3 mb-2">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg,#ec4899,#be185d)" }}
-              >
-                <UtensilsCrossed className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Oswald', sans-serif" }}>
-                  {selected.name}
-                </h2>
-                <p className="text-sm text-muted-foreground">{selected.cuisine} · {selected.neighborhood}</p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2 my-4">
-              <span style={{ background: "rgba(255,211,107,0.15)", color: "#ffd36b" }} className="text-xs px-2 py-1 rounded-full font-mono font-semibold">
-                {priceStr(selected.price)}
-              </span>
-              {selected.recognition && (
-                <span style={{ background: "rgba(253,224,71,0.1)", color: "#fde047" }} className="text-xs px-2 py-1 rounded-full">
-                  ⭐ {selected.recognition}
-                </span>
-              )}
-            </div>
-
-            {selected.blurb && <p className="text-sm text-muted-foreground leading-relaxed mb-4">{selected.blurb}</p>}
-            {selected.signature && (
-              <p className="text-base italic mb-4" style={{ color: "#ec4899", fontFamily: "'Cormorant Garamond', serif" }}>
-                ✦ Signature: {selected.signature}
-              </p>
-            )}
-
-            {selected.occasion?.length > 0 && (
-              <div className="mb-4">
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Best for</p>
-                <div className="flex flex-wrap gap-2">
-                  {selected.occasion.map(o => (
-                    <span key={o} className="text-xs px-3 py-1 rounded-full" style={{ background: `${OCCASION_COLORS[o] || "#8b5cf6"}22`, color: OCCASION_COLORS[o] || "#a78bfa" }}>
-                      {o}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-2 mt-6">
-              <button
-                onClick={() => toggleSaved(selected.id, { stopPropagation: () => {} } as React.MouseEvent)}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
-                style={{ background: saved.has(selected.id) ? "#ffd36b22" : "rgba(255,255,255,0.06)", color: saved.has(selected.id) ? "#ffd36b" : "#9ca3af", border: `1px solid ${saved.has(selected.id) ? "#ffd36b44" : "transparent"}` }}
-              >
-                <Bookmark className="w-4 h-4" />
-                {saved.has(selected.id) ? "Saved" : "Save"}
-              </button>
-              <button
-                onClick={() => toggleVisited(selected.id, { stopPropagation: () => {} } as React.MouseEvent)}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
-                style={{ background: visited.has(selected.id) ? "#22c55e22" : "rgba(255,255,255,0.06)", color: visited.has(selected.id) ? "#22c55e" : "#9ca3af", border: `1px solid ${visited.has(selected.id) ? "#22c55e44" : "transparent"}` }}
-              >
-                <CheckCircle className="w-4 h-4" />
-                {visited.has(selected.id) ? "Visited" : "Mark visited"}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 }

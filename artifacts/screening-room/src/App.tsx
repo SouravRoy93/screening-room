@@ -8,6 +8,7 @@ import Hub from "@/pages/hub";
 import Films from "@/pages/films";
 import MediaDetailPage from "@/pages/media-detail-page";
 import Dining from "@/pages/dining";
+import DiningDetailPage from "@/pages/dining-detail-page";
 import Places from "@/pages/places";
 import Social from "@/pages/social";
 import NotFound from "@/pages/not-found";
@@ -41,6 +42,7 @@ function AppRouter() {
       <Route path="/films" component={Films} />
       <Route path="/films/:type/:id" component={MediaDetailPage} />
       <Route path="/dining" component={Dining} />
+      <Route path="/dining/:id" component={DiningDetailPage} />
       <Route path="/places" component={Places} />
       <Route path="/social" component={Social} />
       <Route component={NotFound} />
