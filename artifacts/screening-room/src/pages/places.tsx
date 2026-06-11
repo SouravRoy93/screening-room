@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, MapPin, CheckCircle, ExternalLink, X, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle, ExternalLink, X, ChevronRight, Search } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import type { PlaceItem } from "@/types";
@@ -89,7 +89,12 @@ function LeafletMap({ places }: { places: PlaceItem[] }) {
   return <div ref={ref} className="pl-map" />;
 }
 
-function PlaceCard({ p, saved, onSelect, onSave }: { p: PlaceItem; saved: boolean; onSelect: () => void; onSave: (e: React.MouseEvent) => void }) {
+function PlaceCard({ p, saved, visited, onSelect, onSave, onVisit }: {
+  p: PlaceItem; saved: boolean; visited: boolean;
+  onSelect: () => void;
+  onSave: (e: React.MouseEvent) => void;
+  onVisit: (e: React.MouseEvent) => void;
+}) {
   const sc = p.scores ? Math.round((p.scores.b + p.scores.u + p.scores.v + p.scores.l) / 4 * 10) / 5 : null;
   return (
     <div className="pl-card" onClick={onSelect}>
@@ -99,12 +104,8 @@ function PlaceCard({ p, saved, onSelect, onSave }: { p: PlaceItem; saved: boolea
           : <div className="pl-photo-fallback" />
         }
         {p.badges?.[0] && <div className="pl-badge">{p.badges[0]}</div>}
-        {saved && (
-          <button className="pl-saved-dot" onClick={onSave}>
-            <CheckCircle size={12} />
-          </button>
-        )}
         {sc !== null && <div className="pl-score">{sc.toFixed(1)} ★</div>}
+        {visited && <div className="pl-visited-stamp">✓ Been</div>}
       </div>
       <div className="pl-body">
         {p.area && <div className="pl-area">{p.area}</div>}
@@ -115,14 +116,25 @@ function PlaceCard({ p, saved, onSelect, onSave }: { p: PlaceItem; saved: boolea
           {p.crowd && <span>{p.crowd} crowd</span>}
           {p.price && <span>{p.price}</span>}
         </div>
+        <div className="pl-card-actions" onClick={e => e.stopPropagation()}>
+          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave}>
+            {saved ? "♥ Saved" : "♡ Want to go"}
+          </button>
+          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit}>
+            {visited ? <><CheckCircle size={11} /> Been</> : "Been there"}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-function PlaceDetail({ p, saved, onClose, onSave }: { p: PlaceItem; saved: boolean; onClose: () => void; onSave: () => void }) {
+function PlaceDetail({ p, saved, visited, onClose, onSave, onVisit }: {
+  p: PlaceItem; saved: boolean; visited: boolean;
+  onClose: () => void; onSave: () => void; onVisit: () => void;
+}) {
   return (
-    <div className="pl-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+    <div className="pl-overlay">
       <div className="pl-sheet">
         <div className="pl-hero">
           {p.img
@@ -130,7 +142,7 @@ function PlaceDetail({ p, saved, onClose, onSave }: { p: PlaceItem; saved: boole
             : <div className="pl-hero-fallback" />
           }
           <div className="pl-hero-scrim" />
-          <button className="pl-close" onClick={onClose}>×</button>
+          <button className="pl-close" onClick={onClose}><X size={14} /></button>
           <div className="pl-hero-text">
             {p.area && <div className="pl-hero-area">{p.area}</div>}
             <h2 className="pl-hero-name">{p.name}</h2>
@@ -139,6 +151,26 @@ function PlaceDetail({ p, saved, onClose, onSave }: { p: PlaceItem; saved: boole
         </div>
 
         <div className="pl-detail-body">
+          {/* Primary actions */}
+          <div className="pl-actions">
+            <button className={`pl-action-btn${saved ? " on" : ""}`} onClick={onSave}>
+              {saved ? <><CheckCircle size={14} fill="currentColor" /> Want to go</> : "♡ Want to go"}
+            </button>
+            <button className={`pl-action-btn pl-action-been${visited ? " on" : ""}`} onClick={onVisit}>
+              {visited ? <><CheckCircle size={14} fill="currentColor" /> Been there</> : "✓ Been there"}
+            </button>
+            {p.name && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+(p.area||""))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pl-action-btn pl-maps-btn"
+              >
+                <ExternalLink size={13} /> Maps
+              </a>
+            )}
+          </div>
+
           {p.badges?.length > 0 && (
             <div className="pl-badges">
               {p.badges.map((b: string) => <span key={b} className="pl-pill">{b}</span>)}
@@ -178,22 +210,6 @@ function PlaceDetail({ p, saved, onClose, onSave }: { p: PlaceItem; saved: boole
               ))}
             </div>
           )}
-
-          <div className="pl-actions">
-            <button className={`pl-action-btn${saved ? " on" : ""}`} onClick={onSave}>
-              {saved ? <><CheckCircle size={14} /> Saved</> : "♡ Save"}
-            </button>
-            {p.name && (
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+(p.area||""))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pl-action-btn pl-maps-btn"
-              >
-                Open in Maps <ExternalLink size={13} />
-              </a>
-            )}
-          </div>
         </div>
       </div>
     </div>
@@ -429,6 +445,8 @@ export default function Places() {
   const [trap, setTrap] = useState(false);
   const [selected, setSelected] = useState<PlaceItem | null>(null);
   const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
+  const [visited, setVisited] = useState<Record<number, boolean>>(() => getLS("pl_visited", {}));
+  const [searchQ, setSearchQ] = useState("");
   const [wxText, setWxText] = useState<string | null>(null);
   const [wxRaw, setWxRaw] = useState<{ code: number; temp: number } | null>(null);
   const [showPerfectDay, setShowPerfectDay] = useState(false);
@@ -448,6 +466,13 @@ export default function Places() {
     if (!next[id]) delete next[id];
     setSaved(next);
     setLS("pl_saved", next);
+  }
+
+  function toggleVisit(id: number) {
+    const next = { ...visited, [id]: !visited[id] };
+    if (!next[id]) delete next[id];
+    setVisited(next);
+    setLS("pl_visited", next);
   }
 
   const matches = useCallback((p: PlaceItem) => {
@@ -553,7 +578,10 @@ export default function Places() {
               {Object.keys(saved).length === 0
                 ? <div className="pl-empty">Nothing saved yet — tap ♡ on a place you love.</div>
                 : places.filter(p => saved[p.id]).map(p => (
-                  <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} onSelect={() => setSelected(p)} onSave={e => { e.stopPropagation(); toggleSave(p.id); }} />
+                  <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
+                    onSelect={() => setSelected(p)}
+                    onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
+                    onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
                 ))
               }
             </div>
@@ -597,35 +625,82 @@ export default function Places() {
               </button>
             </div>
 
-            <div className="pl-filterbar">
-              <div className="pl-moodbar">
-                {MOODS.map(([id, lbl]) => (
-                  <button key={id} className={`pl-mood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
-                ))}
-              </div>
-              <div className="pl-toggles">
-                <button className={`pl-toggle${trap ? " on" : ""}`} onClick={() => setTrap(v => !v)}>No tourist traps</button>
-                <button className={`pl-toggle${lux ? " on" : ""}`} onClick={() => setLux(v => !v)}>Luxury only</button>
+            {/* Search */}
+            <div className="pl-search-row">
+              <div className="dc-search-wrap">
+                <Search className="dc-search-icon" size={14} />
+                <input
+                  type="text"
+                  placeholder="Search places in New York..."
+                  value={searchQ}
+                  onChange={e => setSearchQ(e.target.value)}
+                  className="dc-search-input"
+                  autoComplete="off"
+                />
+                {searchQ && (
+                  <button className="pl-search-clear" onClick={() => setSearchQ("")}>×</button>
+                )}
               </div>
             </div>
 
-            {places.length === 0 && (
-              <div className="pl-empty">The catalog is updating — check back shortly.</div>
-            )}
-
-            {sections.map(sec => (
-              <div key={sec.title} className="pl-section">
+            {searchQ.trim() ? (
+              /* Search results */
+              <div className="pl-section">
                 <div className="pl-sec-head">
-                  <span className="pl-sec-title">{sec.title}</span>
-                  {sec.note && <span className="pl-sec-note">{sec.note}</span>}
+                  <span className="pl-sec-title">Results for "{searchQ.trim()}"</span>
+                  <span className="pl-sec-note">{places.filter(p => {
+                    const q = searchQ.toLowerCase();
+                    return p.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) || p.vibe?.toLowerCase().includes(q);
+                  }).length} found</span>
                 </div>
                 <div className="pl-grid">
-                  {sec.items.map(p => (
-                    <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} onSelect={() => setSelected(p)} onSave={e => { e.stopPropagation(); toggleSave(p.id); }} />
+                  {places.filter(p => {
+                    const q = searchQ.toLowerCase();
+                    return p.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) || p.vibe?.toLowerCase().includes(q);
+                  }).map(p => (
+                    <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
+                      onSelect={() => setSelected(p)}
+                      onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
+                      onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
                   ))}
                 </div>
               </div>
-            ))}
+            ) : (
+              <>
+                <div className="pl-filterbar">
+                  <div className="pl-moodbar">
+                    {MOODS.map(([id, lbl]) => (
+                      <button key={id} className={`pl-mood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
+                    ))}
+                  </div>
+                  <div className="pl-toggles">
+                    <button className={`pl-toggle${trap ? " on" : ""}`} onClick={() => setTrap(v => !v)}>No tourist traps</button>
+                    <button className={`pl-toggle${lux ? " on" : ""}`} onClick={() => setLux(v => !v)}>Luxury only</button>
+                  </div>
+                </div>
+
+                {places.length === 0 && (
+                  <div className="pl-empty">The catalog is updating — check back shortly.</div>
+                )}
+
+                {sections.map(sec => (
+                  <div key={sec.title} className="pl-section">
+                    <div className="pl-sec-head">
+                      <span className="pl-sec-title">{sec.title}</span>
+                      {sec.note && <span className="pl-sec-note">{sec.note}</span>}
+                    </div>
+                    <div className="pl-grid">
+                      {sec.items.map(p => (
+                        <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
+                          onSelect={() => setSelected(p)}
+                          onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
+                          onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </>
         )}
       </div>
@@ -634,8 +709,10 @@ export default function Places() {
         <PlaceDetail
           p={selected}
           saved={!!saved[selected.id]}
+          visited={!!visited[selected.id]}
           onClose={() => setSelected(null)}
           onSave={() => toggleSave(selected.id)}
+          onVisit={() => toggleVisit(selected.id)}
         />
       )}
 

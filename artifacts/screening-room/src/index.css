@@ -564,6 +564,10 @@
 
 /* ===== PLACES (dark cinematic — matches Entertainment & Dining) ===== */
 
+/* Full-screen detail overlay — no blur, solid dark like Dining/Entertainment */
+
+/* ── Detail Overlay (full-screen, no blur) ── */
+
 /* Header taste button */
 .pl-taste-btn {
   font: inherit; font-size: 11.5px; font-weight: 700; letter-spacing: .05em;
@@ -797,20 +801,49 @@
 .pl-meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: rgba(255,255,255,0.35); }
 .pl-meta span { white-space: nowrap; }
 
+/* Card tracking buttons */
+.pl-card-actions { display: flex; gap: 6px; margin-top: 8px; }
+.pl-card-btn {
+  font: inherit; font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 20px;
+  cursor: pointer; transition: .15s; display: inline-flex; align-items: center; gap: 4px;
+  white-space: nowrap;
+}
+.pl-card-btn:hover { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.2); }
+.pl-card-btn.on { color: #fff; background: linear-gradient(135deg,#ec4899,#be185d); border-color: transparent; }
+.pl-card-btn-been.on { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); color: #fff; }
+
+/* Visited stamp on photo */
+.pl-visited-stamp {
+  position: absolute; bottom: 8px; left: 8px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .5px;
+  color: #fff; background: rgba(255,255,255,0.18); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.25); padding: 3px 8px; border-radius: 20px;
+}
+
+/* Search row in Discover */
+.pl-search-row { position: relative; margin-bottom: 16px; }
+.pl-search-clear {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: rgba(255,255,255,0.4);
+  font-size: 16px; cursor: pointer; padding: 0 4px; line-height: 1;
+}
+.pl-search-clear:hover { color: rgba(255,255,255,0.8); }
+
 /* Map */
 .pl-map { width: 100%; height: 420px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); margin-top: 18px; }
 
 /* Detail overlay */
 .pl-overlay {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: 30px 18px; z-index: 70; overflow-y: auto;
+  background: #08080d;
+  z-index: 70; overflow-y: auto;
 }
 .pl-sheet {
-  background: #10101a; border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px; max-width: 680px; width: 100%;
-  overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.7); margin: auto;
+  background: #10101a;
+  max-width: 720px; width: 100%;
+  min-height: 100vh; margin: 0 auto;
 }
 .pl-hero { position: relative; height: 280px; overflow: hidden; background: rgba(255,255,255,0.05); }
 .pl-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -819,8 +852,10 @@
 .pl-close {
   position: absolute; top: 14px; right: 14px; z-index: 3;
   width: 32px; height: 32px; border-radius: 50%;
-  background: rgba(255,255,255,0.15); backdrop-filter: blur(6px);
-  border: none; font-size: 18px; cursor: pointer; color: #fff;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer; color: #fff;
+  display: flex; align-items: center; justify-content: center;
   display: flex; align-items: center; justify-content: center; transition: background .15s;
 }
 .pl-close:hover { background: rgba(255,255,255,0.25); }
@@ -848,7 +883,7 @@
 .pl-score-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
 .pl-score-fill { height: 100%; background: linear-gradient(90deg,#ec4899,#be185d); border-radius: 4px; }
 .pl-score-num { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); width: 14px; text-align: right; }
-.pl-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.pl-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
 .pl-action-btn {
   display: inline-flex; align-items: center; gap: 6px;
   font: inherit; font-size: 13px; font-weight: 600;
@@ -857,8 +892,9 @@
   cursor: pointer; text-decoration: none; transition: .15s;
 }
 .pl-action-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.pl-action-btn.on { background: #ec4899; border-color: transparent; color: #fff; }
-.pl-maps-btn { color: rgba(255,255,255,0.6); }
+.pl-action-btn.on { background: linear-gradient(135deg,#ec4899,#be185d); border-color: transparent; color: #fff; }
+.pl-action-been.on { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff; }
+.pl-maps-btn { color: rgba(255,255,255,0.5); }
 
 /* Onboarding */
 .pl-onb {
