@@ -1043,13 +1043,13 @@
   border-radius: 20px; padding: 3px 10px; white-space: nowrap;
 }
 
-/* Filter row — single line matching Entertainment layout */
+/* Filter — two rows matching the original layout */
 .dc-filter-row {
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 20px; flex-wrap: nowrap; overflow-x: auto;
+  display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
 }
-.dc-filter-row::-webkit-scrollbar { display: none; }
-.dc-search-wrap { position: relative; flex: 1; min-width: 160px; }
+.dc-search-row { position: relative; width: 100%; }
+.dc-search-wrap { position: relative; width: 100%; }
+.dc-controls-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .dc-search-icon {
   position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
   color: rgba(255,255,255,0.35); pointer-events: none;
@@ -1501,7 +1501,37 @@
 .ddp-review-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .ddp-review-author { font-size: 13.5px; font-weight: 700; color: #fff; }
 .ddp-star-row { display: flex; gap: 2px; }
-.ddp-review-text { font-size: 13px; color: rgba(255,255,255,0.68); line-height: 1.6; margin: 0 0 6px; }
+.ddp-review-text {
+  font-size: 13px; color: rgba(255,255,255,0.68); line-height: 1.6; margin: 0 0 6px;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ddp-review-text.expanded { display: block; overflow: visible; -webkit-line-clamp: unset; }
+.ddp-see-more-reviews {
+  display: block; width: 100%; margin-top: 8px; padding: 10px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; color: rgba(255,255,255,0.6); font: inherit; font-size: 13px;
+  cursor: pointer; text-align: center; transition: all .15s;
+}
+.ddp-see-more-reviews:hover { background: rgba(255,255,255,0.09); color: #fff; }
+
+/* More like this */
+.ddp-more-section { margin-bottom: 28px; }
+.ddp-more-head { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+.ddp-more-grid { display: flex; flex-direction: column; gap: 8px; }
+.ddp-more-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; cursor: pointer; text-align: left; transition: background .15s;
+  font: inherit;
+}
+.ddp-more-card:hover { background: rgba(255,255,255,0.08); }
+.ddp-more-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ddp-more-name { font-size: 13.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ddp-more-meta { font-size: 12px; color: rgba(255,255,255,0.45); }
+.ddp-more-format {
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 3px 8px; white-space: nowrap; flex-shrink: 0;
+}
 .ddp-review-time { font-size: 11px; color: rgba(255,255,255,0.3); margin: 0; }
 
 /* Fallback blurb/signature */

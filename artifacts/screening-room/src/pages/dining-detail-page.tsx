@@ -43,6 +43,33 @@ function StarRow({ rating }: { rating: number }) {
   );
 }
 
+function MoreLikeThis({ current, dining, onNav }: { current: DiningItem; dining: DiningItem[]; onNav: (path: string) => void }) {
+  const similar = useMemo(() => {
+    return dining
+      .filter(d => d.id !== current.id && (d.cuisine === current.cuisine || d.format === current.format))
+      .slice(0, 4);
+  }, [current, dining]);
+
+  if (similar.length === 0) return null;
+
+  return (
+    <div className="ddp-more-section">
+      <div className="ddp-more-head">MORE LIKE THIS</div>
+      <div className="ddp-more-grid">
+        {similar.map(d => (
+          <button key={d.id} className="ddp-more-card" onClick={() => onNav(`/dining/${d.id}`)}>
+            <div className="ddp-more-info">
+              <span className="ddp-more-name">{d.name}</span>
+              <span className="ddp-more-meta">{d.cuisine} · {d.neighborhood}</span>
+            </div>
+            <span className="ddp-more-format">{d.format}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function DiningDetailPage() {
   const params = useParams<{ id: string }>();
   const [, nav] = useLocation();
@@ -90,6 +117,8 @@ export default function DiningDetailPage() {
   const notesTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [expandedReviews, setExpandedReviews] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (isLive && liveParams?.name) {
@@ -326,23 +355,43 @@ export default function DiningDetailPage() {
           <button className="ddp-save-btn" onClick={persistNotes}>Save notes</button>
         </div>
 
-        {/* Google Reviews */}
+        {/* Google Reviews — max 3, 4-line clamp, expand on click */}
         {places?.reviews && places.reviews.length > 0 && (
           <div className="ddp-reviews-section">
             <div className="ddp-reviews-head">GOOGLE REVIEWS</div>
-            {places.reviews.map((rev, i) => (
-              <div key={i} className="ddp-review-card">
-                <div className="ddp-review-top">
-                  <span className="ddp-review-author">{rev.author}</span>
-                  <StarRow rating={rev.rating} />
+            {(showAllReviews ? places.reviews : places.reviews.slice(0, 3)).map((rev, i) => {
+              const expanded = expandedReviews.has(i);
+              return (
+                <div key={i} className="ddp-review-card"
+                  onClick={() => setExpandedReviews(prev => {
+                    const next = new Set(prev);
+                    if (next.has(i)) next.delete(i); else next.add(i);
+                    return next;
+                  })}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="ddp-review-top">
+                    <span className="ddp-review-author">{rev.author}</span>
+                    <StarRow rating={rev.rating} />
+                  </div>
+                  <p className={`ddp-review-text${expanded ? " expanded" : ""}`}>{rev.text}</p>
+                  {rev.relativeTime && (
+                    <p className="ddp-review-time">{rev.relativeTime}</p>
+                  )}
                 </div>
-                <p className="ddp-review-text">{rev.text}</p>
-                {rev.relativeTime && (
-                  <p className="ddp-review-time">{rev.relativeTime}</p>
-                )}
-              </div>
-            ))}
+              );
+            })}
+            {places.reviews.length > 3 && (
+              <button className="ddp-see-more-reviews" onClick={() => setShowAllReviews(v => !v)}>
+                {showAllReviews ? "Show fewer reviews" : `See all ${places.reviews.length} reviews`}
+              </button>
+            )}
           </div>
+        )}
+
+        {/* More like this */}
+        {restaurant && dining.length > 0 && (
+          <MoreLikeThis current={restaurant} dining={dining} onNav={nav} />
         )}
 
         {/* Our blurb + signature if no Places data */}

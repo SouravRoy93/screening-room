@@ -228,19 +228,22 @@ export default function Dining() {
       </header>
 
       <div className="max-w-screen-xl mx-auto px-4 py-5">
-        {/* Filter row — single line */}
+        {/* Filter — two rows */}
         <div className="dc-filter-row">
-          <div className="dc-search-wrap" ref={searchWrapRef} style={{ position: "relative" }}>
-            <Search className="dc-search-icon" size={14} />
-            <input
-              type="text"
-              placeholder="Search NYC restaurants..."
-              value={q}
-              onChange={e => setQ(e.target.value)}
-              onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
-              className="dc-search-input"
-              autoComplete="off"
-            />
+          {/* Row 1: Search with autocomplete dropdown */}
+          <div className="dc-search-row" ref={searchWrapRef}>
+            <div className="dc-search-wrap">
+              <Search className="dc-search-icon" size={14} />
+              <input
+                type="text"
+                placeholder="Search NYC restaurants..."
+                value={q}
+                onChange={e => setQ(e.target.value)}
+                onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+                className="dc-search-input"
+                autoComplete="off"
+              />
+            </div>
             {showSuggestions && suggestions.length > 0 && (
               <div className="dc-suggestions">
                 {suggestions.map(s => (
@@ -264,30 +267,32 @@ export default function Dining() {
             )}
           </div>
 
-          <div className="dc-tabs">
-            <button className={`dc-tab${tab === "trending" ? " on" : ""}`} onClick={() => setTab("trending")}>🔥 Trending</button>
-            <button className={`dc-tab${tab === "all" ? " on" : ""}`} onClick={() => setTab("all")}>All</button>
-            <button className={`dc-tab${tab === "nearby" ? " on" : ""}`} onClick={() => setTab("nearby")}>📍 Near Me</button>
-          </div>
-
-          <div className="dc-dropdowns">
-            <div className="dc-select-wrap">
-              <select className="dc-select" value={cuisineFilter} onChange={e => setCuisineFilter(e.target.value)}>
-                {cuisines.map(c => <option key={c}>{c}</option>)}
-              </select>
-              <ChevronDown size={12} className="dc-select-chevron" />
+          {/* Row 2: Tabs + dropdowns */}
+          <div className="dc-controls-row">
+            <div className="dc-tabs">
+              <button className={`dc-tab${tab === "trending" ? " on" : ""}`} onClick={() => setTab("trending")}>🔥 Trending</button>
+              <button className={`dc-tab${tab === "all" ? " on" : ""}`} onClick={() => setTab("all")}>All</button>
+              <button className={`dc-tab${tab === "nearby" ? " on" : ""}`} onClick={() => setTab("nearby")}>📍 Near Me</button>
             </div>
-            <div className="dc-select-wrap">
-              <select className="dc-select" value={occasionFilter} onChange={e => setOccasionFilter(e.target.value)}>
-                {OCCASIONS.map(o => <option key={o}>{o}</option>)}
-              </select>
-              <ChevronDown size={12} className="dc-select-chevron" />
-            </div>
-            <div className="dc-select-wrap">
-              <select className="dc-select" value={diffFilter} onChange={e => setDiffFilter(e.target.value)}>
-                {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
-              </select>
-              <ChevronDown size={12} className="dc-select-chevron" />
+            <div className="dc-dropdowns">
+              <div className="dc-select-wrap">
+                <select className="dc-select" value={cuisineFilter} onChange={e => setCuisineFilter(e.target.value)}>
+                  {cuisines.map(c => <option key={c}>{c}</option>)}
+                </select>
+                <ChevronDown size={12} className="dc-select-chevron" />
+              </div>
+              <div className="dc-select-wrap">
+                <select className="dc-select" value={occasionFilter} onChange={e => setOccasionFilter(e.target.value)}>
+                  {OCCASIONS.map(o => <option key={o}>{o}</option>)}
+                </select>
+                <ChevronDown size={12} className="dc-select-chevron" />
+              </div>
+              <div className="dc-select-wrap">
+                <select className="dc-select" value={diffFilter} onChange={e => setDiffFilter(e.target.value)}>
+                  {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
+                </select>
+                <ChevronDown size={12} className="dc-select-chevron" />
+              </div>
             </div>
           </div>
         </div>
