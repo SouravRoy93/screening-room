@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, MapPin, CheckCircle, ExternalLink, X, ChevronRight, Search } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, Search } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import type { PlaceItem } from "@/types";
@@ -89,15 +89,15 @@ function LeafletMap({ places }: { places: PlaceItem[] }) {
   return <div ref={ref} className="pl-map" />;
 }
 
-function PlaceCard({ p, saved, visited, onSelect, onSave, onVisit }: {
+function PlaceCard({ p, saved, visited, onSave, onVisit }: {
   p: PlaceItem; saved: boolean; visited: boolean;
-  onSelect: () => void;
   onSave: (e: React.MouseEvent) => void;
   onVisit: (e: React.MouseEvent) => void;
 }) {
+  const [, nav] = useLocation();
   const sc = p.scores ? Math.round((p.scores.b + p.scores.u + p.scores.v + p.scores.l) / 4 * 10) / 5 : null;
   return (
-    <div className="pl-card" onClick={onSelect}>
+    <div className="pl-card" onClick={() => nav(`/places/${p.id}`)}>
       <div className="pl-photo">
         {p.img
           ? <img src={p.img} alt={p.name} loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
@@ -129,92 +129,6 @@ function PlaceCard({ p, saved, visited, onSelect, onSave, onVisit }: {
   );
 }
 
-function PlaceDetail({ p, saved, visited, onClose, onSave, onVisit }: {
-  p: PlaceItem; saved: boolean; visited: boolean;
-  onClose: () => void; onSave: () => void; onVisit: () => void;
-}) {
-  return (
-    <div className="pl-overlay">
-      <div className="pl-sheet">
-        <div className="pl-hero">
-          {p.img
-            ? <img src={p.img} alt={p.name} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-            : <div className="pl-hero-fallback" />
-          }
-          <div className="pl-hero-scrim" />
-          <button className="pl-close" onClick={onClose}><X size={14} /></button>
-          <div className="pl-hero-text">
-            {p.area && <div className="pl-hero-area">{p.area}</div>}
-            <h2 className="pl-hero-name">{p.name}</h2>
-            {p.vibe && <div className="pl-hero-vibe">{p.vibe}</div>}
-          </div>
-        </div>
-
-        <div className="pl-detail-body">
-          {/* Primary actions */}
-          <div className="pl-actions">
-            <button className={`pl-action-btn${saved ? " on" : ""}`} onClick={onSave}>
-              {saved ? <><CheckCircle size={14} fill="currentColor" /> Want to go</> : "♡ Want to go"}
-            </button>
-            <button className={`pl-action-btn pl-action-been${visited ? " on" : ""}`} onClick={onVisit}>
-              {visited ? <><CheckCircle size={14} fill="currentColor" /> Been there</> : "✓ Been there"}
-            </button>
-            {p.name && (
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+(p.area||""))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pl-action-btn pl-maps-btn"
-              >
-                <ExternalLink size={13} /> Maps
-              </a>
-            )}
-          </div>
-
-          {p.badges?.length > 0 && (
-            <div className="pl-badges">
-              {p.badges.map((b: string) => <span key={b} className="pl-pill">{b}</span>)}
-            </div>
-          )}
-
-          <div className="pl-facts">
-            {[["Best time", p.best],["Duration", p.dur ? `${p.dur} minutes` : ""],["Crowd", p.crowd],["Price", p.price],["Dress code", p.dress],["Hours", p.hours],["Reservation", p.resv],["Best photo spot", p.photo]]
-              .filter(([, v]) => v)
-              .map(([k, v]) => (
-                <div key={k as string} className="pl-fact">
-                  <div className="pl-fact-key">{k}</div>
-                  <div className="pl-fact-val">{v}</div>
-                </div>
-              ))}
-          </div>
-
-          {(p.worth || p.skip) && (
-            <div className="pl-verdict">
-              {p.worth && <div className="pl-worth"><span>Worth it if</span> {p.worth}</div>}
-              {p.skip && <div className="pl-skip-if"><span>Skip if</span> {p.skip}</div>}
-            </div>
-          )}
-
-          {p.insider && (
-            <div className="pl-insider"><span>Insider tip</span> {p.insider}</div>
-          )}
-
-          {p.scores && (
-            <div className="pl-scores">
-              {[["Beauty",p.scores.b],["Unique",p.scores.u],["Calm",p.scores.c],["Ease",p.scores.e],["Value",p.scores.v],["Luxury",p.scores.l]].map(([k,v]) => (
-                <div key={k as string} className="pl-score-row">
-                  <div className="pl-score-key">{k}</div>
-                  <div className="pl-score-bar"><div className="pl-score-fill" style={{ width:`${(v as number)*20}%` }} /></div>
-                  <div className="pl-score-num">{v}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Perfect Day ────────────────────────────────────────────────────────────
 
@@ -443,7 +357,6 @@ export default function Places() {
   const [view, setView] = useState<"home" | "map" | "saved">("home");
   const [lux, setLux] = useState(false);
   const [trap, setTrap] = useState(false);
-  const [selected, setSelected] = useState<PlaceItem | null>(null);
   const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
   const [visited, setVisited] = useState<Record<number, boolean>>(() => getLS("pl_visited", {}));
   const [searchQ, setSearchQ] = useState("");
@@ -579,7 +492,6 @@ export default function Places() {
                 ? <div className="pl-empty">Nothing saved yet — tap ♡ on a place you love.</div>
                 : places.filter(p => saved[p.id]).map(p => (
                   <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                    onSelect={() => setSelected(p)}
                     onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
                     onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
                 ))
@@ -659,7 +571,6 @@ export default function Places() {
                     return p.name?.toLowerCase().includes(q) || p.area?.toLowerCase().includes(q) || p.vibe?.toLowerCase().includes(q);
                   }).map(p => (
                     <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                      onSelect={() => setSelected(p)}
                       onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
                       onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
                   ))}
@@ -692,7 +603,6 @@ export default function Places() {
                     <div className="pl-grid">
                       {sec.items.map(p => (
                         <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                          onSelect={() => setSelected(p)}
                           onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
                           onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
                       ))}
@@ -704,17 +614,6 @@ export default function Places() {
           </>
         )}
       </div>
-
-      {selected && (
-        <PlaceDetail
-          p={selected}
-          saved={!!saved[selected.id]}
-          visited={!!visited[selected.id]}
-          onClose={() => setSelected(null)}
-          onSave={() => toggleSave(selected.id)}
-          onVisit={() => toggleVisit(selected.id)}
-        />
-      )}
 
       {showPerfectDay && (
         <PerfectDayModal places={places} wxText={wxText} wxRaw={wxRaw} onClose={() => setShowPerfectDay(false)} />

@@ -10,6 +10,7 @@ import MediaDetailPage from "@/pages/media-detail-page";
 import Dining from "@/pages/dining";
 import DiningDetailPage from "@/pages/dining-detail-page";
 import Places from "@/pages/places";
+import PlaceDetailPage from "@/pages/place-detail-page";
 import Social from "@/pages/social";
 import NotFound from "@/pages/not-found";
 
@@ -45,6 +46,7 @@ function AppRouter() {
       <Route path="/dining/live" component={DiningDetailPage} />
       <Route path="/dining/:id" component={DiningDetailPage} />
       <Route path="/places" component={Places} />
+      <Route path="/places/:id" component={PlaceDetailPage} />
       <Route path="/social" component={Social} />
       <Route component={NotFound} />
     </Switch>
