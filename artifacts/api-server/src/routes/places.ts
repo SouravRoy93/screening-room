@@ -20,7 +20,6 @@ async function getPlaceDetails(placeId: string) {
     "photos", "reviews", "googleMapsUri", "priceLevel", "types",
     "currentOpeningHours",
   ].join(",");
-
   const url = `${PLACES_BASE}/places/${placeId}?fields=${fields}&key=${PLACES_KEY}&languageCode=en`;
   const r = await fetch(url, {
     headers: { "X-Goog-Api-Key": PLACES_KEY, "X-Goog-FieldMask": fields },
@@ -32,11 +31,16 @@ async function getPlaceDetails(placeId: string) {
   return r.json();
 }
 
-function photoUrl(photoName: string, maxWidth = 800): string {
-  return `${PLACES_BASE}/${photoName}/media?maxWidthPx=${maxWidth}&key=${PLACES_KEY}&skipHttpRedirect=false`;
+// Resolve to actual CDN URL server-side so the API key is never exposed to the browser
+async function resolveCdnUrl(photoName: string, maxWidth = 800): Promise<string | null> {
+  const url = `${PLACES_BASE}/${photoName}/media?maxWidthPx=${maxWidth}&key=${PLACES_KEY}&skipHttpRedirect=true`;
+  const r = await fetch(url, { headers: { "X-Goog-Api-Key": PLACES_KEY } });
+  if (!r.ok) return null;
+  const data = await r.json() as { photoUri?: string };
+  return data.photoUri || null;
 }
 
-// In-memory thumbnail cache (per server process lifetime)
+// ── Thumbnail cache ─────────────────────────────────────────────────────────
 const thumbCache = new Map<string, string | null>();
 
 router.get("/places/thumbnail/:id", async (req, res): Promise<void> => {
@@ -60,18 +64,17 @@ router.get("/places/thumbnail/:id", async (req, res): Promise<void> => {
 
     const data = await r.json() as { photos?: { name: string }[] };
     const first = data.photos?.[0];
-    const result = first ? photoUrl(first.name, 600) : null;
-    thumbCache.set(cacheKey, result);
-    res.json({ photo_url: result });
+    const cdnUrl = first ? await resolveCdnUrl(first.name, 600) : null;
+    thumbCache.set(cacheKey, cdnUrl);
+    res.json({ photo_url: cdnUrl });
   } catch {
     res.json({ photo_url: null });
   }
 });
 
+// ── Full restaurant detail ───────────────────────────────────────────────────
 router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
-  const { id } = req.params;
   const { name, neighborhood, borough } = req.query as Record<string, string>;
-
   if (!name) { res.status(400).json({ error: "name required" }); return; }
   if (!PLACES_KEY) { res.status(503).json({ error: "Google Places not configured" }); return; }
 
@@ -81,9 +84,11 @@ router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
 
     const detail = await getPlaceDetails(placeId) as Record<string, unknown>;
 
-    const photos = ((detail.photos as Record<string, string>[] | undefined) || [])
-      .slice(0, 6)
-      .map(p => photoUrl(p.name));
+    // Resolve all photo CDN URLs concurrently
+    const rawPhotos = (detail.photos as { name: string }[] | undefined) || [];
+    const photos = (await Promise.all(
+      rawPhotos.slice(0, 6).map(p => resolveCdnUrl(p.name, 800))
+    )).filter((u): u is string => Boolean(u));
 
     const reviews = ((detail.reviews as Record<string, unknown>[] | undefined) || [])
       .slice(0, 5)
@@ -96,10 +101,8 @@ router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
 
     const hours = (detail.currentOpeningHours as Record<string, unknown> | undefined)
       || (detail.regularOpeningHours as Record<string, unknown> | undefined);
-
-    const todayIndex = new Date().getDay(); // 0=Sun
     const weekdayText = (hours?.weekdayDescriptions as string[] | undefined) || [];
-    // weekdayDescriptions is Mon(0)..Sun(6) in Places API v1
+    const todayIndex = new Date().getDay();
     const todayText = weekdayText[(todayIndex + 6) % 7] || null;
     const todayHours = todayText ? todayText.replace(/^[A-Za-z]+:\s*/, "") : null;
 

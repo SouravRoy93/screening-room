@@ -1040,113 +1040,149 @@
 .dc-city-badge {
   font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
   color: #ffd36b; border: 1px solid rgba(255,211,107,0.4);
-  border-radius: 20px; padding: 3px 10px;
+  border-radius: 20px; padding: 3px 10px; white-space: nowrap;
 }
+
+/* Filter row */
+.dc-filter-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.dc-search-wrap {
+  position: relative; width: 100%;
+}
+.dc-search-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: rgba(255,255,255,0.35); pointer-events: none;
+}
+.dc-search-input {
+  width: 100%; padding: 10px 14px 10px 36px; border-radius: 12px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: #fff; font: inherit; font-size: 13.5px; outline: none; box-sizing: border-box;
+}
+.dc-search-input::placeholder { color: rgba(255,255,255,0.3); }
+.dc-search-input:focus { border-color: rgba(255,255,255,0.2); }
+
+.dc-filter-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dc-tabs { display: flex; gap: 4px; }
+.dc-tab {
+  font: inherit; font-size: 12.5px; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 7px 13px;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.dc-tab:hover { color: #fff; border-color: rgba(255,255,255,0.22); }
+.dc-tab.on {
+  background: linear-gradient(135deg,#ec4899,#be185d);
+  border-color: transparent; color: #fff;
+}
+.dc-dropdowns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+.dc-select-wrap { position: relative; display: inline-flex; align-items: center; }
+.dc-select {
+  appearance: none; font: inherit; font-size: 12.5px; font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 7px 30px 7px 12px;
+  cursor: pointer; outline: none; transition: border-color .15s;
+}
+.dc-select:hover { border-color: rgba(255,255,255,0.25); }
+.dc-select option { background: #1a1a2e; color: #fff; }
+.dc-select-chevron {
+  position: absolute; right: 9px; pointer-events: none;
+  color: rgba(255,255,255,0.4);
+}
+.dc-count { font-size: 12px; color: rgba(255,255,255,0.35); white-space: nowrap; }
+
+/* Combined filter second line */
+.dc-filter-row .dc-filter-controls {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+
+/* Grid — 4 cols matching Entertainment */
 .dc-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
 }
-@media (max-width: 480px) { .dc-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .dc-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .dc-grid { grid-template-columns: repeat(2, 1fr); } }
 
 .dc-card {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 18px;
+  border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
   transition: transform .2s, border-color .2s;
   display: flex;
   flex-direction: column;
 }
-.dc-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.16);
-}
+.dc-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.16); }
 
 /* Photo area */
 .dc-photo {
-  position: relative;
-  height: 210px;
-  overflow: hidden;
-  background: #111;
-  flex-shrink: 0;
+  position: relative; height: 180px;
+  overflow: hidden; background: rgba(255,255,255,0.04); flex-shrink: 0;
 }
-.dc-photo-img {
-  width: 100%; height: 100%; object-fit: cover;
-  opacity: 0; transition: opacity .4s;
-}
+.dc-photo-img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s; }
 .dc-photo-img.loaded { opacity: 1; }
 .dc-photo-placeholder {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.03);
 }
 .dc-photo-gradient {
   position: absolute; inset: 0;
-  background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.92) 100%);
+  background: linear-gradient(to bottom, transparent 35%, rgba(0,0,0,0.65) 70%, rgba(0,0,0,0.9) 100%);
 }
 .dc-rope-badge {
-  position: absolute; top: 12px; right: 12px; z-index: 5;
-  font-size: 9px; font-weight: 800; letter-spacing: 1.2px;
-  color: #fff;
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 20px;
-  padding: 4px 10px;
-  backdrop-filter: blur(6px);
+  position: absolute; top: 10px; right: 10px; z-index: 5;
+  font-size: 8.5px; font-weight: 800; letter-spacing: 1px;
+  color: #fff; background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px; padding: 3px 9px; backdrop-filter: blur(6px);
 }
 .dc-recog {
-  position: absolute; bottom: 38px; left: 14px; right: 14px; z-index: 5;
-  font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  position: absolute; bottom: 8px; left: 10px; right: 10px; z-index: 5;
+  font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
   color: #ffd36b;
 }
 
 /* Body */
-.dc-body { padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 0; flex: 1; }
+.dc-body { padding: 11px 12px 10px; display: flex; flex-direction: column; flex: 1; }
 .dc-name {
   font-family: 'Oswald', sans-serif;
-  font-weight: 700; font-size: 22px; line-height: 1.1;
-  color: #fff; margin: 0 0 4px;
+  font-weight: 700; font-size: 16px; line-height: 1.1;
+  color: #fff; margin: 0 0 3px;
 }
 .dc-meta {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
-  color: rgba(255,255,255,0.45); margin: 0 0 10px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); margin: 0 0 8px;
 }
 .dc-format-chip {
-  display: inline-block;
-  font-size: 10px; font-weight: 800; letter-spacing: 1px;
-  color: #ffd36b;
-  border: 1px solid rgba(255,211,107,0.35);
-  border-radius: 20px; padding: 4px 10px;
-  margin-bottom: 10px; align-self: flex-start;
+  display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.8px;
+  color: #ffd36b; border: 1px solid rgba(255,211,107,0.3);
+  border-radius: 20px; padding: 3px 8px; margin-bottom: 8px; align-self: flex-start;
 }
-.dc-occasions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.dc-occasions { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
 .dc-occ-chip {
-  font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,0.75);
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 20px; padding: 4px 12px;
+  font-size: 10.5px; font-weight: 500; color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 3px 9px;
 }
-.dc-order {
-  font-size: 12.5px; color: rgba(255,255,255,0.7);
-  margin: 0 0 12px; line-height: 1.4;
-}
+.dc-order { font-size: 11.5px; color: rgba(255,255,255,0.65); margin: 0 0 10px; line-height: 1.4; }
 .dc-order-label {
-  font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
   color: #ffd36b; margin-right: 4px;
 }
-.dc-btns { display: flex; gap: 6px; margin-top: auto; }
+.dc-btns { display: flex; gap: 5px; margin-top: auto; }
 .dc-btn {
-  flex: 1; font: inherit; font-size: 12px; font-weight: 600;
-  color: rgba(255,255,255,0.65);
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px; padding: 9px 4px;
-  cursor: pointer; transition: all .15s; text-align: center;
+  flex: 1; font: inherit; font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 7px 3px; cursor: pointer; transition: all .15s; text-align: center;
 }
-.dc-btn:hover { border-color: rgba(255,255,255,0.28); color: #fff; }
-.dc-btn.on { background: rgba(139,92,246,0.22); border-color: rgba(139,92,246,0.45); color: #c4b5fd; }
+.dc-btn:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+.dc-btn.on { background: rgba(139,92,246,0.2); border-color: rgba(139,92,246,0.4); color: #c4b5fd; }
 
 /* ===== DINING DETAIL PAGE ===== */
 .ddp-root {
