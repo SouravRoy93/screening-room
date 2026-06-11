@@ -50,9 +50,9 @@ interface Props {
 }
 
 const STATUS_CONFIG = {
-  want: { icon: Bookmark, label: "Watchlist", color: "#ffd36b" },
-  watching: { icon: Eye, label: "Watching", color: "#8b5cf6" },
-  watched: { icon: CheckCircle, label: "Watched", color: "#22c55e" },
+  want: { icon: Bookmark, label: "Watchlist", color: "#1098ad" },
+  watching: { icon: Eye, label: "Watching", color: "#f08c00" },
+  watched: { icon: CheckCircle, label: "Watched", color: "#2f9e44" },
 };
 
 export function MediaDetailPanel({ item, tracked, onClose, onStatus, onRating, onOpen }: Props) {
@@ -200,23 +200,16 @@ export function MediaDetailPanel({ item, tracked, onClose, onStatus, onRating, o
 
           {/* Track buttons */}
           {onStatus && (
-            <div className="flex gap-2 mb-4">
+            <div className="det-status-wrap">
               {(["want", "watching", "watched"] as const).map(s => {
                 const cfg = STATUS_CONFIG[s];
-                const Icon = cfg.icon;
                 const active = tracked?.status === s;
                 return (
                   <button
                     key={s}
                     onClick={() => onStatus(item, s)}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all flex-1 justify-center"
-                    style={{
-                      background: active ? cfg.color : "rgba(255,255,255,0.06)",
-                      color: active ? (s === "want" ? "#000" : "#fff") : "#9ca3af",
-                      border: `1px solid ${active ? cfg.color : "transparent"}`,
-                    }}
+                    className={`${s}${active ? " on" : ""}`}
                   >
-                    <Icon className="w-3.5 h-3.5" />
                     {cfg.label}
                   </button>
                 );

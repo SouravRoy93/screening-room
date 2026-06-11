@@ -1,307 +1,375 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Search, MapPin, Bookmark, Clock } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import type { PlaceItem } from "@/types";
 
-const MOOD_COLORS: Record<string, string> = {
-  romantic: "#ec4899",
-  outdoor: "#22c55e",
-  cultural: "#8b5cf6",
-  social: "#3bc9db",
-  quiet: "#ffd36b",
-  adventurous: "#f97316",
-  relaxed: "#a78bfa",
+const STYLES = ["Iconic","Hidden gems","Luxury","Romantic","Food & cafés","Culture","Nature & views","Nightlife","Shopping","Wellness","Photography","Family"];
+const MOODS: [string, string][] = [
+  ["all","Everything"],["beautiful","Something beautiful"],["romantic","A romantic evening"],
+  ["calm","Something calm"],["premium","A premium experience"],["hidden","A hidden gem"],
+  ["iconic","Something iconic"],["photo","A great photo"],["quick","Only 90 minutes"],
+  ["avoid-crowds","Avoid crowds"],["classy","A classy night out"],
+];
+const WX: Record<number, [string, string]> = {
+  0:["Clear","☀"],1:["Mainly clear","🌤"],2:["Partly cloudy","⛅"],3:["Overcast","☁"],
+  45:["Foggy","🌫"],51:["Light drizzle","🌦"],61:["Light rain","🌧"],63:["Rain","🌧"],
+  71:["Snow","🌨"],80:["Showers","🌦"],95:["Thunderstorm","⛈"],
 };
 
-function LeafletMap({ places, selected, onSelect }: {
-  places: PlaceItem[];
-  selected: PlaceItem | null;
-  onSelect: (p: PlaceItem) => void;
-}) {
+function getLS<T>(k: string, def: T): T {
+  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; }
+}
+function setLS(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+function PlacesOnboarding({ onDone }: { onDone: (styles: string[], pace: string) => void }) {
+  const [step, setStep] = useState<"styles" | "pace">("styles");
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [pace, setPace] = useState("");
+
+  function toggleStyle(s: string) {
+    const n = new Set(picked);
+    if (n.has(s)) n.delete(s); else n.add(s);
+    setPicked(n);
+  }
+
+  if (step === "styles") return (
+    <div className="ponb">
+      <div className="ponbox">
+        <div className="peye">Welcome</div>
+        <h2>How do you like to explore?</h2>
+        <p>Choose a few. We'll quietly shape everything around them.</p>
+        <div className="popts">
+          {STYLES.map(s => (
+            <button key={s} className={`popt${picked.has(s) ? " on" : ""}`} onClick={() => toggleStyle(s)}>{s}</button>
+          ))}
+        </div>
+        <button className="ponbtn" disabled={picked.size === 0} onClick={() => setStep("pace")}>Continue</button>
+        <button className="pskip" onClick={() => onDone(["Iconic","Hidden gems","Romantic"], "Balanced")}>Skip for now</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="ponb">
+      <div className="ponbox">
+        <div className="peye">Almost there</div>
+        <h2>What pace do you prefer?</h2>
+        <p>Luxury is rarely rushed.</p>
+        <div className="popts">
+          {["Relaxed","Balanced","Packed itinerary"].map(p => (
+            <button key={p} className={`popt${pace === p ? " on" : ""}`} onClick={() => setPace(p)}>{p}</button>
+          ))}
+        </div>
+        <button className="ponbtn" disabled={!pace} onClick={() => onDone([...picked], pace.replace(" itinerary",""))}>Enter</button>
+        <button className="pskip" onClick={() => onDone([...picked], "Balanced")}>Skip</button>
+      </div>
+    </div>
+  );
+}
+
+function LeafletMap({ places }: { places: PlaceItem[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<unknown>(null);
 
   useEffect(() => {
     const L = (window as unknown as { L: Record<string, unknown> }).L;
     if (!L || !ref.current || mapRef.current) return;
-
-    const map = (L.map as (el: HTMLElement, opts: unknown) => unknown)(ref.current, {
-      center: [40.7128, -74.006],
-      zoom: 12,
-      zoomControl: true,
-      scrollWheelZoom: false,
-    });
-
-    (L.tileLayer as (url: string, opts: unknown) => { addTo: (m: unknown) => void })(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      { attribution: "© CartoDB", maxZoom: 19 }
-    ).addTo(map);
-
-    const markerIcon = (L.divIcon as (opts: unknown) => unknown)({
-      className: "",
-      html: '<div style="width:10px;height:10px;background:#8b5cf6;border-radius:50%;border:2px solid #fff;box-shadow:0 0 6px rgba(139,92,246,0.5)"></div>',
-      iconSize: [10, 10],
-      iconAnchor: [5, 5],
-    });
-
+    const map = (L.map as Function)(ref.current, { center: [40.7128,-74.006], zoom: 12, scrollWheelZoom: false });
+    (L.tileLayer as Function)("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:"© CARTO", maxZoom:19 }).addTo(map);
     places.filter(p => p.lat && p.lng).forEach(p => {
-      const marker = (L.marker as (latlng: [number, number], opts: unknown) => { addTo: (m: unknown) => void; on: (e: string, fn: () => void) => void })([p.lat!, p.lng!], { icon: markerIcon });
-      marker.addTo(map);
-      marker.on("click", () => onSelect(p));
+      const marker = (L.marker as Function)([p.lat!, p.lng!]).addTo(map);
+      marker.bindPopup(`<b style="color:#211d18">${p.name}</b><br/><span style="color:#5d564c">${p.area||""}</span>`);
     });
-
     mapRef.current = map;
-  }, [places, onSelect]);
+    setTimeout(() => (map as { invalidateSize: () => void }).invalidateSize(), 80);
+  }, [places]);
 
+  return <div ref={ref} className="pmap" />;
+}
+
+function PlaceCard({ p, saved, onSelect, onSave }: { p: PlaceItem; saved: boolean; onSelect: () => void; onSave: (e: React.MouseEvent) => void }) {
+  const sc = p.scores ? Math.round((p.scores.b + p.scores.u + p.scores.v + p.scores.l) / 4 * 10) / 5 : null;
   return (
-    <div
-      ref={ref}
-      className="w-full rounded-xl overflow-hidden"
-      style={{ height: "300px", background: "#14141d", border: "1px solid rgba(255,255,255,0.08)" }}
-    />
+    <div className="pcard" onClick={onSelect}>
+      <div className="pph">
+        {p.img
+          ? <img src={p.img} alt={p.name} loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          : <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#e2d9c9,#c9bfaf)" }} />
+        }
+        {p.badges?.[0] && <div className="pbadge">{p.badges[0]}</div>}
+        {saved && <div className="psaveDot">✓</div>}
+        {sc !== null && <div className="pscore">Worth it {sc.toFixed(1)}</div>}
+      </div>
+      <div className="pcb">
+        <div className="parea">{p.area}</div>
+        <h3>{p.name}</h3>
+        <div className="pvibe">{p.vibe}</div>
+        <div className="pmeta">
+          {p.dur && <span><b>{p.dur} min</b></span>}
+          {p.crowd && <span>{p.crowd} crowd</span>}
+          {p.price && <span>{p.price}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PlaceDetail({ p, saved, onClose, onSave }: { p: PlaceItem; saved: boolean; onClose: () => void; onSave: () => void }) {
+  return (
+    <div className="pov show" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="psheet">
+        <div className="phero">
+          {p.img
+            ? <img src={p.img} alt={p.name} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+            : <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#b8924f,#8a6a30)" }} />
+          }
+          <button className="px" onClick={onClose}>×</button>
+          <div className="phtext">
+            <div className="pharea">{p.area}</div>
+            <h2>{p.name}</h2>
+            <div className="phvibe">{p.vibe}</div>
+          </div>
+        </div>
+
+        <div className="psbody">
+          {p.badges?.length > 0 && (
+            <div className="pbadges">
+              {p.badges.map((b: string) => <span key={b} className="pbpill">{b}</span>)}
+            </div>
+          )}
+
+          <div className="pfacts">
+            {[["Best time", p.best],["Duration", p.dur ? `${p.dur} minutes` : ""],["Crowd", p.crowd],["Price", p.price],["Dress code", p.dress],["Hours", p.hours],["Reservation", p.resv],["Best photo", p.photo]]
+              .filter(([, v]) => v)
+              .map(([k, v]) => (
+                <div key={k as string} className="pfact">
+                  <div className="pk">{k}</div>
+                  <div className="pv">{v}</div>
+                </div>
+              ))}
+          </div>
+
+          {(p.worth || p.skip) && (
+            <div className="pverdict">
+              {p.worth && <div className="pv1"><b>Worth it if</b>{p.worth}</div>}
+              {p.skip && <div className="pv2"><b>Skip if</b>{p.skip}</div>}
+            </div>
+          )}
+
+          {p.insider && (
+            <div className="pinsider"><b>Insider tip</b>{p.insider}</div>
+          )}
+
+          {p.scores && (
+            <div className="pscores">
+              {[["Beauty",p.scores.b],["Unique",p.scores.u],["Calm",p.scores.c],["Ease",p.scores.e],["Value",p.scores.v],["Luxury",p.scores.l]].map(([k,v]) => (
+                <div key={k as string} className="psc">
+                  <div className="pk">{k}</div>
+                  <div className="pbar"><div className="pfill" style={{ width:`${(v as number)*20}%` }} /></div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="psact">
+            <button className={saved ? "on" : ""} onClick={onSave}>
+              {saved ? "✓ Saved" : "♡ Save"}
+            </button>
+            {p.name && (
+              <button onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+(p.area||""))}`, "_blank")}>
+                Open in Maps
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function Places() {
   const [, nav] = useLocation();
   const { places } = usePlaces();
-  const [q, setQ] = useState("");
-  const [moodFilter, setMoodFilter] = useState<string>("All");
-  const [showMap, setShowMap] = useState(false);
+
+  const [profStyles, setProfStyles] = useState<string[] | null>(() => getLS<string[] | null>("pl_styles", null));
+  const [mood, setMood] = useState("all");
+  const [view, setView] = useState<"home" | "map" | "saved">("home");
+  const [lux, setLux] = useState(false);
+  const [trap, setTrap] = useState(false);
   const [selected, setSelected] = useState<PlaceItem | null>(null);
-  const [saved, setSaved] = useState<Set<number>>(new Set());
+  const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
+  const [wxText, setWxText] = useState<string | null>(null);
 
-  const moods = useMemo(() => {
-    const s = new Set<string>();
-    places.forEach(p => p.moods?.forEach(m => s.add(m)));
-    return ["All", ...Array.from(s).sort()];
-  }, [places]);
-
-  const filtered = useMemo(() => {
-    let items = places;
-    if (moodFilter !== "All") items = items.filter(p => p.moods?.includes(moodFilter));
-    if (q.trim()) {
-      const lq = q.toLowerCase();
-      items = items.filter(p => p.name.toLowerCase().includes(lq) || p.area?.toLowerCase().includes(lq));
-    }
-    return items;
-  }, [places, q, moodFilter]);
-
-  function toggleSaved(id: number, e: React.MouseEvent) {
-    e.stopPropagation();
-    const next = new Set(saved);
-    if (next.has(id)) next.delete(id); else next.add(id);
-    setSaved(next);
+  function onboardDone(styles: string[], pace: string) {
+    setProfStyles(styles);
+    setLS("pl_styles", styles);
+    setLS("pl_pace", pace);
   }
 
-  const durLabel = (d: number) => d < 60 ? `${d}m` : `${Math.floor(d / 60)}h${d % 60 ? `${d % 60}m` : ""}`;
+  function toggleSave(id: number) {
+    const next = { ...saved, [id]: !saved[id] };
+    if (!next[id]) delete next[id];
+    setSaved(next);
+    setLS("pl_saved", next);
+  }
+
+  const matches = useCallback((p: PlaceItem) => {
+    if (trap && p.badges?.includes("Tourist Heavy")) return false;
+    if (lux && !(p.styles?.includes("Luxury") || p.badges?.includes("Quiet Luxury") || p.badges?.includes("Worth the Price"))) return false;
+    if (mood === "all") return true;
+    if (mood === "quick") return (p.dur || 999) <= 90;
+    if (mood === "avoid-crowds") return p.crowd === "Low";
+    if (mood === "classy") return p.styles?.includes("Nightlife") || p.styles?.includes("Luxury") || p.badges?.includes("Quiet Luxury");
+    return p.moods?.includes(mood);
+  }, [trap, lux, mood]);
+
+  const filtered = useMemo(() => places.filter(matches), [places, matches]);
+
+  const sections = useMemo(() => {
+    if (!places.length) return [];
+    if (mood !== "all") {
+      const lbl = MOODS.find(m => m[0] === mood)?.[1] || mood;
+      return [{ title: lbl, items: filtered }];
+    }
+    const byStyle = filtered.filter(p => p.styles?.some((s: string) => profStyles?.includes(s)));
+    const base = filtered;
+    return [
+      { title: "Handpicked for you", note: "based on your taste", items: (byStyle.length ? byStyle : base).slice(0, 6) },
+      { title: "Best at golden hour", note: "plan around the light", items: base.filter(p => p.badges?.includes("Best at Sunset")).slice(0, 6) },
+      { title: "Quiet luxury — less touristy", note: "where locals go", items: base.filter(p => p.crowd === "Low").slice(0, 6) },
+      { title: "Perfect for two hours", note: "a beautiful in-between", items: base.filter(p => (p.dur || 999) <= 90).slice(0, 6) },
+    ].filter(s => s.items.length > 0);
+  }, [places, filtered, mood, profStyles]);
+
+  useEffect(() => {
+    if (!places.length) return;
+    const pts = places.filter(p => p.lat && p.lng);
+    if (!pts.length) return;
+    const lat = pts.reduce((s, p) => s + p.lat!, 0) / pts.length;
+    const lng = pts.reduce((s, p) => s + p.lng!, 0) / pts.length;
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`)
+      .then(r => r.json())
+      .then(d => {
+        const c = d.current.weather_code, t = Math.round(d.current.temperature_2m);
+        const wx = WX[c] || ["", "🌡"];
+        const note = t >= 60 ? "a beautiful day for a rooftop or a park." : "crisp — bundle up for that skyline view.";
+        setWxText(`${wx[1]} \u00a0${t}°·${wx[0]} — ${note}`);
+      }).catch(() => {});
+  }, [places]);
+
+  if (profStyles === null) {
+    return (
+      <div id="places">
+        <PlacesOnboarding onDone={onboardDone} />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header
-        className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
-        style={{ background: "rgba(8,8,13,0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-      >
-        <button onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-lg font-bold" style={{ fontFamily: "'Oswald', sans-serif" }}>Places</h1>
-        <div className="flex-1" />
-        <button
-          onClick={() => setShowMap(v => !v)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-          style={{
-            background: showMap ? "rgba(139,92,246,0.3)" : "rgba(255,255,255,0.06)",
-            color: showMap ? "#a78bfa" : "#9ca3af",
-          }}
-        >
-          <MapPin className="w-3.5 h-3.5" />
-          {showMap ? "List" : "Map"}
-        </button>
-      </header>
-
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="search"
-            placeholder="Search places…"
-            value={q}
-            onChange={e => setQ(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm outline-none"
-            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
-          />
+    <div id="places">
+      <div className="pwrap">
+        {/* Top nav */}
+        <div className="ptop">
+          <div className="pbrand">Screening Room <span>· Places</span></div>
+          <div className="pnav">
+            <button onClick={() => nav("/")}>← Hub</button>
+            <button className={view === "home" ? "on" : ""} onClick={() => setView("home")}>Discover</button>
+            <button className={view === "map" ? "on" : ""} onClick={() => setView("map")}>Map</button>
+            <button className={view === "saved" ? "on" : ""} onClick={() => setView("saved")}>Saved</button>
+            <button className={`ptoggle${trap ? " on" : ""}`} onClick={() => setTrap(v => !v)}>Avoid tourist traps</button>
+          </div>
         </div>
 
-        {/* Mood filter */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
-          {moods.map(m => (
-            <button
-              key={m}
-              onClick={() => setMoodFilter(m)}
-              className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
-              style={{
-                background: moodFilter === m
-                  ? `${MOOD_COLORS[m] || "#8b5cf6"}33`
-                  : "rgba(255,255,255,0.06)",
-                color: moodFilter === m ? MOOD_COLORS[m] || "#a78bfa" : "#9ca3af",
-                border: `1px solid ${moodFilter === m ? MOOD_COLORS[m] + "55" || "#8b5cf655" : "rgba(255,255,255,0.08)"}`,
-              }}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
-
-        {showMap && <div className="mb-6"><LeafletMap places={filtered} selected={selected} onSelect={setSelected} /></div>}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {filtered.map(p => (
-            <div
-              key={p.id}
-              className="group cursor-pointer rounded-2xl overflow-hidden transition-all hover:scale-[1.01]"
-              style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${selected?.id === p.id ? "#8b5cf6" : "rgba(255,255,255,0.07)"}` }}
-              onClick={() => setSelected(p)}
-            >
-              {p.img && (
-                <div className="h-36 overflow-hidden">
-                  <img
-                    src={p.img}
-                    alt={p.name}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    loading="lazy"
-                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  />
-                </div>
-              )}
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div>
-                    <h3 className="font-semibold text-foreground">{p.name}</h3>
-                    <p className="text-xs text-muted-foreground">{p.area}</p>
-                  </div>
-                  <button
-                    onClick={e => toggleSaved(p.id, e)}
-                    className="p-1.5 transition-colors shrink-0"
-                    style={{ color: saved.has(p.id) ? "#ffd36b" : "#6b7280" }}
-                  >
-                    <Bookmark className={`w-4 h-4 ${saved.has(p.id) ? "fill-current" : ""}`} />
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {p.moods?.slice(0, 3).map(m => (
-                    <span
-                      key={m}
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: `${MOOD_COLORS[m] || "#8b5cf6"}22`, color: MOOD_COLORS[m] || "#a78bfa" }}
-                    >
-                      {m}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  {p.dur && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {durLabel(p.dur)}
-                    </span>
-                  )}
-                  {p.price && <span>{p.price}</span>}
-                  {p.best && <span className="truncate">Best: {p.best}</span>}
-                </div>
+        {/* Saved view */}
+        {view === "saved" && (
+          <>
+            <div className="pgreet">
+              <h1>Saved</h1>
+              <div className="psub">Your collection — places kept for the right moment.</div>
+            </div>
+            <div className="psection">
+              <div className="pgrid">
+                {Object.keys(saved).length === 0
+                  ? <div className="pempty">Nothing saved yet — tap ♡ on a place you love.</div>
+                  : places.filter(p => saved[p.id]).map(p => (
+                    <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} onSelect={() => setSelected(p)} onSave={e => { e.stopPropagation(); toggleSave(p.id); }} />
+                  ))
+                }
               </div>
             </div>
-          ))}
-        </div>
+          </>
+        )}
 
-        {filtered.length === 0 && (
-          <p className="text-center text-muted-foreground text-sm py-16">No places found.</p>
+        {/* Map view */}
+        {view === "map" && (
+          <>
+            <div className="pgreet">
+              <h1>The map</h1>
+              <div className="psub">Every place, located.</div>
+            </div>
+            <div className="pmoods">
+              {MOODS.map(([id, lbl]) => (
+                <button key={id} className={`pmood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
+              ))}
+            </div>
+            <LeafletMap places={filtered} />
+          </>
+        )}
+
+        {/* Home / Discover view */}
+        {view === "home" && (
+          <>
+            <div className="pgreet">
+              <h1>Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}.</h1>
+              <div className="psub">Handpicked ways to spend your time in the city.</div>
+              {wxText && (
+                <div className="pwx" style={{ display:"inline-flex", alignItems:"center", gap:8, marginTop:14, fontSize:13, color:"#5d564c", background:"#fffdf9", border:"1px solid #e2d9c9", padding:"8px 14px", borderRadius:30 }}>
+                  <span dangerouslySetInnerHTML={{ __html: wxText }} />
+                </div>
+              )}
+            </div>
+
+            <div className="pmoods">
+              {MOODS.map(([id, lbl]) => (
+                <button key={id} className={`pmood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
+              ))}
+            </div>
+
+            <div className="pdrow">
+              <button className="ptoggle" style={{ background: lux ? "#211d18" : undefined, color: lux ? "#fff" : undefined, borderColor: lux ? "#211d18" : undefined }} onClick={() => setLux(v => !v)}>
+                Luxury nearby
+              </button>
+            </div>
+
+            {places.length === 0 && (
+              <div className="pempty">The catalog is updating — check back shortly.</div>
+            )}
+
+            {sections.map(sec => (
+              <div key={sec.title} className="psection">
+                <div className="psh">
+                  <h2>{sec.title}</h2>
+                  {sec.note && <span className="pmore">{sec.note}</span>}
+                </div>
+                <div className="pgrid">
+                  {sec.items.map(p => (
+                    <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} onSelect={() => setSelected(p)} onSave={e => { e.stopPropagation(); toggleSave(p.id); }} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </>
         )}
       </div>
 
-      {/* Detail drawer */}
+      {/* Detail overlay */}
       {selected && (
-        <>
-          <div className="fixed inset-0 z-40 bg-black/60" onClick={() => setSelected(null)} />
-          <div
-            className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md overflow-y-auto"
-            style={{ background: "#0d0d18", borderLeft: "1px solid rgba(255,255,255,0.08)" }}
-          >
-            {selected.img && (
-              <div className="h-52 overflow-hidden">
-                <img src={selected.img} alt={selected.name} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              </div>
-            )}
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-1">
-                <div>
-                  <h2 className="text-2xl font-bold" style={{ fontFamily: "'Oswald', sans-serif" }}>{selected.name}</h2>
-                  <p className="text-sm text-muted-foreground">{selected.area}</p>
-                </div>
-                <button onClick={() => setSelected(null)} className="text-muted-foreground hover:text-foreground">
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-2 my-3">
-                {selected.moods?.map(m => (
-                  <span key={m} className="text-xs px-2.5 py-1 rounded-full" style={{ background: `${MOOD_COLORS[m] || "#8b5cf6"}22`, color: MOOD_COLORS[m] || "#a78bfa" }}>
-                    {m}
-                  </span>
-                ))}
-              </div>
-
-              {[
-                { label: "Best for", value: selected.best },
-                { label: "Hours", value: selected.hours },
-                { label: "Dress code", value: selected.dress },
-                { label: "Reservations", value: selected.resv },
-                { label: "Crowd", value: selected.crowd },
-              ].filter(r => r.value).map(r => (
-                <div key={r.label} className="flex gap-3 py-2 border-b border-border">
-                  <span className="text-xs text-muted-foreground w-24 shrink-0 pt-0.5">{r.label}</span>
-                  <span className="text-sm text-foreground">{r.value}</span>
-                </div>
-              ))}
-
-              {selected.insider && (
-                <div className="mt-4 p-3 rounded-xl" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                  <p className="text-xs text-[#a78bfa] font-semibold mb-1">Insider tip</p>
-                  <p className="text-sm text-foreground">{selected.insider}</p>
-                </div>
-              )}
-
-              {(selected.worth || selected.skip) && (
-                <div className="grid grid-cols-2 gap-3 mt-4">
-                  {selected.worth && (
-                    <div className="p-3 rounded-xl" style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.15)" }}>
-                      <p className="text-xs text-green-400 font-semibold mb-1">Worth it</p>
-                      <p className="text-xs text-foreground">{selected.worth}</p>
-                    </div>
-                  )}
-                  {selected.skip && (
-                    <div className="p-3 rounded-xl" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
-                      <p className="text-xs text-red-400 font-semibold mb-1">Skip</p>
-                      <p className="text-xs text-foreground">{selected.skip}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <button
-                onClick={e => { toggleSaved(selected.id, e); }}
-                className="w-full mt-6 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all"
-                style={{ background: saved.has(selected.id) ? "#ffd36b22" : "rgba(255,255,255,0.06)", color: saved.has(selected.id) ? "#ffd36b" : "#9ca3af", border: `1px solid ${saved.has(selected.id) ? "#ffd36b44" : "transparent"}` }}
-              >
-                <Bookmark className="w-4 h-4" />
-                {saved.has(selected.id) ? "Saved" : "Save this place"}
-              </button>
-            </div>
-          </div>
-        </>
+        <PlaceDetail
+          p={selected}
+          saved={!!saved[selected.id]}
+          onClose={() => setSelected(null)}
+          onSave={() => toggleSave(selected.id)}
+        />
       )}
     </div>
   );

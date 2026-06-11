@@ -1,7 +1,5 @@
 import type { MediaItem, TrackedItem } from "@/types";
 import { IMG_BASE, colorFor } from "@/types";
-import { Film, Tv, Star, Bookmark, Eye, CheckCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface Props {
   item: MediaItem;
@@ -11,113 +9,68 @@ interface Props {
   compact?: boolean;
 }
 
-const STATUS_ICONS = {
-  want: <Bookmark className="w-3 h-3" />,
-  watching: <Eye className="w-3 h-3" />,
-  watched: <CheckCircle className="w-3 h-3" />,
-};
-
-export function MediaCard({ item, tracked, onOpen, onStatus, compact }: Props) {
+export function MediaCard({ item, tracked, onOpen, onStatus }: Props) {
   const genre = item.genres?.[0] || "";
   const [g1, g2] = colorFor(genre);
-  const statusColor = tracked
-    ? tracked.status === "want" ? "#ffd36b"
-    : tracked.status === "watching" ? "#8b5cf6"
-    : "#22c55e"
-    : null;
+  const genres = item.genres?.slice(0, 3).join(" · ") || "";
+  const meta = [
+    item.year,
+    item.media_type === "tv" ? "TV" : null,
+  ].filter(Boolean).join(" · ");
 
   return (
-    <div
-      className="group relative flex flex-col cursor-pointer select-none"
-      onClick={() => onOpen?.(item)}
-    >
-      <div className="relative overflow-hidden rounded-lg aspect-[2/3] bg-card">
+    <div className="card" onClick={() => onOpen?.(item)}>
+      <div className="poster">
         {item.poster_path ? (
           <img
             src={`${IMG_BASE}${item.poster_path}`}
             alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         ) : (
           <div
-            className="w-full h-full flex flex-col items-center justify-center p-3 text-center"
-            style={{ background: `linear-gradient(135deg, ${g1}, ${g2})` }}
-          >
-            {item.media_type === "tv"
-              ? <Tv className="w-8 h-8 mb-2 text-white/80" />
-              : <Film className="w-8 h-8 mb-2 text-white/80" />}
-            <span className="text-xs font-medium text-white/90 leading-tight">{item.title}</span>
-          </div>
+            className="fallback"
+            style={{ background: `linear-gradient(150deg,${g1},${g2})` }}
+          />
         )}
 
-        {/* gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+        {/* Type badge */}
+        <div className="ptype">{item.media_type === "tv" ? "TV" : "Film"}</div>
 
-        {/* status badge */}
-        {tracked && statusColor && (
-          <div
-            className="absolute top-2 right-2 p-1 rounded-full"
-            style={{ backgroundColor: statusColor }}
-          >
-            {STATUS_ICONS[tracked.status]}
-          </div>
-        )}
-
-        {/* vote average */}
+        {/* Vote badge */}
         {item.vote_average && item.vote_average > 0 && (
-          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/60 rounded px-1.5 py-0.5">
-            <Star className="w-3 h-3 fill-[#ffd36b] text-[#ffd36b]" />
-            <span className="text-xs font-medium text-white">{item.vote_average.toFixed(1)}</span>
-          </div>
+          <div className="badge-vote">★ {item.vote_average.toFixed(1)}</div>
         )}
 
-        {/* quick-track buttons on hover */}
+        {/* Rating badge (if watched + rated) */}
+        {tracked?.status === "watched" && tracked.rating != null && (
+          <div className="badge-rating">★ {Number(tracked.rating).toFixed(1)}</div>
+        )}
+
+        {/* Title + meta overlay */}
+        <div className="pscrim">
+          <div className="ptitle">{item.title}</div>
+          {meta && <div className="pmeta">{meta}</div>}
+        </div>
+      </div>
+
+      <div className="cbody">
+        {genres && <div className="cgenres">{genres}</div>}
         {onStatus && (
-          <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="statusrow" onClick={e => e.stopPropagation()}>
             {(["want", "watching", "watched"] as const).map(s => (
               <button
                 key={s}
-                onClick={e => { e.stopPropagation(); onStatus(item, s); }}
-                className={cn(
-                  "p-1.5 rounded-full transition-colors",
-                  tracked?.status === s
-                    ? s === "want" ? "bg-[#ffd36b] text-black"
-                    : s === "watching" ? "bg-[#8b5cf6] text-white"
-                    : "bg-green-500 text-white"
-                    : "bg-black/60 text-white hover:bg-white/20"
-                )}
-                title={s}
+                className={`${s}${tracked?.status === s ? " on" : ""}`}
+                onClick={() => onStatus(item, s)}
+                title={s === "want" ? "Watchlist" : s === "watching" ? "Watching" : "Watched"}
               >
-                {STATUS_ICONS[s]}
+                {s === "want" ? "Want" : s === "watching" ? "Watch" : "Done"}
               </button>
             ))}
           </div>
         )}
       </div>
-
-      {!compact && (
-        <div className="mt-2 px-0.5">
-          <p className="text-sm font-medium text-foreground truncate leading-snug">{item.title}</p>
-          <div className="flex items-center gap-2 mt-0.5">
-            {item.year && <span className="text-xs text-muted-foreground">{item.year}</span>}
-            {genre && (
-              <span
-                className="text-xs px-1.5 py-0.5 rounded text-white/90"
-                style={{ background: `linear-gradient(135deg, ${g1}99, ${g2}99)` }}
-              >
-                {genre}
-              </span>
-            )}
-          </div>
-          {tracked?.rating != null && (
-            <div className="flex items-center gap-1 mt-1">
-              <Star className="w-3 h-3 fill-[#ffd36b] text-[#ffd36b]" />
-              <span className="text-xs text-[#ffd36b] font-medium">{tracked.rating}/10</span>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
