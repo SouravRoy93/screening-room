@@ -2,7 +2,6 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Bell } from "lucide-react";
 import { MediaCard } from "@/components/media-card";
-import { MediaDetailPanel } from "@/components/media-detail-panel";
 import { EpisodeBanner } from "@/components/episode-banner";
 import { useCatalog } from "@/hooks/use-catalog";
 import { useTracked } from "@/hooks/use-tracked";
@@ -65,10 +64,11 @@ export default function Films() {
   const [q, setQ] = useState("");
   const [searchResults, setSearchResults] = useState<MediaItem[]>([]);
   const [searching, setSearching] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [typeFilter, setTypeFilter] = useState<"all" | "movie" | "tv">("all");
   const [genreFilter, setGenreFilter] = useState("all");
   const [alerts, setAlerts] = useState<EpisodeAlert[]>([]);
+
+  const openDetail = (item: MediaItem) => nav(`/films/${item.media_type}/${item.tmdb_id}`);
 
   useEffect(() => {
     const watchingIds = Object.values(tracked)
@@ -202,7 +202,7 @@ export default function Films() {
                   key={`${item.media_type}:${item.tmdb_id}`}
                   item={item}
                   tracked={trackedFor(item)}
-                  onOpen={setSelectedItem}
+                  onOpen={openDetail}
                   onStatus={setStatus}
                 />
               ))}
@@ -243,7 +243,7 @@ export default function Films() {
                   key={`${t.media_type}:${t.tmdb_id}`}
                   item={toMedia(t)}
                   tracked={trackedForLib(t)}
-                  onOpen={setSelectedItem}
+                  onOpen={openDetail}
                   onStatus={setStatus}
                 />
               ))}
@@ -278,14 +278,6 @@ export default function Films() {
         </>
       )}
 
-      <MediaDetailPanel
-        item={selectedItem}
-        tracked={selectedItem ? trackedFor(selectedItem) : undefined}
-        onClose={() => setSelectedItem(null)}
-        onStatus={setStatus}
-        onRating={saveRating}
-        onOpen={setSelectedItem}
-      />
     </div>
   );
 }

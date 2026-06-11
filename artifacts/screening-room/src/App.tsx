@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import Auth from "@/pages/auth";
 import Hub from "@/pages/hub";
 import Films from "@/pages/films";
+import MediaDetailPage from "@/pages/media-detail-page";
 import Dining from "@/pages/dining";
 import Places from "@/pages/places";
 import Social from "@/pages/social";
@@ -38,6 +39,7 @@ function AppRouter() {
     <Switch>
       <Route path="/" component={Hub} />
       <Route path="/films" component={Films} />
+      <Route path="/films/:type/:id" component={MediaDetailPage} />
       <Route path="/dining" component={Dining} />
       <Route path="/places" component={Places} />
       <Route path="/social" component={Social} />
