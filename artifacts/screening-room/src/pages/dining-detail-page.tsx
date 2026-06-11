@@ -46,8 +46,17 @@ function StarRow({ rating }: { rating: number }) {
 function MoreLikeThis({ current, dining, onNav }: { current: DiningItem; dining: DiningItem[]; onNav: (path: string) => void }) {
   const similar = useMemo(() => {
     return dining
-      .filter(d => d.id !== current.id && (d.cuisine === current.cuisine || d.format === current.format))
-      .slice(0, 4);
+      .filter(d => d.id !== current.id)
+      .map(d => ({
+        d,
+        score:
+          (d.cuisine === current.cuisine ? 4 : 0) +
+          (d.format === current.format ? 3 : 0) +
+          (d.price === current.price ? 1 : 0),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4)
+      .map(s => s.d);
   }, [current, dining]);
 
   if (similar.length === 0) return null;

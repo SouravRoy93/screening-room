@@ -1047,9 +1047,9 @@
 .dc-filter-row {
   display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
 }
-.dc-search-row { position: relative; width: 100%; }
-.dc-search-wrap { position: relative; width: 100%; }
-.dc-controls-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dc-search-row { position: relative; width: 100%; box-sizing: border-box; }
+.dc-search-wrap { position: relative; width: 100%; box-sizing: border-box; }
+.dc-controls-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; box-sizing: border-box; }
 .dc-search-icon {
   position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
   color: rgba(255,255,255,0.35); pointer-events: none;
