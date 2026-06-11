@@ -254,7 +254,46 @@ function buildItinerary(places: PlaceItem[], typeId: string, stops: number, addD
   return { stops: stops_out, outfit: dt.outfit, tip: dt.tip };
 }
 
-function PerfectDayModal({ places, wxText, onClose }: { places: PlaceItem[]; wxText: string | null; onClose: () => void }) {
+function weatherDayNote(dayTypeId: string, code: number | null, temp: number | null): string | null {
+  if (code === null || temp === null) return null;
+  const isRain = [51,53,55,61,63,65,80,81,82,95,96,99].includes(code);
+  const isSnow = [71,73,75,77].includes(code);
+  const isClear = code <= 2;
+  const warm = temp >= 68;
+  const hot = temp >= 85;
+  const cold = temp < 45;
+
+  if (dayTypeId === "photo") {
+    if (isRain) return "Rainy skies — diffused light can be stunning; bring an umbrella and lean into moody shots.";
+    if (isSnow) return "Snow on the ground — golden hour will be soft and magical.";
+    if (isClear && warm) return "Clear skies — your golden-hour stops will shine.";
+    return "Check tonight's sunset time for the best light windows.";
+  }
+  if (dayTypeId === "romantic") {
+    if (isRain) return "Rainy evening — perfect for slowing down inside; lean into candlelit venues.";
+    if (isClear && warm) return "Clear and warm — beautiful evening to linger outside.";
+    return "Mild evening — a light layer and you're set.";
+  }
+  if (dayTypeId === "calm") {
+    if (isRain || isSnow) return "Quiet, grey day — perfect for this kind of slow exploration.";
+    if (cold) return "Cold but crisp — the uncrowded spots will feel especially peaceful.";
+    return "Comfortable conditions — ideal for moving at a gentle pace.";
+  }
+  if (dayTypeId === "iconic") {
+    if (isRain) return "Bring an umbrella — the iconic spots are worth it in any weather.";
+    if (hot) return "Very warm — start early and take breaks in the shade.";
+    if (isClear) return "Perfect visibility — great day for skyline views.";
+    return "Good conditions for covering ground across the city.";
+  }
+  if (dayTypeId === "art") {
+    if (isRain) return "Rainy day — couldn't be more perfect for galleries and museums.";
+    if (isClear && warm) return "Nice out, but the interiors are the point today.";
+    return "Comfortable day to move between indoor spaces.";
+  }
+  return null;
+}
+
+function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem[]; wxText: string | null; wxRaw: { code: number; temp: number } | null; onClose: () => void }) {
   const [step, setStep] = useState<"type" | "duration" | "result">("type");
   const [dayType, setDayType] = useState<string>("");
   const [durId, setDurId] = useState<string>("");
@@ -362,7 +401,11 @@ function PerfectDayModal({ places, wxText, onClose }: { places: PlaceItem[]; wxT
             {/* Footer notes */}
             <div className="pl-day-notes">
               <div className="pl-day-note"><span>Outfit</span> {itinerary.outfit}</div>
-              {wxText && <div className="pl-day-note"><span>Weather</span> {wxText}</div>}
+              {(() => {
+                const wNote = weatherDayNote(dayType, wxRaw?.code ?? null, wxRaw?.temp ?? null);
+                const display = wNote ?? wxText;
+                return display ? <div className="pl-day-note"><span>Weather</span> {display}</div> : null;
+              })()}
               <div className="pl-day-note"><span>Tip</span> {itinerary.tip}</div>
             </div>
           </div>
@@ -387,6 +430,7 @@ export default function Places() {
   const [selected, setSelected] = useState<PlaceItem | null>(null);
   const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
   const [wxText, setWxText] = useState<string | null>(null);
+  const [wxRaw, setWxRaw] = useState<{ code: number; temp: number } | null>(null);
   const [showPerfectDay, setShowPerfectDay] = useState(false);
 
   const hour = new Date().getHours();
@@ -443,9 +487,21 @@ export default function Places() {
     fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`)
       .then(r => r.json())
       .then(d => {
-        const c = d.current.weather_code, t = Math.round(d.current.temperature_2m);
-        const wx = WX[c] || ["", "🌡"];
-        const note = t >= 60 ? "a beautiful day for a rooftop or a park." : "crisp — bundle up for that skyline view.";
+        const c = d.current.weather_code as number, t = Math.round(d.current.temperature_2m);
+        const wx = WX[c] || ["Clear", "🌡"];
+        setWxRaw({ code: c, temp: t });
+        // Code-aware, temperature-tuned recommendation
+        let note: string;
+        if ([95, 96, 99].includes(c))       note = "thunderstorms — stay indoors, this is a museum day.";
+        else if ([71, 73, 75, 77].includes(c)) note = "snow on the ground — the park looks magical; dress warm.";
+        else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(c)) note = "rainy today — perfect for galleries and cozy dining.";
+        else if (c === 45 || c === 48)       note = "foggy this morning — the skyline looks beautifully mysterious.";
+        else if (t >= 88)                    note = "very hot — seek shade or head underground to a museum.";
+        else if (t >= 75 && c <= 2)         note = "beautiful day for a rooftop or a park.";
+        else if (t >= 65 && c <= 3)         note = "great walking weather — the city is yours today.";
+        else if (t >= 55)                    note = "comfortable and mild — perfect for exploring on foot.";
+        else if (t >= 40)                    note = "crisp — bundle up for that skyline view.";
+        else                                 note = "very cold — lean into indoor gems today.";
         setWxText(`${wx[1]}\u00a0${t}°\u00b7${wx[0]} — ${note}`);
       }).catch(() => {});
   }, [places]);
@@ -584,7 +640,7 @@ export default function Places() {
       )}
 
       {showPerfectDay && (
-        <PerfectDayModal places={places} wxText={wxText} onClose={() => setShowPerfectDay(false)} />
+        <PerfectDayModal places={places} wxText={wxText} wxRaw={wxRaw} onClose={() => setShowPerfectDay(false)} />
       )}
     </div>
   );
