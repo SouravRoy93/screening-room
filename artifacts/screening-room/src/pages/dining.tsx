@@ -1,10 +1,21 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Search, UtensilsCrossed, ChevronDown } from "lucide-react";
+import { ArrowLeft, Search, UtensilsCrossed, ChevronDown, Star } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
 import type { DiningItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
+
+interface SearchSuggestion {
+  place_id: string;
+  name: string;
+  rating: number | null;
+  user_rating_count: number | null;
+  address: string;
+  neighborhood: string;
+  photo_url: string | null;
+  static_id?: number;
+}
 
 // Module-level photo cache
 const photoCache = new Map<string, string | null>();
@@ -118,6 +129,11 @@ export default function Dining() {
   const [occasionFilter, setOccasionFilter] = useState("Any occasion");
   const [diffFilter, setDiffFilter] = useState("Any difficulty");
 
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+
   const cuisines = useMemo(() => {
     const s = new Set(dining.map(d => d.cuisine));
     return ["All cuisines", ...Array.from(s).sort()];
@@ -129,10 +145,6 @@ export default function Dining() {
 
   const filtered = useMemo(() => {
     let items = dining;
-    if (q.trim()) {
-      const lq = q.toLowerCase();
-      items = items.filter(d => d.name.toLowerCase().includes(lq) || d.cuisine.toLowerCase().includes(lq) || (d.neighborhood || "").toLowerCase().includes(lq));
-    }
     if (cuisineFilter !== "All cuisines") items = items.filter(d => d.cuisine === cuisineFilter);
     if (occasionFilter !== "Any occasion") items = items.filter(d => d.occasion?.some(o => o.toLowerCase().includes(occasionFilter.toLowerCase())));
     if (diffFilter !== "Any difficulty") {
@@ -140,7 +152,67 @@ export default function Dining() {
       items = items.filter(d => allowed.includes(d.rope ?? 0));
     }
     return items;
-  }, [dining, q, cuisineFilter, occasionFilter, diffFilter]);
+  }, [dining, cuisineFilter, occasionFilter, diffFilter]);
+
+  const runSearch = useCallback(async (val: string) => {
+    const trimmed = val.trim();
+    if (trimmed.length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
+
+    const lq = trimmed.toLowerCase();
+    const localMatches: SearchSuggestion[] = dining
+      .filter(d => d.name.toLowerCase().includes(lq) || d.cuisine.toLowerCase().includes(lq) || (d.neighborhood || "").toLowerCase().includes(lq))
+      .slice(0, 3)
+      .map(d => ({
+        place_id: `static-${d.id}`,
+        name: d.name,
+        rating: null,
+        user_rating_count: null,
+        address: [d.neighborhood, d.borough].filter(Boolean).join(", "),
+        neighborhood: d.neighborhood || "",
+        photo_url: null,
+        static_id: d.id,
+      }));
+
+    try {
+      const res = await fetch(`${API_BASE}/places/search?q=${encodeURIComponent(trimmed)}`);
+      if (!res.ok) { setSuggestions(localMatches); setShowSuggestions(true); return; }
+      const live: SearchSuggestion[] = await res.json();
+      const liveFiltered = live.filter(l => !localMatches.some(lm => lm.name.toLowerCase() === l.name.toLowerCase()));
+      const combined = [...localMatches, ...liveFiltered].slice(0, 6);
+      setSuggestions(combined);
+      setShowSuggestions(true);
+    } catch {
+      setSuggestions(localMatches);
+      setShowSuggestions(localMatches.length > 0);
+    }
+  }, [dining]);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!q.trim()) { setSuggestions([]); setShowSuggestions(false); return; }
+    debounceRef.current = setTimeout(() => runSearch(q), 350);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [q, runSearch]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleSuggestionClick = (s: SearchSuggestion) => {
+    setShowSuggestions(false);
+    setQ("");
+    if (s.static_id != null) {
+      nav(`/dining/${s.static_id}`);
+    } else {
+      nav(`/dining/live?name=${encodeURIComponent(s.name)}&neighborhood=${encodeURIComponent(s.neighborhood)}&address=${encodeURIComponent(s.address)}&place_id=${encodeURIComponent(s.place_id)}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,15 +230,38 @@ export default function Dining() {
       <div className="max-w-screen-xl mx-auto px-4 py-5">
         {/* Filter row — single line */}
         <div className="dc-filter-row">
-          <div className="dc-search-wrap">
+          <div className="dc-search-wrap" ref={searchWrapRef} style={{ position: "relative" }}>
             <Search className="dc-search-icon" size={14} />
             <input
-              type="search"
+              type="text"
               placeholder="Search NYC restaurants..."
               value={q}
               onChange={e => setQ(e.target.value)}
+              onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
               className="dc-search-input"
+              autoComplete="off"
             />
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="dc-suggestions">
+                {suggestions.map(s => (
+                  <button key={s.place_id} className="dc-suggestion" onMouseDown={() => handleSuggestionClick(s)}>
+                    <div className="dc-sug-photo">
+                      {s.photo_url
+                        ? <img src={s.photo_url} alt={s.name} />
+                        : <div className="dc-sug-photo-placeholder">{s.name[0]}</div>
+                      }
+                    </div>
+                    <div className="dc-sug-info">
+                      <span className="dc-sug-name">{s.name}</span>
+                      <span className="dc-sug-meta">
+                        {s.rating && <><Star size={10} fill="#ffd36b" color="#ffd36b" style={{ display: "inline", marginRight: 2 }} />{s.rating.toFixed(1)} · </>}
+                        {s.address || s.neighborhood || "NYC Restaurant"}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="dc-tabs">

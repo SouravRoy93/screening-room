@@ -42,6 +42,7 @@ function AppRouter() {
       <Route path="/films" component={Films} />
       <Route path="/films/:type/:id" component={MediaDetailPage} />
       <Route path="/dining" component={Dining} />
+      <Route path="/dining/live" component={DiningDetailPage} />
       <Route path="/dining/:id" component={DiningDetailPage} />
       <Route path="/places" component={Places} />
       <Route path="/social" component={Social} />

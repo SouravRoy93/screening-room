@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, useLocation } from "wouter";
 import { ChevronLeft, Star, ExternalLink, MapPin, Clock, Globe, Bookmark, CheckCircle } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
@@ -48,14 +48,31 @@ export default function DiningDetailPage() {
   const [, nav] = useLocation();
   const { dining } = useDining();
 
-  const id = Number(params.id);
-  const savedKey = `sr_dining_saved_${id}`;
-  const visitedKey = `sr_dining_visited_${id}`;
-  const bookedKey = `sr_dining_booked_${id}`;
-  const notesKey = `sr_dining_notes_${id}`;
-  const dishKey = `sr_dining_dish_${id}`;
-  const withKey = `sr_dining_with_${id}`;
-  const tagsKey = `sr_dining_tags_${id}`;
+  const isLive = params.id === "live" || params.id === undefined;
+  const id = isLive ? 0 : Number(params.id);
+
+  // For live results, pull name/neighborhood/place_id from query string
+  const liveParams = useMemo(() => {
+    if (!isLive) return null;
+    const sp = new URLSearchParams(window.location.search);
+    return {
+      name: sp.get("name") || "",
+      neighborhood: sp.get("neighborhood") || "",
+      address: sp.get("address") || "",
+      place_id: sp.get("place_id") || "",
+    };
+  }, [isLive]);
+
+  const storageKey = isLive
+    ? `live-${liveParams?.name?.toLowerCase().replace(/\s+/g, "-")}`
+    : id;
+  const savedKey = `sr_dining_saved_${storageKey}`;
+  const visitedKey = `sr_dining_visited_${storageKey}`;
+  const bookedKey = `sr_dining_booked_${storageKey}`;
+  const notesKey = `sr_dining_notes_${storageKey}`;
+  const dishKey = `sr_dining_dish_${storageKey}`;
+  const withKey = `sr_dining_with_${storageKey}`;
+  const tagsKey = `sr_dining_tags_${storageKey}`;
 
   const [restaurant, setRestaurant] = useState<DiningItem | null>(null);
   const [places, setPlaces] = useState<PlacesData | null>(null);
@@ -75,8 +92,25 @@ export default function DiningDetailPage() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   useEffect(() => {
-    if (dining.length > 0) setRestaurant(dining.find(d => d.id === id) || null);
-  }, [dining, id]);
+    if (isLive && liveParams?.name) {
+      setRestaurant({
+        id: 0,
+        name: liveParams.name,
+        cuisine: "",
+        format: "",
+        neighborhood: liveParams.neighborhood,
+        borough: "",
+        price: 0,
+        rope: 0,
+        occasion: [],
+        recognition: "",
+        signature: "",
+        blurb: "",
+      });
+    } else if (!isLive && dining.length > 0) {
+      setRestaurant(dining.find(d => d.id === id) || null);
+    }
+  }, [dining, id, isLive, liveParams]);
 
   useEffect(() => {
     setSaved(localStorage.getItem(savedKey) === "1");
