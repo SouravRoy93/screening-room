@@ -98,6 +98,64 @@ router.get("/places/search", async (req, res): Promise<void> => {
   }
 });
 
+// ── General landmark / attraction search ─────────────────────────────────────
+const exploreCache = new Map<string, { ts: number; results: unknown[] }>();
+
+router.get("/places/explore", async (req, res): Promise<void> => {
+  const q = (req.query.q as string || "").trim();
+  if (!q || q.length < 2) { res.json([]); return; }
+  if (!PLACES_KEY) { res.json([]); return; }
+
+  const cacheKey = q.toLowerCase();
+  const cached = exploreCache.get(cacheKey);
+  if (cached && Date.now() - cached.ts < 120_000) { res.json(cached.results); return; }
+
+  try {
+    const body = {
+      textQuery: `${q} New York City`,
+      locationBias: {
+        circle: { center: { latitude: 40.7128, longitude: -74.006 }, radius: 50000 },
+      },
+      maxResultCount: 8,
+    };
+    const r = await fetch(`${PLACES_BASE}/places:searchText`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": PLACES_KEY,
+        "X-Goog-FieldMask": "places.id,places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.photos,places.types,places.shortFormattedAddress",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) { res.json([]); return; }
+    const data = await r.json() as { places?: Record<string, unknown>[] };
+    const places = data.places || [];
+
+    const results = await Promise.all(places.map(async (p) => {
+      const photos = p.photos as { name: string }[] | undefined;
+      const photoUrl = photos?.[0] ? await resolveCdnUrl(photos[0].name, 600) : null;
+      const address = (p.formattedAddress as string) || "";
+      const shortAddress = (p.shortFormattedAddress as string) || address.split(",").slice(0, 2).join(", ");
+      const types = (p.types as string[] | undefined) || [];
+      return {
+        place_id: p.id,
+        name: (p.displayName as { text: string })?.text || "",
+        rating: (p.rating as number) || null,
+        user_rating_count: (p.userRatingCount as number) || null,
+        address,
+        short_address: shortAddress,
+        photo_url: photoUrl,
+        types,
+      };
+    }));
+
+    exploreCache.set(cacheKey, { ts: Date.now(), results });
+    res.json(results);
+  } catch {
+    res.json([]);
+  }
+});
+
 // ── Thumbnail cache ─────────────────────────────────────────────────────────
 const thumbCache = new Map<string, string | null>();
 

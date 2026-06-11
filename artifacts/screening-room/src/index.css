@@ -821,6 +821,19 @@
   color: #fff; background: rgba(255,255,255,0.18); backdrop-filter: blur(6px);
   border: 1px solid rgba(255,255,255,0.25); padding: 3px 8px; border-radius: 20px;
 }
+.pl-live-badge {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 9px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+  color: rgba(255,255,255,0.7); background: rgba(66,133,244,0.25); backdrop-filter: blur(6px);
+  border: 1px solid rgba(66,133,244,0.4); padding: 2px 7px; border-radius: 20px;
+}
+.pl-card-btn-maps {
+  padding: 5px 8px;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  display: inline-flex; align-items: center;
+}
+.pl-card-btn-maps:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.08); }
 
 /* Search row in Discover */
 .pl-search-row { position: relative; margin-bottom: 16px; }

@@ -1,9 +1,22 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, Search } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, Search, ExternalLink } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import type { PlaceItem } from "@/types";
+
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+interface LivePlace {
+  place_id: string;
+  name: string;
+  rating: number | null;
+  user_rating_count: number | null;
+  address: string;
+  short_address: string;
+  photo_url: string | null;
+  types: string[];
+}
 
 const STYLES = ["Iconic","Hidden gems","Luxury","Romantic","Food & cafés","Culture","Nature & views","Nightlife","Shopping","Wellness","Photography","Family"];
 const MOODS: [string, string][] = [
@@ -129,6 +142,46 @@ function PlaceCard({ p, saved, visited, onSave, onVisit }: {
   );
 }
 
+
+// ─── Live Google Place Card ──────────────────────────────────────────────────
+
+function LivePlaceCard({ p, saved, visited, onSave, onVisit }: {
+  p: LivePlace; saved: boolean; visited: boolean;
+  onSave: (e: React.MouseEvent) => void;
+  onVisit: (e: React.MouseEvent) => void;
+}) {
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}&query_place_id=${p.place_id}`;
+  return (
+    <div className="pl-card" style={{ cursor: "default" }}>
+      <div className="pl-photo">
+        {p.photo_url
+          ? <img src={p.photo_url} alt={p.name} loading="lazy" />
+          : <div className="pl-photo-fallback" />
+        }
+        {visited && <div className="pl-visited-stamp">✓ Been</div>}
+        <div className="pl-live-badge">via Google</div>
+      </div>
+      <div className="pl-info">
+        {p.short_address && <div className="pl-area">{p.short_address}</div>}
+        <h3 className="pl-name">{p.name}</h3>
+        <div className="pl-meta">
+          {p.rating && <span>★ {p.rating.toFixed(1)}{p.user_rating_count ? ` (${p.user_rating_count.toLocaleString()})` : ""}</span>}
+        </div>
+        <div className="pl-card-actions" onClick={e => e.stopPropagation()}>
+          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave}>
+            {saved ? "♥ Saved" : "♡ Want to go"}
+          </button>
+          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit}>
+            {visited ? <><CheckCircle size={11} /> Been</> : "Been there"}
+          </button>
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="pl-card-btn pl-card-btn-maps" onClick={e => e.stopPropagation()}>
+            <ExternalLink size={10} />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Perfect Day ────────────────────────────────────────────────────────────
 
@@ -360,6 +413,11 @@ export default function Places() {
   const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
   const [visited, setVisited] = useState<Record<number, boolean>>(() => getLS("pl_visited", {}));
   const [searchQ, setSearchQ] = useState("");
+  const [liveResults, setLiveResults] = useState<LivePlace[]>([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveSaved, setLiveSaved] = useState<Record<string, boolean>>(() => getLS("gpl_saved", {}));
+  const [liveVisited, setLiveVisited] = useState<Record<string, boolean>>(() => getLS("gpl_visited", {}));
+  const liveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [wxText, setWxText] = useState<string | null>(null);
   const [wxRaw, setWxRaw] = useState<{ code: number; temp: number } | null>(null);
   const [showPerfectDay, setShowPerfectDay] = useState(false);
@@ -387,6 +445,34 @@ export default function Places() {
     setVisited(next);
     setLS("pl_visited", next);
   }
+
+  function toggleLiveSave(id: string) {
+    const next = { ...liveSaved, [id]: !liveSaved[id] };
+    if (!next[id]) delete next[id];
+    setLiveSaved(next); setLS("gpl_saved", next);
+  }
+  function toggleLiveVisit(id: string) {
+    const next = { ...liveVisited, [id]: !liveVisited[id] };
+    if (!next[id]) delete next[id];
+    setLiveVisited(next); setLS("gpl_visited", next);
+  }
+
+  // Debounced live Google search
+  useEffect(() => {
+    if (liveTimer.current) clearTimeout(liveTimer.current);
+    const q = searchQ.trim();
+    if (!q || q.length < 2) { setLiveResults([]); setLiveLoading(false); return; }
+    setLiveLoading(true);
+    liveTimer.current = setTimeout(async () => {
+      try {
+        const r = await fetch(`${API_BASE}/places/explore?q=${encodeURIComponent(q)}`);
+        const data = await r.json();
+        setLiveResults(Array.isArray(data) ? data : []);
+      } catch { setLiveResults([]); }
+      setLiveLoading(false);
+    }, 700);
+    return () => { if (liveTimer.current) clearTimeout(liveTimer.current); };
+  }, [searchQ]);
 
   const matches = useCallback((p: PlaceItem) => {
     if (trap && p.badges?.includes("Tourist Heavy")) return false;
@@ -557,41 +643,74 @@ export default function Places() {
 
             {searchQ.trim() ? (
               /* Search results */
-              <div className="pl-section">
+              <>
                 {(() => {
                   const q = searchQ.toLowerCase().trim();
-                  const results = places.filter(p =>
+                  const localResults = places.filter(p =>
                     p.name?.toLowerCase().includes(q) ||
                     p.area?.toLowerCase().includes(q) ||
                     p.vibe?.toLowerCase().includes(q) ||
                     p.badges?.some((b: string) => b.toLowerCase().includes(q)) ||
                     p.styles?.some((s: string) => s.toLowerCase().includes(q))
                   );
-                  return (
-                    <>
+                  return localResults.length > 0 ? (
+                    <div className="pl-section">
                       <div className="pl-sec-head">
-                        <span className="pl-sec-title">Results for "{searchQ.trim()}"</span>
-                        <span className="pl-sec-note">{results.length} found</span>
+                        <span className="pl-sec-title">In our guide</span>
+                        <span className="pl-sec-note">{localResults.length} found</span>
                       </div>
-                      {results.length === 0 ? (
-                        <div className="pl-empty" style={{ padding: "32px 0", textAlign: "center", lineHeight: 1.6 }}>
-                          <div style={{ fontSize: 28, marginBottom: 8 }}>🔍</div>
-                          <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 14 }}>No places match <strong style={{ color: "#fff" }}>"{searchQ.trim()}"</strong></div>
-                          <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginTop: 6 }}>Try a neighbourhood, vibe, or style — like "hidden" or "Brooklyn"</div>
-                        </div>
-                      ) : (
-                        <div className="pl-grid">
-                          {results.map(p => (
-                            <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                              onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
-                              onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  );
+                      <div className="pl-grid">
+                        {localResults.map(p => (
+                          <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
+                            onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
+                            onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
+                        ))}
+                      </div>
+                    </div>
+                  ) : null;
                 })()}
-              </div>
+
+                {/* Live Google results */}
+                <div className="pl-section">
+                  <div className="pl-sec-head">
+                    <span className="pl-sec-title">
+                      {liveLoading
+                        ? <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Searching Google…</span>
+                        : "Live from Google"}
+                    </span>
+                    {!liveLoading && liveResults.length > 0 && (
+                      <span className="pl-sec-note">{liveResults.length} results</span>
+                    )}
+                  </div>
+                  {liveLoading ? (
+                    <div className="pl-grid">
+                      {[0,1,2].map(i => (
+                        <div key={i} className="pl-card" style={{ opacity: 0.4 }}>
+                          <div className="pl-photo" style={{ background: "rgba(255,255,255,0.06)", height: 140 }} />
+                          <div className="pl-info">
+                            <div className="mdp-shimmer" style={{ width: "60%", height: 12, borderRadius: 6, marginBottom: 8 }} />
+                            <div className="mdp-shimmer" style={{ width: "80%", height: 16, borderRadius: 6 }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : liveResults.length > 0 ? (
+                    <div className="pl-grid">
+                      {liveResults.map(p => (
+                        <LivePlaceCard key={p.place_id} p={p}
+                          saved={!!liveSaved[p.place_id]}
+                          visited={!!liveVisited[p.place_id]}
+                          onSave={e => { e.stopPropagation(); toggleLiveSave(p.place_id); }}
+                          onVisit={e => { e.stopPropagation(); toggleLiveVisit(p.place_id); }} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="pl-empty" style={{ padding: "16px 0", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>
+                      No Google results yet
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <>
                 <div className="pl-filterbar">
