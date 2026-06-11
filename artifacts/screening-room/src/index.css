@@ -1063,7 +1063,7 @@
 .dc-search-input:focus { border-color: rgba(255,255,255,0.2); }
 
 /* Tabs — inline, same style as Entertainment type selector */
-.dc-tabs { display: flex; gap: 0; flex-shrink: 0; }
+.dc-tabs { display: flex; gap: 0; flex-shrink: 0; flex-grow: 0; }
 .dc-tab {
   font: inherit; font-size: 13px; font-weight: 600;
   color: rgba(255,255,255,0.55);
@@ -1079,7 +1079,7 @@
 .dc-tab.on + .dc-tab { border-left: 1px solid rgba(255,255,255,0.12); }
 
 /* Dropdowns */
-.dc-dropdowns { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.dc-dropdowns { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
 .dc-select-wrap { position: relative; display: inline-flex; align-items: center; }
 .dc-select {
   appearance: none; font: inherit; font-size: 12.5px; font-weight: 500;
