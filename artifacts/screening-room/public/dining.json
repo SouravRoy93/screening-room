@@ -848,5 +848,1805 @@
   "recognition": "April Bloomfield return",
   "signature": "the roast chicken",
   "blurb": "April Bloomfield's beloved return, Brooklyn-side."
+ },
+ {
+  "id": 1051,
+  "name": "OLIO E PIÙ",
+  "cuisine": "Italian",
+  "format": "Rustic Italian osteria",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Hand-rolled pasta with seasonal ingredients",
+  "blurb": "Warm West Village Italian with exceptional housemade pasta and natural wines."
+ },
+ {
+  "id": 1052,
+  "name": "Osteria Nonnino",
+  "cuisine": "Italian",
+  "format": "Cozy trattoria",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Handmade pasta with seasonal ingredients",
+  "blurb": "Warm West Village spot serving elevated traditional Italian comfort food."
+ },
+ {
+  "id": 1053,
+  "name": "Cotenna",
+  "cuisine": "Italian",
+  "format": "Cozy trattoria",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House-made pasta with seasonal ingredients",
+  "blurb": "West Village trattoria serving rustic Italian fare with warmth and care."
+ },
+ {
+  "id": 1054,
+  "name": "San Sabino",
+  "cuisine": "Italian",
+  "format": "Cozy trattoria",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House-made pasta with seasonal preparations",
+  "blurb": "Intimate West Village spot serving thoughtful, traditional Italian fare."
+ },
+ {
+  "id": 1055,
+  "name": "Sant Ambroeus West Village",
+  "cuisine": "Italian",
+  "format": "Elegant Italian café",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Celebration",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Affogato and housemade pastries",
+  "blurb": "Sophisticated Italian spot serving refined cuisine and impeccable coffee."
+ },
+ {
+  "id": 1056,
+  "name": "Codino",
+  "cuisine": "Italian",
+  "format": "Cozy trattoria",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Handmade pasta with seasonal preparations",
+  "blurb": "West Village Italian spot serving refined, approachable housemade pastas nightly."
+ },
+ {
+  "id": 1057,
+  "name": "Osteria Carlina West Village",
+  "cuisine": "Italian",
+  "format": "Cozy trattoria",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House-made pasta with seasonal preparations",
+  "blurb": "Warmly lit West Village trattoria serving refined Italian classics."
+ },
+ {
+  "id": 1058,
+  "name": "Da Andrea Greenwich Village",
+  "cuisine": "Italian",
+  "format": "Convivial trattoria",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Group dinner",
+   "Casual"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House-made pasta",
+  "blurb": "Warm West Village trattoria serving rustic Italian classics with neighborhood charm."
+ },
+ {
+  "id": 1059,
+  "name": "Lume West Village",
+  "cuisine": "Italian",
+  "format": "Intimate tasting-menu restaurant",
+  "neighborhood": "West Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Multi-course Italian tasting menu with seasonal ingredients",
+  "blurb": "Elegant Italian fine dining in the heart of West Village."
+ },
+ {
+  "id": 1060,
+  "name": "Yakiniku Gen East Village",
+  "cuisine": "Japanese",
+  "format": "Buzzy yakiniku hotspot",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Group dinner",
+   "Casual",
+   "Date night"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Table-grilled wagyu and premium cuts",
+  "blurb": "High-energy izakaya where diners grill superior Japanese beef tableside."
+ },
+ {
+  "id": 1061,
+  "name": "Secchu Yokota",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Omakase chef's selection",
+  "blurb": "Intimate counter temple for pristine, artfully composed sushi experiences."
+ },
+ {
+  "id": 1062,
+  "name": "Chubby TAN｜New York",
+  "cuisine": "Japanese",
+  "format": "Vibrant izakaya",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Late night"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Grilled skewers and creative small plates",
+  "blurb": "Lively East Village izakaya with stellar ratings and casual charm."
+ },
+ {
+  "id": 1063,
+  "name": "Shinzo Omakase",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase selection",
+  "blurb": "Intimate counter sushi with pristine fish and assured technique."
+ },
+ {
+  "id": 1064,
+  "name": "Raku",
+  "cuisine": "Japanese",
+  "format": "Buzzy izakaya",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Drinks & bites"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Yakitori and sake selection",
+  "blurb": "Lively East Village izakaya with stellar grilled skewers and vibrant energy."
+ },
+ {
+  "id": 1065,
+  "name": "TabeTomo",
+  "cuisine": "Japanese",
+  "format": "Vibrant ramen counter",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House ramen with carefully crafted broths",
+  "blurb": "Beloved East Village ramen spot delivering bold, satisfying bowls nightly."
+ },
+ {
+  "id": 1066,
+  "name": "RokuNana",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Omakase experience with premium daily fish selection",
+  "blurb": "Intimate sushi counter showcasing pristine fish and expert craftsmanship."
+ },
+ {
+  "id": 1067,
+  "name": "Takahachi",
+  "cuisine": "Japanese",
+  "format": "Intimate sushi counter",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Celebration",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Fresh omakase selection",
+  "blurb": "Refined sushi craftsmanship in East Village's beloved neighborhood counter."
+ },
+ {
+  "id": 1068,
+  "name": "Benemon",
+  "cuisine": "Japanese",
+  "format": "Buzzy izakaya",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Drinks & bites"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Yakitori and sake pairings",
+  "blurb": "Lively East Village izakaya serving expertly grilled skewers and Japanese comfort food."
+ },
+ {
+  "id": 1069,
+  "name": "Kimura",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Solo",
+   "Casual"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pristine nigiri and seasonal sashimi selection",
+  "blurb": "Refined Japanese craftsmanship in intimate East Village setting."
+ },
+ {
+  "id": 1070,
+  "name": "SHINN EAST",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Omakase progression with seasonal fish selection",
+  "blurb": "Meticulous sushi craftsmanship in intimate East Village setting."
+ },
+ {
+  "id": 1071,
+  "name": "Kyuramen - Union Square",
+  "cuisine": "Japanese",
+  "format": "Bustling ramen counter",
+  "neighborhood": "East Village",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Rich tonkotsu broth with perfectly cooked noodles",
+  "blurb": "Excellent ramen spot delivering consistent quality in vibrant East Village."
+ },
+ {
+  "id": 1072,
+  "name": "SoZo Sip Bar + Omakase",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Omakase sushi experience with sake pairings",
+  "blurb": "Intimate sushi counter offering personalized omakase in Midtown."
+ },
+ {
+  "id": 1073,
+  "name": "Hanaya Omakase",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase selection with premium sushi-grade fish",
+  "blurb": "Intimate Midtown counter showcasing pristine sushi craftsmanship and artistry."
+ },
+ {
+  "id": 1074,
+  "name": "Uka Omakase",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's daily omakase selection",
+  "blurb": "Midtown omakase gem delivering pristine sushi at an intimate counter."
+ },
+ {
+  "id": 1075,
+  "name": "Tatsuda Omakase",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase progression",
+  "blurb": "Intimate sushi counter crafting pristine daily selections with precision."
+ },
+ {
+  "id": 1076,
+  "name": "Omakase by Kun Tsuki",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase selection with premium nigiri",
+  "blurb": "Intimate sushi counter showcasing pristine fish and artisanal technique."
+ },
+ {
+  "id": 1077,
+  "name": "Mido Omakase - West Village",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Omakase progression featuring seasonal fish and nigiri",
+  "blurb": "Intimate sushi counter delivering pristine fish and expert craftsmanship."
+ },
+ {
+  "id": 1078,
+  "name": "Domo omakase",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase selection",
+  "blurb": "Pristine sushi counter experience in Midtown with meticulous seasonal offerings."
+ },
+ {
+  "id": 1079,
+  "name": "Omakase Room by Shin",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase selection with pristine seasonal fish",
+  "blurb": "Intimate omakase counter delivering precise, elegant sushi craftsmanship."
+ },
+ {
+  "id": 1080,
+  "name": "Kazumi Omakase",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Omakase progression of pristine seasonal sushi",
+  "blurb": "Intimate Midtown counter showcasing chef's finest daily selections."
+ },
+ {
+  "id": 1081,
+  "name": "Omakase by korami",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase selection",
+  "blurb": "Intimate sushi counter showcasing pristine fish and expert craftsmanship."
+ },
+ {
+  "id": 1082,
+  "name": "Omakase 33",
+  "cuisine": "Japanese",
+  "format": "Counter-seat omakase",
+  "neighborhood": "Midtown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chef's omakase selection",
+  "blurb": "Intimate sushi counter showcasing pristine fish and masterful technique."
+ },
+ {
+  "id": 1083,
+  "name": "Bubby's",
+  "cuisine": "New American",
+  "format": "Comfort-food institution",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Brunch"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Chicken pot pie",
+  "blurb": "Homey New American comfort food in a convivial Tribeca setting."
+ },
+ {
+  "id": 1084,
+  "name": "Au Cheval",
+  "cuisine": "New American",
+  "format": "Buzzy bistro with classic American fare and vibrant energy",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Cheeseburger with hand-cut fries",
+  "blurb": "Tribeca hotspot delivering elevated comfort food in a lively setting."
+ },
+ {
+  "id": 1085,
+  "name": "Chambers",
+  "cuisine": "New American",
+  "format": "Elegant neighborhood destination",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Seasonal New American tasting menu",
+  "blurb": "Refined Tribeca dining with locally-sourced ingredients and polished technique."
+ },
+ {
+  "id": 1086,
+  "name": "Lindens",
+  "cuisine": "New American",
+  "format": "Neighborhood bistro",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Seasonal American fare with refined technique",
+  "blurb": "Elevated comfort food in sophisticated Tribeca setting."
+ },
+ {
+  "id": 1087,
+  "name": "Tiny's & The Bar Upstairs",
+  "cuisine": "New American",
+  "format": "Upscale tavern with vibrant bar scene",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Drinks & bites"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House-made pasta and craft cocktails",
+  "blurb": "Sophisticated Tribeca dining with elevated comfort food and lively atmosphere."
+ },
+ {
+  "id": 1088,
+  "name": "The Mary Lane",
+  "cuisine": "New American",
+  "format": "Polished neighborhood bistro",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Seasonal American fare with refined technique",
+  "blurb": "Tribeca gem serving thoughtful New American cooking in relaxed elegance."
+ },
+ {
+  "id": 1089,
+  "name": "RH Rooftop Restaurant at RH New York",
+  "cuisine": "New American",
+  "format": "Rooftop dining destination",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Elevated views with seasonal American cuisine",
+  "blurb": "Design-forward rooftop with polished New American fare and city vistas."
+ },
+ {
+  "id": 1090,
+  "name": "Filé Gumbo Bar",
+  "cuisine": "New American",
+  "format": "Casual gumbo hall",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Brunch"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House gumbo",
+  "blurb": "Spirited New Orleans-inspired comfort in Tribeca."
+ },
+ {
+  "id": 1091,
+  "name": "Monkey Bar",
+  "cuisine": "New American",
+  "format": "Lively cocktail den with nostalgic glamour",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Drinks & bites"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Classic cocktails in a storied, theatrical setting",
+  "blurb": "Tribeca institution blending retro charm with sophisticated cocktails and cuisine."
+ },
+ {
+  "id": 1092,
+  "name": "Forgione",
+  "cuisine": "New American",
+  "format": "Elegant neighborhood flagship",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Seasonal tasting menu with Italian-inspired techniques",
+  "blurb": "Refined New American cooking in a sophisticated Tribeca setting."
+ },
+ {
+  "id": 1093,
+  "name": "BETTY",
+  "cuisine": "New American",
+  "format": "Vibrant neighborhood bistro",
+  "neighborhood": "Tribeca",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Seasonal small plates with refined technique",
+  "blurb": "Tribeca's convivial spot for contemporary American cooking and lively atmosphere."
+ },
+ {
+  "id": 1094,
+  "name": "Cafe d’Alsace",
+  "cuisine": "French",
+  "format": "Convivial brasserie",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Choucroute garnie",
+  "blurb": "Warm Upper East Side classic serving rustic Alsatian comfort with effortless charm."
+ },
+ {
+  "id": 1095,
+  "name": "Jacques Brasserie",
+  "cuisine": "French",
+  "format": "Classic brasserie",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "French bistro classics with refined execution",
+  "blurb": "Elegant Upper East Side French brasserie with timeless appeal."
+ },
+ {
+  "id": 1096,
+  "name": "Supper Club By Le Petit Parisien",
+  "cuisine": "French",
+  "format": "Intimate supper club",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "French classics in an elegant, intimate setting",
+  "blurb": "Charming French supper club delivering classic Parisian elegance uptown."
+ },
+ {
+  "id": 1097,
+  "name": "Brasserie Cognac Upper East Side",
+  "cuisine": "French",
+  "format": "Classic brasserie",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Traditional French bistro fare with refined preparations",
+  "blurb": "Elegant Upper East Side French brasserie for timeless Gallic dining."
+ },
+ {
+  "id": 1098,
+  "name": "Match 65 Brasserie",
+  "cuisine": "French",
+  "format": "Classic brasserie",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Traditional French bistro fare with refined technique",
+  "blurb": "Elegant Upper East Side brasserie serving timeless French classics."
+ },
+ {
+  "id": 1099,
+  "name": "Pascalou",
+  "cuisine": "French",
+  "format": "Cozy bistro",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Classic French bistro fare with refined technique",
+  "blurb": "Upper East Side French bistro delivering timeless comfort with accessible elegance."
+ },
+ {
+  "id": 1100,
+  "name": "Majorelle",
+  "cuisine": "French",
+  "format": "Elegant bistro",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Classical French preparations with refined technique",
+  "blurb": "Sophisticated French dining on the Upper East Side, polished and romantic."
+ },
+ {
+  "id": 1101,
+  "name": "Le Moulin à Café",
+  "cuisine": "French",
+  "format": "Charming neighborhood bistro",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Date night",
+   "Casual",
+   "Brunch"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Classic French bistro fare with seasonal preparations",
+  "blurb": "Unpretentious Upper East Side French bistro with warm hospitality and reliable cooking."
+ },
+ {
+  "id": 1102,
+  "name": "Le Bilboquet",
+  "cuisine": "French",
+  "format": "Classic French brasserie",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Sole meunière",
+  "blurb": "Timeless Upper East Side French dining with reliable classics and convivial atmosphere."
+ },
+ {
+  "id": 1103,
+  "name": "La Goulue New York",
+  "cuisine": "French",
+  "format": "Elegant bistro",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Classic French bistro fare with impeccable execution",
+  "blurb": "Timeless Upper East Side French dining with refined elegance and tradition."
+ },
+ {
+  "id": 1104,
+  "name": "QUATORZE",
+  "cuisine": "French",
+  "format": "Elegant bistro",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "French classics with refined technique",
+  "blurb": "Sophisticated Upper East Side French dining with polished execution and warmth."
+ },
+ {
+  "id": 1105,
+  "name": "Le Charlot",
+  "cuisine": "French",
+  "format": "Polished bistro",
+  "neighborhood": "Upper East Side",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Classic French preparations with refined execution",
+  "blurb": "Elegant Upper East Side French dining with timeless sophistication."
+ },
+ {
+  "id": 1106,
+  "name": "Woorijip",
+  "cuisine": "Korean",
+  "format": "Bustling casual counter, bubbling stews and grilled meats",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Bubbling sundubu jjigae and Korean BBQ",
+  "blurb": "Koreatown stalwart serving authentic Korean comfort food with reliably excellent execution."
+ },
+ {
+  "id": 1107,
+  "name": "O2 Hot Stone BBQ House - Koreatown NYC",
+  "cuisine": "Korean",
+  "format": "Table-grilling hotspot",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Late night"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Hot stone BBQ tableside grilling",
+  "blurb": "Sizzling tableside Korean BBQ in the heart of Koreatown."
+ },
+ {
+  "id": 1108,
+  "name": "Cho Dang Gol",
+  "cuisine": "Korean",
+  "format": "Bustling tofu-house destination",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Silken homemade tofu with dipping sauces",
+  "blurb": "Authentic Korean comfort food in the heart of Koreatown."
+ },
+ {
+  "id": 1109,
+  "name": "Jongro BBQ",
+  "cuisine": "Korean",
+  "format": "Sizzling tableside barbecue",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Group dinner",
+   "Casual",
+   "Big night out"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Marinated short ribs grilled tableside",
+  "blurb": "Vibrant Koreatown spot for interactive Korean BBQ with high-quality meats."
+ },
+ {
+  "id": 1110,
+  "name": "Oncheon NYC",
+  "cuisine": "Korean",
+  "format": "Spirited Korean grill and banchan bar",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Late night"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Tabletop grilled meats with house-made banchan",
+  "blurb": "Lively Koreatown spot for grilled meats and vibrant banchan spreads."
+ },
+ {
+  "id": 1111,
+  "name": "miss KOREA BBQ",
+  "cuisine": "Korean",
+  "format": "Lively tabletop grill house",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Group dinner",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Marbled beef grilled tableside with house banchan",
+  "blurb": "Vibrant Koreatown destination for interactive Korean BBQ and premium cuts."
+ },
+ {
+  "id": 1112,
+  "name": "Anytime Kitchen",
+  "cuisine": "Korean",
+  "format": "Vibrant neighborhood Korean spot",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Authentic Korean comfort dishes",
+  "blurb": "Reliable Koreatown standby for craveable Korean fare and high ratings."
+ },
+ {
+  "id": 1113,
+  "name": "GAN-HOO BBQ",
+  "cuisine": "Korean BBQ",
+  "format": "Sizzling tableside grill house",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Group dinner",
+   "Casual",
+   "Big night out"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Marinated short ribs grilled tableside",
+  "blurb": "Stellar Korean barbecue in Koreatown with exceptional meats and convivial energy."
+ },
+ {
+  "id": 1114,
+  "name": "Her Name is Han",
+  "cuisine": "Korean",
+  "format": "Buzzy neighborhood spot",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Handmade noodles and banchan-focused small plates",
+  "blurb": "Vibrant Koreatown destination for authentic Korean comfort with spirited energy."
+ },
+ {
+  "id": 1115,
+  "name": "Tosokchon NYC",
+  "cuisine": "Korean",
+  "format": "Vibrant grill-focused spot",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Ginseng chicken soup (samgyetang)",
+  "blurb": "Spirited Korean comfort cooking in the heart of Koreatown."
+ },
+ {
+  "id": 1116,
+  "name": "KJUN",
+  "cuisine": "Korean",
+  "format": "Sleek Korean grill with energetic atmosphere",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Big night out"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Table-grilled meats and banchan spreads",
+  "blurb": "High-rated Koreatown spot for spirited Korean BBQ and vibrant dining."
+ },
+ {
+  "id": 1117,
+  "name": "Ahgassi Korean Barbecue",
+  "cuisine": "Korean",
+  "format": "Vibrant tabletop grill house",
+  "neighborhood": "Koreatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Group dinner",
+   "Casual",
+   "Big night out"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Marinated short ribs grilled tableside",
+  "blurb": "Lively Korean BBQ where diners grill premium meats at the table."
+ },
+ {
+  "id": 1118,
+  "name": "La Contenta",
+  "cuisine": "Mexican",
+  "format": "Vibrant mezcal bar with coastal Mexican small plates",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Ceviches and grilled fish with house-made tortillas",
+  "blurb": "Lively Lower East Side favorite for refined Mexican cuisine and spirits."
+ },
+ {
+  "id": 1119,
+  "name": "Vallarta Tropical NYC",
+  "cuisine": "Mexican Seafood",
+  "format": "Vibrant seafood counter",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Fresh ceviche and grilled fish tacos",
+  "blurb": "Lower East Side gem serving pristine Mexican seafood with tropical flair."
+ },
+ {
+  "id": 1120,
+  "name": "Mictlan México and Spanish cuisine",
+  "cuisine": "Mexican",
+  "format": "Vibrant Mexican kitchen",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Date night"
+  ],
+  "recognition": "Local favorite",
+  "signature": "House moles and Spanish-Mexican fusion plates",
+  "blurb": "Spirited Lower East Side spot blending Mexican tradition with Spanish flair."
+ },
+ {
+  "id": 1121,
+  "name": "CANTINA SUNDOWN",
+  "cuisine": "Mexican",
+  "format": "Lively cantina",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Drinks & bites"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Margaritas and street tacos",
+  "blurb": "Spirited Lower East Side cantina serving vibrant Mexican fare and classic cocktails."
+ },
+ {
+  "id": 1122,
+  "name": "Carnitas Ramirez",
+  "cuisine": "Mexican",
+  "format": "Casual carnitas counter",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Slow-cooked carnitas with warm tortillas",
+  "blurb": "Lower East Side institution for authentic, melt-in-mouth carnitas."
+ },
+ {
+  "id": 1123,
+  "name": "Rosie's",
+  "cuisine": "Mexican",
+  "format": "Vibrant neighborhood cantina",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Drinks & bites"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Street-style tacos",
+  "blurb": "Lively Lower East Side favorite serving bold, authentic Mexican fare."
+ },
+ {
+  "id": 1124,
+  "name": "Mezcali",
+  "cuisine": "Mexican",
+  "format": "Vibrant mezcal bar with bold small plates",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Drinks & bites"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Mezcal cocktails with housemade infusions",
+  "blurb": "Lower East Side hotspot for premium mezcal and refined Mexican fare."
+ },
+ {
+  "id": 1125,
+  "name": "Birria LES",
+  "cuisine": "Mexican",
+  "format": "Casual birria counter",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Birria tacos with consomé",
+  "blurb": "Authentic Lower East Side birria spot with devoted neighborhood following."
+ },
+ {
+  "id": 1126,
+  "name": "Toro Loco",
+  "cuisine": "Mexican",
+  "format": "Vibrant cantina",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Late night"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Carne asada tacos",
+  "blurb": "Spirited Lower East Side haunt for authentic Mexican fare and margaritas."
+ },
+ {
+  "id": 1127,
+  "name": "Jajaja Mexicana",
+  "cuisine": "Mexican",
+  "format": "Vibrant vegan cantina",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Vegan carne asada tacos",
+  "blurb": "Colorful, plant-based Mexican cooking on the Lower East Side."
+ },
+ {
+  "id": 1128,
+  "name": "Son del North",
+  "cuisine": "Mexican",
+  "format": "Casual burrito counter",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Solo"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Breakfast burritos with house chorizo",
+  "blurb": "Vibrant Lower East Side spot for authentic, no-frills Mexican fare."
+ },
+ {
+  "id": 1129,
+  "name": "Rosa Mexicano",
+  "cuisine": "Mexican",
+  "format": "Festive cantina",
+  "neighborhood": "Lower East Side",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Guacamole prepared tableside",
+  "blurb": "Vibrant Mexican spot with lively energy and fresh classic dishes."
+ },
+ {
+  "id": 1130,
+  "name": "Jiang Nan NYC",
+  "cuisine": "Chinese",
+  "format": "Elegant Sichuan dining",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 4,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Hand-pulled noodles in chili oil",
+  "blurb": "Refined Sichuan cuisine in Chinatown's most buzzed-about destination."
+ },
+ {
+  "id": 1131,
+  "name": "Shanghai 21",
+  "cuisine": "Chinese",
+  "format": "Bustling Chinatown dim sum and noodle house",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Hand-pulled noodles and Shanghai soup dumplings",
+  "blurb": "Beloved neighborhood spot for authentic Shanghai classics and lively dim sum service."
+ },
+ {
+  "id": 1132,
+  "name": "Wo Hop",
+  "cuisine": "Chinese",
+  "format": "Bustling dim sum counter",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Shrimp cheung fun, hand-pulled noodles",
+  "blurb": "Frenetic Chinatown institution serving authentic dim sum and noodles since 1938."
+ },
+ {
+  "id": 1133,
+  "name": "Uncle Lou 快樂人",
+  "cuisine": "Cantonese",
+  "format": "Bustling dim sum hall",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Har gow and siu mai dim sum",
+  "blurb": "Spirited Cantonese spot serving authentic dim sum to Chinatown crowds."
+ },
+ {
+  "id": 1134,
+  "name": "Chang Lai",
+  "cuisine": "Chinese",
+  "format": "Vibrant dim sum and noodle counter",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Hand-pulled noodles and steamed dumplings",
+  "blurb": "Beloved Chinatown spot for authentic Cantonese fare and lively dining."
+ },
+ {
+  "id": 1135,
+  "name": "Joe's Shanghai",
+  "cuisine": "Chinese",
+  "format": "Bustling dim sum hall",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Soup dumplings (xiaolongbao)",
+  "blurb": "Legendary Shanghai spot for expertly crafted soup dumplings and dim sum."
+ },
+ {
+  "id": 1136,
+  "name": "Shu Jiao Fu Zhou",
+  "cuisine": "Chinese",
+  "format": "Bustling dumpling counter",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Fuzhou-style shrimp dumplings",
+  "blurb": "Lively Chinatown spot serving authentic Fuzhou dumplings and noodles."
+ },
+ {
+  "id": 1137,
+  "name": "Hop Kee Restaurant",
+  "cuisine": "Chinese",
+  "format": "Bustling dim sum and noodle house",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Handmade noodles and traditional dim sum",
+  "blurb": "Chinatown institution serving authentic Cantonese classics since 1973."
+ },
+ {
+  "id": 1138,
+  "name": "Mei Lai Xuan｜美麗軒",
+  "cuisine": "Chinese",
+  "format": "Casual dim sum and Cantonese spot",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Dim sum cart service",
+  "blurb": "Authentic Cantonese dining in Chinatown with dim sum and traditional favorites."
+ },
+ {
+  "id": 1139,
+  "name": "Mei Lai Wah",
+  "cuisine": "Chinese",
+  "format": "Bustling dim sum counter",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Har gow and siu mai",
+  "blurb": "Legendary Chinatown dim sum destination with cart service and reliable classics."
+ },
+ {
+  "id": 1140,
+  "name": "Dim Sum Palace",
+  "cuisine": "Chinese",
+  "format": "Bustling dim sum hall",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Brunch"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Cart-service dim sum selection",
+  "blurb": "Lively Chinatown destination for traditional dim sum and spirited service."
+ },
+ {
+  "id": 1141,
+  "name": "Jin Mei Dumpling",
+  "cuisine": "Chinese",
+  "format": "Bustling dumpling counter",
+  "neighborhood": "Chinatown",
+  "borough": "Manhattan",
+  "price": 1,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Hand-pleated dumplings",
+  "blurb": "Exceptional dumplings and bold flavors in vibrant Chinatown."
+ },
+ {
+  "id": 1142,
+  "name": "STK Steakhouse",
+  "cuisine": "Steakhouse",
+  "format": "Upscale chophouse",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "",
+  "signature": "Prime dry-aged steaks with craft cocktails",
+  "blurb": "Sophisticated steakhouse delivering premium beef and vibrant atmosphere."
+ },
+ {
+  "id": 1143,
+  "name": "Boucherie Union Square",
+  "cuisine": "French Steakhouse",
+  "format": "Upscale bistro with classic charm",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Prime steaks with French technique and classic sides",
+  "blurb": "Sophisticated French steakhouse delivering impeccable beef in Flatiron."
+ },
+ {
+  "id": 1144,
+  "name": "COTE Flatiron",
+  "cuisine": "Steakhouse",
+  "format": "Upscale Korean steakhouse with tableside grilling",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 4,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Dry-aged beef cooked over charcoal at your table",
+  "blurb": "Sophisticated Korean steakhouse with interactive grilling and premium cuts."
+ },
+ {
+  "id": 1145,
+  "name": "Empire Steak House Times Square",
+  "cuisine": "American Steakhouse",
+  "format": "Classic steakhouse den",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Prime dry-aged steaks with classic sides",
+  "blurb": "Timeless steakhouse serving prime cuts in a sophisticated setting."
+ },
+ {
+  "id": 1146,
+  "name": "La Tête d'Or by Daniel",
+  "cuisine": "French Steakhouse",
+  "format": "Refined steakhouse with classical French technique",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Prime dry-aged steaks with classical French preparations",
+  "blurb": "Flatiron steakhouse delivering refined French technique and premium cuts."
+ },
+ {
+  "id": 1147,
+  "name": "Vinyl Steakhouse",
+  "cuisine": "Steakhouse",
+  "format": "Upscale steakhouse",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Prime dry-aged steaks",
+  "blurb": "Sophisticated Flatiron steakhouse delivering prime beef and classic elegance."
+ },
+ {
+  "id": 1148,
+  "name": "Rocco Steakhouse",
+  "cuisine": "Steakhouse",
+  "format": "Classic steakhouse",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 3,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Celebration"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Prime dry-aged steaks",
+  "blurb": "Flatiron institution serving exemplary steaks in a timeless setting."
+ },
+ {
+  "id": 1149,
+  "name": "Giulietta",
+  "cuisine": "Italian Steakhouse",
+  "format": "Upscale steakhouse with Italian soul",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 3,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Business"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Prime-aged steaks with Italian preparations",
+  "blurb": "Refined Italian steakhouse delivering exceptional beef in Flatiron's sophisticated dining scene."
+ },
+ {
+  "id": 1150,
+  "name": "Skirt Steak",
+  "cuisine": "Steakhouse",
+  "format": "Lively chophouse",
+  "neighborhood": "Flatiron",
+  "borough": "Manhattan",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Date night",
+   "Big night out",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Skirt steak with chimichurri",
+  "blurb": "Robust steakhouse fare in Flatiron's convivial, bustling setting."
  }
 ]
