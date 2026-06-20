@@ -350,6 +350,52 @@ export default function DiningDetailPage() {
           )}
         </div>
 
+        {/* Our take — curated traits & scores */}
+        {r && (r.scores || r.signature || r.recognition || (r.occasion && r.occasion.length > 0) || r.chef) && (
+          <div className="ddp-section" style={{ marginTop: 18 }}>
+            <div className="ddp-section-label">Our take</div>
+            {r.recognition && <p style={{ color: "#f0b429", fontWeight: 600, margin: "4px 0 8px" }}>★ {r.recognition}</p>}
+            {r.signature && <p className="ddp-blurb" style={{ marginBottom: 10 }}>✦ {r.signature}</p>}
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px", fontSize: 13, marginBottom: 14 }}>
+              {([
+                ["Reservation", r.rope ? (["Walk-in friendly", "Book ahead", "Hard to get", "Near-impossible"][Math.max(0, Math.min(3, r.rope - 1))]) : ""],
+                ["Noise", r.noise || ""],
+                ["Dress", r.dress || ""],
+                ["Best tables", r.bestTables || ""],
+                ["Getting there", r.arrival || ""],
+                ["Private dining", r.privateDining || ""],
+                ["Chef", r.chef || ""],
+                ["Good for", (r.occasion || []).join(", ")],
+              ] as [string, string][]).filter(([, v]) => v).map(([k, v]) => (
+                <div key={k}>
+                  <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>{k}</div>
+                  <div style={{ color: "rgba(255,255,255,0.85)" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+
+            {r.scores && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {([
+                  ["Food", r.scores.food], ["Service", r.scores.service], ["Ambiance", r.scores.ambiance],
+                  ["Beverage", r.scores.beverage], ["View", r.scores.view], ["Value", r.scores.value],
+                  ["Privacy", r.scores.privacy], ["Clientele", r.scores.clientele], ["Consistency", r.scores.consistency],
+                  ["Romantic", r.scores.romantic], ["Business", r.scores.business],
+                ] as [string, number | undefined][]).filter((x): x is [string, number] => typeof x[1] === "number").map(([k, v]) => (
+                  <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 92, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>{k}</div>
+                    <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3 }}>
+                      <div style={{ width: `${v * 20}%`, height: "100%", background: "linear-gradient(90deg,#f59e0b,#ef4444)", borderRadius: 3 }} />
+                    </div>
+                    <div style={{ width: 16, fontSize: 12, color: "rgba(255,255,255,0.6)", textAlign: "right" }}>{v}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Your Notes */}
         <div className="ddp-notes-card">
           <div className="ddp-notes-head">
