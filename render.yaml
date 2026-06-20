@@ -15,7 +15,9 @@ services:
     runtime: static
     name: screening-room
     rootDir: .
-    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && BASE_PATH=/ pnpm --filter "@workspace/screening-room..." run build
+    # Render's STATIC build image ships a read-only pnpm in /usr/bin, so `corepack enable`
+    # crashes (EROFS). Use npx to run a pinned pnpm from the writable home cache instead.
+    buildCommand: npx -y pnpm@10.26.1 install --no-frozen-lockfile && BASE_PATH=/ npx -y pnpm@10.26.1 --filter "@workspace/screening-room..." run build
     staticPublishPath: artifacts/screening-room/dist/public
     pullRequestPreviewsEnabled: false
     envVars:
