@@ -67,8 +67,8 @@ async function editorial(cand, city) {
 ${JSON.stringify(facts)}
 
 Return JSON with EXACTLY these keys:
-{"area":"neighborhood/district","vibe":"one evocative sentence (max ~14 words)","styles":["2-4 from: ${STYLES.join(", ")}"],"moods":["3-5 from: ${MOODS.join(", ")}"],"best":"best time (short)","dur":<minutes 30-180 int>,"crowd":"Low|Moderate|High","price":"Free|$|$$|$$$ (add ' (suggested)' for donation museums)","dress":"short guidance","hours":"typical hours, general if unsure","resv":"No|Recommended|Yes — timed ticket","photo":"the single best photo spot","cafe":"a fitting café nearby (general if unsure)","dinner":"a fitting dinner spot nearby (general if unsure)","insider":"one genuine insider tip (max ~22 words)","worth":"Worth it if …","skip":"Skip if …","badges":["1-3 from: ${BADGES.join(", ")}"],"scores":{"b":<1-5 beauty>,"u":<1-5 unique>,"c":<1-5 calm>,"e":<1-5 ease>,"v":<1-5 value>,"l":<1-5 luxury>},"rain":<true if pleasant in rain>}`;
-  return anthropicJSON({ system, user, maxTokens: 900 });
+{"area":"neighborhood/district","vibe":"one evocative sentence (max ~14 words)","styles":["2-4 from: ${STYLES.join(", ")}"],"moods":["3-5 from: ${MOODS.join(", ")}"],"best":"best time of day to visit (short)","dur":<typical visit minutes 30-180 int>,"crowd":"Low|Moderate|High","price":"Free|$|$$|$$$ (add ' (suggested)' for donation museums)","dress":"short guidance","hours":"typical hours, general if unsure","resv":"No|Recommended|Yes — timed ticket","photo":"the single best photo spot","cafe":"a fitting café nearby (general if unsure)","dinner":"a fitting dinner spot nearby (general if unsure)","insider":"one genuine insider tip (max ~22 words)","worth":"Worth it if …","skip":"Skip if …","badges":["1-3 from: ${BADGES.join(", ")}"],"effort":"Easy|Moderate|Strenuous (walking/physical effort)","accessibility":"short note on step-free / wheelchair / mobility access","nearby":"1-3 notable attractions within walking distance","seasonal":"best season(s) or a seasonal note (short)","weather":"how weather-dependent it is (short)","scores":{"b":<1-5 scenic beauty>,"u":<1-5 uniqueness>,"c":<1-5 calm/peaceful>,"e":<1-5 ease/transport access>,"v":<1-5 cost-to-experience value>,"l":<1-5 luxury>,"mustVisit":<1-5 must-visit priority>,"timeWorth":<1-5 worth the time>,"authenticity":<1-5 authentic vs touristy>,"significance":<1-5 historical/cultural significance>,"safety":<1-5 safety>,"access":<1-5 transport accessibility>,"photoWorth":<1-5 photo worthiness>,"view":<1-5 view quality>,"hidden":<1-5 hidden-gem factor>,"family":<1-5 family friendliness>,"night":<1-5 night experience quality>,"memory":<1-5 memory-making potential>},"rain":<true if pleasant in rain>}`;
+  return anthropicJSON({ system, user, maxTokens: 1100 });
 }
 
 // ---- 3) RECORD (exact app schema; photo resolved LIVE via place_id/photoName) ----
@@ -94,7 +94,18 @@ function record(id, cand, e, city) {
     worth: norm(e.worth),
     skip: norm(e.skip),
     badges: pick(e.badges, BADGES, 1, 3),
-    scores: { b: clamp(s.b), u: clamp(s.u), c: clamp(s.c), e: clamp(s.e), v: clamp(s.v), l: clamp(s.l) },
+    effort: ["Easy","Moderate","Strenuous"].includes(e.effort) ? e.effort : "Moderate",
+    accessibility: norm(e.accessibility),
+    nearby: norm(e.nearby),
+    seasonal: norm(e.seasonal),
+    weather: norm(e.weather),
+    scores: {
+      b: clamp(s.b), u: clamp(s.u), c: clamp(s.c), e: clamp(s.e), v: clamp(s.v), l: clamp(s.l),
+      mustVisit: clamp(s.mustVisit), timeWorth: clamp(s.timeWorth), authenticity: clamp(s.authenticity),
+      significance: clamp(s.significance), safety: clamp(s.safety), access: clamp(s.access),
+      photoWorth: clamp(s.photoWorth), view: clamp(s.view), hidden: clamp(s.hidden),
+      family: clamp(s.family), night: clamp(s.night), memory: clamp(s.memory)
+    },
     rain: !!e.rain,
     img: null, placeId: cand.placeId, photoName: cand.photoName, imgAttr: "via Google",
     imgLink: cand.placeId ? ("https://www.google.com/maps/place/?q=place_id:" + cand.placeId) : null,
