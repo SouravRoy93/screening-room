@@ -64,7 +64,10 @@ export interface PlaceItem {
   badges: string[];
   scores: { b: number; u: number; e: number; c: number; v: number; l: number };
   rain: boolean;
-  img: string;
+  img: string | null;
+  placeId?: string | null;
+  photoName?: string | null;
+  country?: string;
   imgAttr?: string;
   imgLink?: string;
   lat?: number;

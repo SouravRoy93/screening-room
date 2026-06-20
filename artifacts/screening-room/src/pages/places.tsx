@@ -7,6 +7,25 @@ import type { PlaceItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
+const _photoMemo = new Map<string, string | null>();
+function useLivePhoto(p: { img?: string | null; photoName?: string | null; placeId?: string | null }) {
+  const [url, setUrl] = useState<string | null>(p.img || null);
+  useEffect(() => {
+    if (p.img) { setUrl(p.img); return; }
+    const key = p.photoName || p.placeId;
+    if (!key) { setUrl(null); return; }
+    if (_photoMemo.has(key)) { setUrl(_photoMemo.get(key)!); return; }
+    let alive = true;
+    const qs = p.photoName ? `name=${encodeURIComponent(p.photoName)}` : `placeId=${encodeURIComponent(p.placeId!)}`;
+    fetch(`${API_BASE}/places/photo?${qs}&w=640`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { const u = (d && d.photo_url) ?? null; _photoMemo.set(key, u); if (alive) setUrl(u); })
+      .catch(() => { if (alive) setUrl(null); });
+    return () => { alive = false; };
+  }, [p.img, p.photoName, p.placeId]);
+  return url;
+}
+
 interface LivePlace {
   place_id: string;
   name: string;
@@ -109,11 +128,12 @@ function PlaceCard({ p, saved, visited, onSave, onVisit }: {
 }) {
   const [, nav] = useLocation();
   const sc = p.scores ? Math.round((p.scores.b + p.scores.u + p.scores.v + p.scores.l) / 4 * 10) / 5 : null;
+  const photo = useLivePhoto(p);
   return (
     <div className="pl-card" onClick={() => nav(`/places/${p.id}`)}>
       <div className="pl-photo">
-        {p.img
-          ? <img src={p.img} alt={p.name} loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        {photo
+          ? <img src={photo} alt={p.name} loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
           : <div className="pl-photo-fallback" />
         }
         {p.badges?.[0] && <div className="pl-badge">{p.badges[0]}</div>}

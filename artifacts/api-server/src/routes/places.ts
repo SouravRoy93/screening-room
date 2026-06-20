@@ -244,4 +244,37 @@ router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
   }
 });
 
+// ── Curated place photo (resolve a stored photoName / placeId live) ──────────
+const curatedPhotoCache = new Map<string, string | null>();
+
+router.get("/places/photo", async (req, res): Promise<void> => {
+  const photoName = (req.query.name as string) || "";
+  const placeId   = (req.query.placeId as string) || "";
+  const w = Math.min(parseInt((req.query.w as string) || "640", 10) || 640, 1600);
+  if (!PLACES_KEY) { res.json({ photo_url: null }); return; }
+
+  const cacheKey = (photoName || placeId) + ":" + w;
+  if (curatedPhotoCache.has(cacheKey)) {
+    res.json({ photo_url: curatedPhotoCache.get(cacheKey) ?? null });
+    return;
+  }
+  try {
+    let name = photoName;
+    if (!name && placeId) {
+      const r = await fetch(`${PLACES_BASE}/places/${placeId}?fields=photos&key=${PLACES_KEY}`, {
+        headers: { "X-Goog-Api-Key": PLACES_KEY, "X-Goog-FieldMask": "photos" },
+      });
+      if (r.ok) {
+        const d = await r.json() as { photos?: { name: string }[] };
+        name = d.photos?.[0]?.name || "";
+      }
+    }
+    const url = name ? await resolveCdnUrl(name, w) : null;
+    curatedPhotoCache.set(cacheKey, url);
+    res.json({ photo_url: url });
+  } catch {
+    res.json({ photo_url: null });
+  }
+});
+
 export default router;
