@@ -18,7 +18,7 @@ export async function jget(url, headers = {}) {
 }
 
 // ---- Claude Haiku → strict JSON (the shared editorial brain) ----
-export async function anthropicJSON({ system, user, maxTokens = 800, model = "claude-3-5-haiku-latest" }) {
+export async function anthropicJSON({ system, user, maxTokens = 800, model = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5" }) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("Missing ANTHROPIC_API_KEY");
   const r = await fetch("https://api.anthropic.com/v1/messages", {
