@@ -8,26 +8,51 @@ import type { PlaceItem } from "@/types";
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
 const _photoMemo = new Map<string, string | null>();
-function useLivePhoto(p: { img?: string | null; photoName?: string | null; placeId?: string | null }) {
+function useLivePhoto(p: { img?: string | null; photoName?: string | null; placeId?: string | null; name?: string | null }) {
   const [url, setUrl] = useState<string | null>(p.img || null);
   useEffect(() => {
-    if (p.img) { setUrl(p.img); return; }
-    const key = p.placeId || p.photoName;
-    if (!key) { setUrl(null); return; }
-    if (_photoMemo.has(key)) { setUrl(_photoMemo.get(key)!); return; }
     let alive = true;
-    // Send BOTH: the API tries the stored photoName, then falls back to a fresh
-    // lookup by placeId (stored Google photo tokens expire, placeId is stable).
-    const qs = [
-      p.photoName ? `name=${encodeURIComponent(p.photoName)}` : "",
-      p.placeId ? `placeId=${encodeURIComponent(p.placeId)}` : "",
-    ].filter(Boolean).join("&");
-    fetch(`${API_BASE}/places/photo?${qs}&w=640`)
-      .then(r => (r.ok ? r.json() : null))
-      .then(d => { const u = (d && d.photo_url) ?? null; if (u) _photoMemo.set(key, u); if (alive) setUrl(u); })
-      .catch(() => { if (alive) setUrl(null); });
+    const key = p.placeId || p.photoName || p.name || p.img || "";
+
+    // Resolve a fresh photo from the API. Try the stored Google token / placeId
+    // first (tokens expire, placeId is stable); then, for legacy curated places
+    // that have neither, fall back to a live search by name.
+    const goLive = async () => {
+      if (key && _photoMemo.has(key)) { if (alive) setUrl(_photoMemo.get(key)!); return; }
+      try {
+        const qs = [
+          p.photoName ? `name=${encodeURIComponent(p.photoName)}` : "",
+          p.placeId ? `placeId=${encodeURIComponent(p.placeId)}` : "",
+        ].filter(Boolean).join("&");
+        if (qs) {
+          const r = await fetch(`${API_BASE}/places/photo?${qs}&w=640`);
+          const d = r.ok ? await r.json() : null;
+          const u = (d && d.photo_url) || null;
+          if (u) { if (key) _photoMemo.set(key, u); if (alive) setUrl(u); return; }
+        }
+        if (p.name) {
+          const r = await fetch(`${API_BASE}/places/explore?q=${encodeURIComponent(p.name)}`);
+          const d = r.ok ? await r.json() : null;
+          const u = Array.isArray(d) && d[0] && d[0].photo_url ? d[0].photo_url : null;
+          if (u) { if (key) _photoMemo.set(key, u); if (alive) setUrl(u); return; }
+        }
+        if (alive) setUrl(null);
+      } catch { if (alive) setUrl(null); }
+    };
+
+    if (p.img) {
+      // Show the stored image, but verify it actually loads — many legacy
+      // Wikimedia URLs have rotted. If it 404s, self-heal with a live photo.
+      setUrl(p.img);
+      const probe = new Image();
+      probe.onerror = () => { if (alive) goLive(); };
+      probe.src = p.img;
+      return () => { alive = false; };
+    }
+
+    goLive();
     return () => { alive = false; };
-  }, [p.img, p.photoName, p.placeId]);
+  }, [p.img, p.photoName, p.placeId, p.name]);
   return url;
 }
 
@@ -134,11 +159,14 @@ function PlaceCard({ p, saved, visited, onSave, onVisit }: {
   const [, nav] = useLocation();
   const sc = p.scores ? Math.round((p.scores.b + p.scores.u + p.scores.v + p.scores.l) / 4 * 10) / 5 : null;
   const photo = useLivePhoto(p);
+  const [imgFailed, setImgFailed] = useState(false);
+  // reset the failure flag whenever the resolved photo URL changes (self-heal)
+  useEffect(() => { setImgFailed(false); }, [photo]);
   return (
     <div className="pl-card" onClick={() => nav(`/places/${p.id}`)}>
       <div className="pl-photo">
-        {photo
-          ? <img src={photo} alt={p.name} loading="lazy" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        {photo && !imgFailed
+          ? <img src={photo} alt={p.name} loading="lazy" onError={() => setImgFailed(true)} />
           : <div className="pl-photo-fallback" />
         }
         {p.badges?.[0] && <div className="pl-badge">{p.badges[0]}</div>}
