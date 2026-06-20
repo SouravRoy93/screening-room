@@ -39,6 +39,21 @@ export interface DiningItem {
   recognition: string;
   signature: string;
   blurb: string;
+  // multi-city
+  city?: string;
+  country?: string;
+  // richer traits
+  chef?: string;
+  noise?: string;
+  dress?: string;
+  bestTables?: string;
+  arrival?: string;
+  privateDining?: string;
+  scores?: {
+    food?: number; service?: number; ambiance?: number; clientele?: number;
+    privacy?: number; beverage?: number; view?: number; value?: number;
+    consistency?: number; romantic?: number; business?: number;
+  };
 }
 
 export interface PlaceItem {
@@ -62,8 +77,19 @@ export interface PlaceItem {
   worth: string;
   skip: string;
   badges: string[];
-  scores: { b: number; u: number; e: number; c: number; v: number; l: number };
+  scores: {
+    b: number; u: number; e: number; c: number; v: number; l: number;
+    mustVisit?: number; timeWorth?: number; authenticity?: number; significance?: number;
+    safety?: number; access?: number; photoWorth?: number; view?: number; hidden?: number;
+    family?: number; night?: number; memory?: number;
+  };
   rain: boolean;
+  // richer traits
+  effort?: string;
+  accessibility?: string;
+  nearby?: string;
+  seasonal?: string;
+  weather?: string;
   img: string | null;
   placeId?: string | null;
   photoName?: string | null;
