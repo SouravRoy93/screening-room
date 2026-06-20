@@ -12,14 +12,19 @@ function useLivePhoto(p: { img?: string | null; photoName?: string | null; place
   const [url, setUrl] = useState<string | null>(p.img || null);
   useEffect(() => {
     if (p.img) { setUrl(p.img); return; }
-    const key = p.photoName || p.placeId;
+    const key = p.placeId || p.photoName;
     if (!key) { setUrl(null); return; }
     if (_photoMemo.has(key)) { setUrl(_photoMemo.get(key)!); return; }
     let alive = true;
-    const qs = p.photoName ? `name=${encodeURIComponent(p.photoName)}` : `placeId=${encodeURIComponent(p.placeId!)}`;
+    // Send BOTH: the API tries the stored photoName, then falls back to a fresh
+    // lookup by placeId (stored Google photo tokens expire, placeId is stable).
+    const qs = [
+      p.photoName ? `name=${encodeURIComponent(p.photoName)}` : "",
+      p.placeId ? `placeId=${encodeURIComponent(p.placeId)}` : "",
+    ].filter(Boolean).join("&");
     fetch(`${API_BASE}/places/photo?${qs}&w=640`)
       .then(r => (r.ok ? r.json() : null))
-      .then(d => { const u = (d && d.photo_url) ?? null; _photoMemo.set(key, u); if (alive) setUrl(u); })
+      .then(d => { const u = (d && d.photo_url) ?? null; if (u) _photoMemo.set(key, u); if (alive) setUrl(u); })
       .catch(() => { if (alive) setUrl(null); });
     return () => { alive = false; };
   }, [p.img, p.photoName, p.placeId]);
