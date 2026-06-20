@@ -1,0 +1,54 @@
+# ============================================================================
+#  Render blueprint — 100% free deploy of the Screening Room monorepo.
+#  • Frontend  → a free Static Site (global CDN, always-on, instant).
+#  • API       → a free Web Service (Express). Free instances sleep after ~15 min
+#                idle and wake in a few seconds; browsing is unaffected because the
+#                catalogs are static JSON served by the frontend.
+#
+#  After the first deploy: set the secret env vars in the Render dashboard
+#  (they are marked sync:false below), then set the frontend's VITE_API_URL to
+#  your API service URL + "/api"  (e.g. https://screening-api.onrender.com/api).
+# ============================================================================
+services:
+  # ---------- Frontend (static) ----------
+  - type: web
+    runtime: static
+    name: screening-room
+    rootDir: .
+    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && BASE_PATH=/ pnpm --filter "@workspace/screening-room..." run build
+    staticPublishPath: artifacts/screening-room/dist/public
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: BASE_PATH
+        value: /
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: VITE_TMDB_KEY
+        sync: false
+      - key: VITE_API_URL          # set to https://<your-api>.onrender.com/api after API deploys
+        sync: false
+    routes:
+      - type: rewrite              # SPA fallback so client routes (/films, /places/…) work
+        source: /*
+        destination: /index.html
+
+  # ---------- API (Express web service) ----------
+  - type: web
+    runtime: node
+    name: screening-api
+    rootDir: .
+    plan: free
+    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && pnpm --filter "@workspace/api-server..." run build
+    startCommand: node artifacts/api-server/dist/index.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: TMDB_KEY
+        sync: false
+      - key: DATABASE_URL          # Supabase Postgres connection string (only if the API uses the DB)
+        sync: false
