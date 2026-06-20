@@ -145,9 +145,11 @@ function PlaceCard({ p, saved, visited, onSave, onVisit }: {
         <h3 className="pl-name">{p.name}</h3>
         {p.vibe && <div className="pl-vibe">{p.vibe}</div>}
         <div className="pl-meta">
+          {p.city && <span>{p.city}</span>}
           {p.dur && <span>{p.dur} min</span>}
           {p.crowd && <span>{p.crowd} crowd</span>}
           {p.price && <span>{p.price}</span>}
+          {(p.scores?.mustVisit ?? 0) >= 5 && <span style={{ color: "#ffd36b" }}>★ Must-visit</span>}
         </div>
         <div className="pl-card-actions" onClick={e => e.stopPropagation()}>
           <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave}>

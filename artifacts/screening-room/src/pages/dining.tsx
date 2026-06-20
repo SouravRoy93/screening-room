@@ -93,7 +93,7 @@ function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
       {/* Body */}
       <div className="dc-body">
         <h3 className="dc-name">{r.name}</h3>
-        <p className="dc-meta">{r.cuisine}{r.neighborhood ? ` · ${r.neighborhood}` : ""}{` · ${priceStr(r.price)}`}</p>
+        <p className="dc-meta">{r.cuisine}{r.neighborhood ? ` · ${r.neighborhood}` : ""}{r.city ? ` · ${r.city}` : ""}{` · ${priceStr(r.price)}`}</p>
 
         {r.format && <div className="dc-format-chip">{r.format.toUpperCase()}</div>}
 
@@ -125,6 +125,7 @@ export default function Dining() {
   const { dining } = useDining();
   const [q, setQ] = useState("");
   const [tab, setTab] = useState<"trending" | "all" | "nearby">("trending");
+  const [cityFilter, setCityFilter] = useState("All cities");
   const [cuisineFilter, setCuisineFilter] = useState("All cuisines");
   const [occasionFilter, setOccasionFilter] = useState("Any occasion");
   const [diffFilter, setDiffFilter] = useState("Any difficulty");
@@ -139,12 +140,18 @@ export default function Dining() {
     return ["All cuisines", ...Array.from(s).sort()];
   }, [dining]);
 
+  const cities = useMemo(() => {
+    const s = new Set(dining.map(d => d.city).filter(Boolean) as string[]);
+    return ["All cities", ...Array.from(s).sort()];
+  }, [dining]);
+
   const DIFF_ROPE: Record<string, number[]> = {
     "Walk in": [0, 1], "Easy": [2], "Plan ahead": [3], "Hard to get": [4], "Near impossible": [5],
   };
 
   const filtered = useMemo(() => {
     let items = dining;
+    if (cityFilter !== "All cities") items = items.filter(d => d.city === cityFilter);
     if (cuisineFilter !== "All cuisines") items = items.filter(d => d.cuisine === cuisineFilter);
     if (occasionFilter !== "Any occasion") items = items.filter(d => d.occasion?.some(o => o.toLowerCase().includes(occasionFilter.toLowerCase())));
     if (diffFilter !== "Any difficulty") {
@@ -152,7 +159,7 @@ export default function Dining() {
       items = items.filter(d => allowed.includes(d.rope ?? 0));
     }
     return items;
-  }, [dining, cuisineFilter, occasionFilter, diffFilter]);
+  }, [dining, cityFilter, cuisineFilter, occasionFilter, diffFilter]);
 
   const runSearch = useCallback(async (val: string) => {
     const trimmed = val.trim();
@@ -224,7 +231,7 @@ export default function Dining() {
         </button>
         <UtensilsCrossed className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />
         <h1 className="text-lg font-bold tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>DINING</h1>
-        <span className="dc-city-badge">NEW YORK</span>
+        <span className="dc-city-badge">{cityFilter === "All cities" ? "USA" : cityFilter.toUpperCase()}</span>
       </header>
 
       <div className="max-w-screen-xl mx-auto px-4 py-5">
@@ -275,6 +282,12 @@ export default function Dining() {
               <button className={`dc-tab${tab === "nearby" ? " on" : ""}`} onClick={() => setTab("nearby")}>📍 Near Me</button>
             </div>
             <div className="dc-dropdowns">
+              <div className="dc-select-wrap">
+                <select className="dc-select" value={cityFilter} onChange={e => setCityFilter(e.target.value)}>
+                  {cities.map(c => <option key={c}>{c}</option>)}
+                </select>
+                <ChevronDown size={12} className="dc-select-chevron" />
+              </div>
               <div className="dc-select-wrap">
                 <select className="dc-select" value={cuisineFilter} onChange={e => setCuisineFilter(e.target.value)}>
                   {cuisines.map(c => <option key={c}>{c}</option>)}
