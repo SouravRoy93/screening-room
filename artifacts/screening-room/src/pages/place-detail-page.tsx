@@ -119,6 +119,13 @@ export default function PlaceDetailPage() {
             ["Hours",            place.hours],
             ["Reservation",      place.resv],
             ["Best photo spot",  place.photo],
+            ["Effort",           place.effort || ""],
+            ["Accessibility",    place.accessibility || ""],
+            ["Best season",      place.seasonal || ""],
+            ["Weather",          place.weather || ""],
+            ["Nearby",           place.nearby || ""],
+            ["Coffee nearby",    place.cafe],
+            ["Dinner after",     place.dinner],
           ] as [string, string][]).filter(([, v]) => v).map(([k, v]) => (
             <div key={k} className="pl-fact">
               <div className="pl-fact-key">{k}</div>
@@ -144,13 +151,23 @@ export default function PlaceDetailPage() {
         {place.scores && (
           <div className="pl-scores">
             {([
-              ["Beauty", place.scores.b],
-              ["Unique", place.scores.u],
-              ["Calm",   place.scores.c],
-              ["Ease",   place.scores.e],
-              ["Value",  place.scores.v],
-              ["Luxury", place.scores.l],
-            ] as [string, number][]).map(([k, v]) => (
+              ["Must-visit",    place.scores.mustVisit],
+              ["Beauty",        place.scores.b],
+              ["Unique",        place.scores.u],
+              ["Authenticity",  place.scores.authenticity],
+              ["Significance",  place.scores.significance],
+              ["View",          place.scores.view],
+              ["Photo-worthy",  place.scores.photoWorth],
+              ["Hidden gem",    place.scores.hidden],
+              ["Calm",          place.scores.c],
+              ["Safety",        place.scores.safety],
+              ["Transit ease",  place.scores.access],
+              ["Family",        place.scores.family],
+              ["Night",         place.scores.night],
+              ["Value",         place.scores.v],
+              ["Memory",        place.scores.memory],
+              ["Luxury",        place.scores.l],
+            ] as [string, number | undefined][]).filter((x): x is [string, number] => typeof x[1] === "number").map(([k, v]) => (
               <div key={k} className="pl-score-row">
                 <div className="pl-score-key">{k}</div>
                 <div className="pl-score-bar"><div className="pl-score-fill" style={{ width: `${v * 20}%` }} /></div>
