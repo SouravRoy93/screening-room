@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Bell } from "lucide-react";
 import { MediaCard } from "@/components/media-card";
@@ -106,6 +106,19 @@ export default function Films() {
     return items;
   }, [q, searchResults, catalog, typeFilter, genreFilter]);
 
+  // Render the grid in windows so first paint stays light and it scales to a
+  // very large catalog. Show 60, auto-append on scroll via an IntersectionObserver.
+  const [visible, setVisible] = useState(60);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { setVisible(60); }, [q, typeFilter, genreFilter]);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) setVisible(v => v + 60); }, { rootMargin: "800px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [displayItems.length, visible]);
+
   const libraryItems = useMemo(() => Object.values(tracked).filter(t => t.status === libStatus), [tracked, libStatus]);
   const allWatched = useMemo(() => Object.values(tracked).filter(t => t.status === "watched"), [tracked]);
 
@@ -196,17 +209,20 @@ export default function Films() {
           {searching && <div className="empty">Searching TMDB…</div>}
 
           {!searching && displayItems.length > 0 && (
-            <div className="grid">
-              {displayItems.map(item => (
-                <MediaCard
-                  key={`${item.media_type}:${item.tmdb_id}`}
-                  item={item}
-                  tracked={trackedFor(item)}
-                  onOpen={openDetail}
-                  onStatus={setStatus}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid">
+                {displayItems.slice(0, visible).map(item => (
+                  <MediaCard
+                    key={`${item.media_type}:${item.tmdb_id}`}
+                    item={item}
+                    tracked={trackedFor(item)}
+                    onOpen={openDetail}
+                    onStatus={setStatus}
+                  />
+                ))}
+              </div>
+              {visible < displayItems.length && <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />}
+            </>
           )}
 
           {!searching && q && displayItems.length === 0 && (
