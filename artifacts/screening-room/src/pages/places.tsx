@@ -293,7 +293,13 @@ function fmtTime(h: number, m: number) {
   return `${h12}:${String(m).padStart(2, "0")} ${ap}`;
 }
 
-// ── Geo helpers for routing + travel-time estimates (approximate, no API needed) ──
+function humanMin(m: number): string {
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60), mm = m % 60;
+  return mm ? `${h}h ${mm}m` : `${h}h`;
+}
+
+// ── Feasibility engine: profiles, water-aware travel, time-budgeted routing ──
 type LL = { lat: number; lng: number };
 function haversineKm(a: LL, b: LL): number {
   const R = 6371, toRad = (d: number) => (d * Math.PI) / 180;
@@ -301,27 +307,69 @@ function haversineKm(a: LL, b: LL): number {
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
+const ISLAND_RE = /\b(governors island|liberty island|ellis island|roosevelt island|randall'?s island|city island)\b/i;
 function isWaterPlace(p: PlaceItem): boolean {
-  return /island|ferry|liberty|governors|roosevelt|ellis|harbor|harbour|pier|seaport/i.test(`${p.name} ${p.area || ""}`);
+  if (/little island/i.test(p.name)) return false;
+  return ISLAND_RE.test(`${p.name} ${p.area || ""}`) || (/\btram\b/i.test(p.name) && /east river|island/i.test(`${p.name} ${p.area || ""}`));
 }
+
+// Realistic "time consumed" at a place: entry/queue + visit + exit/return.
+type Profile = { cat: string; dwell: number; accessIn: number; accessOut: number; water: boolean; roundTrip: boolean; total: number; note: string };
+function profilePlace(p: PlaceItem): Profile {
+  const hay = `${p.name} ${p.area || ""} ${p.vibe || ""}`;
+  const littleIsland = /little island/i.test(p.name);
+  let cat = "attraction", accessIn = 8, accessOut = 5, minDwell = 45, water = false, roundTrip = false, note = "";
+  if (!littleIsland && (ISLAND_RE.test(hay) || (/\btram\b/i.test(p.name) && /east river|island/i.test(hay)))) {
+    cat = "island"; accessIn = 25; accessOut = 30; minDwell = 75; water = true; roundTrip = true;
+    note = "Round-trip by tram/ferry — allow real time on the island";
+  } else if (/observator|observation|top of the rock|empire state|one world|summit|the edge|\bdeck\b|tallest/i.test(hay)) {
+    cat = "observation"; accessIn = 25; accessOut = 15; minDwell = 50;
+    note = "Timed entry — tickets, security & elevator";
+  } else if (/\b(the met\b|metropolitan museum|moma|museum of modern|natural history|guggenheim|whitney|brooklyn museum|the frick|frick collection|morgan library)\b/i.test(hay) || (/museum/i.test(hay) && (p.dur || 0) >= 120)) {
+    cat = "museum_major"; accessIn = 15; accessOut = 10; minDwell = 120;
+    note = "A major museum — give it real time";
+  } else if (/museum|gallery|collection|cloisters/i.test(hay)) {
+    cat = "museum"; accessIn = 12; accessOut = 8; minDwell = 70;
+  } else if (/market|food hall|seaport/i.test(hay)) {
+    cat = "market"; accessIn = 5; accessOut = 5; minDwell = 40;
+  } else if (/park|garden|promenade|high ?line|conservatory|botanic/i.test(hay)) {
+    cat = "park"; accessIn = 5; accessOut = 5; minDwell = 40;
+  } else if (/bridge|terminal|square|cathedral|library|memorial|center/i.test(hay)) {
+    cat = "landmark"; accessIn = 6; accessOut = 5; minDwell = 30;
+  }
+  const dwell = Math.min(240, Math.max(minDwell, p.dur || minDwell));
+  return { cat, dwell, accessIn, accessOut, water, roundTrip, total: accessIn + dwell + accessOut, note };
+}
+
 export type TravelOpt = { mode: "walk" | "transit" | "car" | "ferry"; label: string; min: number };
 export type TravelLeg = { km: number; mi: number; opts: TravelOpt[] };
 function travelOptions(a: PlaceItem, b: PlaceItem): TravelLeg | null {
   if (!a.lat || !a.lng || !b.lat || !b.lng) return null;
-  const km = haversineKm({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
-  const mi = km * 0.621371;
+  const straight = haversineKm({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
+  const km = straight * 1.35;   // detour factor — streets/transit aren't straight lines
+  const mi = straight * 0.621371;
+  const water = isWaterPlace(a) || isWaterPlace(b);
   const opts: TravelOpt[] = [];
-  if (km <= 2.6) opts.push({ mode: "walk", label: "Walk", min: Math.max(2, Math.round((km / 5) * 60)) });
-  opts.push({ mode: "transit", label: "Transit", min: Math.max(5, Math.round((km / 16) * 60) + 6) });
-  opts.push({ mode: "car", label: "Car", min: Math.max(4, Math.round((km / 22) * 60) + 4) });
-  if (isWaterPlace(a) || isWaterPlace(b)) opts.push({ mode: "ferry", label: "Ferry", min: Math.max(10, Math.round((km / 25) * 60) + 12) });
-  return { km, mi, opts };
+  if (!water && km <= 2.6) opts.push({ mode: "walk", label: "Walk", min: Math.max(2, Math.round((km / 4.8) * 60)) });
+  opts.push({ mode: "transit", label: "Transit", min: Math.max(6, Math.round((km / 15) * 60) + 7 + (water ? 8 : 0)) });
+  opts.push({ mode: "car", label: "Car", min: Math.max(4, Math.round((km / 20) * 60) + 5) });
+  if (water) opts.push({ mode: "ferry", label: "Ferry", min: Math.max(10, Math.round((km / 22) * 60) + 12) });
+  opts.sort((x, y) => x.min - y.min);   // fastest first = the recommended mode
+  return { km: straight, mi, opts };
 }
 
-type DayStop = { time: string; name: string; desc: string; area: string; lat: number | null; lng: number | null; travel: TravelLeg | null };
+type DayStop = { time: string; name: string; desc: string; area: string; lat: number | null; lng: number | null; stopMin: number; note: string; roundTrip: boolean; travel: TravelLeg | null };
 
-function buildItinerary(places: PlaceItem[], typeId: string, stops: number, addDinner: boolean) {
+const DAY_END_MIN = 23 * 60;   // never schedule past ~11pm
+const DUR_BUDGET: Record<string, number> = { few: 210, half: 360, full: 540 };
+const DUR_CAP: Record<string, number> = { few: 3, half: 4, full: 5 };
+const nrmName = (x: string) => (x || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function buildItinerary(places: PlaceItem[], typeId: string, durId: string, addDinner: boolean) {
   const dt = DAY_TYPES.find(d => d.id === typeId)!;
+  const cap = DUR_CAP[durId] || 4;
+  const budget = Math.min(DUR_BUDGET[durId] || 360, DAY_END_MIN - dt.startHour * 60);
+
   const scored = places
     .map(p => ({
       p,
@@ -329,56 +377,55 @@ function buildItinerary(places: PlaceItem[], typeId: string, stops: number, addD
            + dt.styles.filter(s => p.styles?.includes(s)).length * 2
            + (dt.crowd === "Low" && p.crowd === "Low" ? 2 : 0),
     }))
-    .filter(s => s.score > 0)
+    .filter(s => s.score > 0 && s.p.lat && s.p.lng)
     .sort((a, b) => b.score - a.score);
 
-  // Prefer geo-routed selection so the day flows; fall back to score order if no coords.
-  const withGeo = scored.filter(s => s.p.lat && s.p.lng).map(s => s.p);
   let selected: PlaceItem[];
-  if (withGeo.length >= 2) {
-    const pool = withGeo.slice(0, 15);
+  if (scored.length >= 1) {
+    const pool = scored.slice(0, 18).map(s => s.p);
     const anchor = pool[0];
-    // keep the cluster tight: candidates nearest the anchor, then walk a nearest-neighbour path
-    const near = pool.slice(1).sort((a, b) =>
-      haversineKm({ lat: anchor.lat!, lng: anchor.lng! }, { lat: a.lat!, lng: a.lng! })
-      - haversineKm({ lat: anchor.lat!, lng: anchor.lng! }, { lat: b.lat!, lng: b.lng! })
-    ).slice(0, Math.max(stops * 2, 6));
+    const isDup = (cand: PlaceItem, route: PlaceItem[]) => route.some(r =>
+      haversineKm({ lat: cand.lat!, lng: cand.lng! }, { lat: r.lat!, lng: r.lng! }) < 0.2 || nrmName(cand.name) === nrmName(r.name));
     const route: PlaceItem[] = [anchor];
-    const remaining = [...near];
-    while (route.length < stops && remaining.length) {
+    let used = profilePlace(anchor).total;
+    const rem = pool.slice(1);
+    while (route.length < cap && rem.length) {
       const last = route[route.length - 1];
-      remaining.sort((a, b) =>
+      rem.sort((a, b) =>
         haversineKm({ lat: last.lat!, lng: last.lng! }, { lat: a.lat!, lng: a.lng! })
-        - haversineKm({ lat: last.lat!, lng: last.lng! }, { lat: b.lat!, lng: b.lng! })
-      );
-      const next = remaining.shift();
-      if (next) route.push(next);
+        - haversineKm({ lat: last.lat!, lng: last.lng! }, { lat: b.lat!, lng: b.lng! }));
+      let chosen = -1;
+      for (let i = 0; i < rem.length; i++) {
+        if (isDup(rem[i], route)) continue;
+        const leg = travelOptions(last, rem[i]);
+        const legMin = leg && leg.opts.length ? leg.opts[0].min : 20;
+        const cost = legMin + profilePlace(rem[i]).total;
+        if (used + cost <= budget) { chosen = i; used += cost; break; }
+      }
+      if (chosen < 0) break;
+      route.push(rem.splice(chosen, 1)[0]);
     }
     selected = route;
   } else {
-    selected = scored.slice(0, stops).map(s => s.p);
+    selected = [];
   }
 
   let hour = dt.startHour, min = 0;
   const stops_out: DayStop[] = selected.map((p, i) => {
+    const pr = profilePlace(p);
     const time = fmtTime(hour, min);
     const travel = i < selected.length - 1 ? travelOptions(p, selected[i + 1]) : null;
-    const dwell = p.dur || 75;
-    let move = 30;
-    if (travel) {
-      const def = travel.opts.find(o => o.mode === "walk") || travel.opts.find(o => o.mode === "transit") || travel.opts[0];
-      move = def ? def.min : 20;
-    }
-    const total = min + dwell + move;
+    const legMin = travel && travel.opts.length ? travel.opts[0].min : 0;
+    const total = min + pr.total + legMin;
     hour += Math.floor(total / 60);
     min = total % 60;
-    return { time, name: p.name, desc: p.vibe || "", area: p.area || "", lat: p.lat ?? null, lng: p.lng ?? null, travel };
+    return { time, name: p.name, desc: p.vibe || "", area: p.area || "", lat: p.lat ?? null, lng: p.lng ?? null, stopMin: pr.total, note: pr.note, roundTrip: pr.roundTrip, travel };
   });
 
-  if (addDinner) {
+  if (addDinner && selected.length) {
     const lastPlace = selected[selected.length - 1];
     const dinnerName = lastPlace?.dinner || "a restaurant near your last stop";
-    stops_out.push({ time: fmtTime(hour, 0), name: "Dinner", desc: dinnerName, area: "", lat: null, lng: null, travel: null });
+    stops_out.push({ time: fmtTime(hour, 0), name: "Dinner", desc: dinnerName, area: "", lat: null, lng: null, stopMin: 0, note: "", roundTrip: false, travel: null });
   }
 
   return { stops: stops_out, outfit: dt.outfit, tip: dt.tip };
@@ -456,7 +503,7 @@ function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem
   const dur = DURATIONS.find(d => d.id === durId);
   const itinerary = useMemo(() => {
     if (!dayType || !dur || !places.length) return null;
-    return buildItinerary(places, dayType, dur.stops, dur.dinner);
+    return buildItinerary(places, dayType, durId, dur.dinner);
   }, [places, dayType, dur]);
 
   useEffect(() => {
@@ -566,6 +613,12 @@ function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem
                         {stop.area && <div className="pl-day-stop-area">{stop.area}</div>}
                         <div className="pl-day-stop-name">{stop.name}</div>
                         {stop.desc && <div className="pl-day-stop-desc">{stop.desc}</div>}
+                        {stop.stopMin > 0 && (
+                          <div className="pl-day-stop-meta">
+                            <span className="pl-day-dwell">≈ {humanMin(stop.stopMin)} here</span>
+                            {stop.note && <span className="pl-day-stop-note">{stop.note}</span>}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
