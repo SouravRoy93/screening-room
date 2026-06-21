@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, ChevronDown, Search, ExternalLink, Heart, Check } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, ChevronDown, Search, ExternalLink, Heart, Check, Footprints, Bus, Car, Ship } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import type { PlaceItem } from "@/types";
@@ -139,11 +139,18 @@ function LeafletMap({ places }: { places: PlaceItem[] }) {
     const L = (window as unknown as { L: Record<string, unknown> }).L;
     if (!L || !ref.current || mapRef.current) return;
     const map = (L.map as Function)(ref.current, { center: [40.7128,-74.006], zoom: 12, scrollWheelZoom: false });
-    (L.tileLayer as Function)("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution:"© CARTO", maxZoom:19 }).addTo(map);
-    places.filter(p => p.lat && p.lng).forEach(p => {
-      const marker = (L.marker as Function)([p.lat!, p.lng!]).addTo(map);
+    (L.tileLayer as Function)("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution:"© CARTO", subdomains:"abcd", maxZoom:20 }).addTo(map);
+    const PAL = ["#ec4899","#f59e0b","#8b5cf6","#10b981","#3b82f6","#ef4444","#14b8a6","#f43f5e"];
+    const pts = places.filter(p => p.lat && p.lng);
+    pts.forEach(p => {
+      const color = PAL[(p.id || 0) % PAL.length];
+      const marker = (L.circleMarker as Function)([p.lat!, p.lng!], { radius: 8, color: "#fff", weight: 2, fillColor: color, fillOpacity: 0.95 }).addTo(map);
       marker.bindPopup(`<b>${p.name}</b><br/><small>${p.area||""}</small>`);
     });
+    if (pts.length) {
+      const b = (L.latLngBounds as Function)(pts.map(p => [p.lat!, p.lng!]));
+      (map as { fitBounds: (b: unknown, o?: unknown) => void }).fitBounds((b as { pad: (n: number) => unknown }).pad(0.2));
+    }
     mapRef.current = map;
     setTimeout(() => (map as { invalidateSize: () => void }).invalidateSize(), 80);
   }, [places]);
@@ -286,6 +293,33 @@ function fmtTime(h: number, m: number) {
   return `${h12}:${String(m).padStart(2, "0")} ${ap}`;
 }
 
+// ── Geo helpers for routing + travel-time estimates (approximate, no API needed) ──
+type LL = { lat: number; lng: number };
+function haversineKm(a: LL, b: LL): number {
+  const R = 6371, toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function isWaterPlace(p: PlaceItem): boolean {
+  return /island|ferry|liberty|governors|roosevelt|ellis|harbor|harbour|pier|seaport/i.test(`${p.name} ${p.area || ""}`);
+}
+export type TravelOpt = { mode: "walk" | "transit" | "car" | "ferry"; label: string; min: number };
+export type TravelLeg = { km: number; mi: number; opts: TravelOpt[] };
+function travelOptions(a: PlaceItem, b: PlaceItem): TravelLeg | null {
+  if (!a.lat || !a.lng || !b.lat || !b.lng) return null;
+  const km = haversineKm({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
+  const mi = km * 0.621371;
+  const opts: TravelOpt[] = [];
+  if (km <= 2.6) opts.push({ mode: "walk", label: "Walk", min: Math.max(2, Math.round((km / 5) * 60)) });
+  opts.push({ mode: "transit", label: "Transit", min: Math.max(5, Math.round((km / 16) * 60) + 6) });
+  opts.push({ mode: "car", label: "Car", min: Math.max(4, Math.round((km / 22) * 60) + 4) });
+  if (isWaterPlace(a) || isWaterPlace(b)) opts.push({ mode: "ferry", label: "Ferry", min: Math.max(10, Math.round((km / 25) * 60) + 12) });
+  return { km, mi, opts };
+}
+
+type DayStop = { time: string; name: string; desc: string; area: string; lat: number | null; lng: number | null; travel: TravelLeg | null };
+
 function buildItinerary(places: PlaceItem[], typeId: string, stops: number, addDinner: boolean) {
   const dt = DAY_TYPES.find(d => d.id === typeId)!;
   const scored = places
@@ -298,24 +332,81 @@ function buildItinerary(places: PlaceItem[], typeId: string, stops: number, addD
     .filter(s => s.score > 0)
     .sort((a, b) => b.score - a.score);
 
-  const selected = scored.slice(0, stops).map(s => s.p);
-  let hour = dt.startHour, min = 0;
+  // Prefer geo-routed selection so the day flows; fall back to score order if no coords.
+  const withGeo = scored.filter(s => s.p.lat && s.p.lng).map(s => s.p);
+  let selected: PlaceItem[];
+  if (withGeo.length >= 2) {
+    const pool = withGeo.slice(0, 15);
+    const anchor = pool[0];
+    // keep the cluster tight: candidates nearest the anchor, then walk a nearest-neighbour path
+    const near = pool.slice(1).sort((a, b) =>
+      haversineKm({ lat: anchor.lat!, lng: anchor.lng! }, { lat: a.lat!, lng: a.lng! })
+      - haversineKm({ lat: anchor.lat!, lng: anchor.lng! }, { lat: b.lat!, lng: b.lng! })
+    ).slice(0, Math.max(stops * 2, 6));
+    const route: PlaceItem[] = [anchor];
+    const remaining = [...near];
+    while (route.length < stops && remaining.length) {
+      const last = route[route.length - 1];
+      remaining.sort((a, b) =>
+        haversineKm({ lat: last.lat!, lng: last.lng! }, { lat: a.lat!, lng: a.lng! })
+        - haversineKm({ lat: last.lat!, lng: last.lng! }, { lat: b.lat!, lng: b.lng! })
+      );
+      const next = remaining.shift();
+      if (next) route.push(next);
+    }
+    selected = route;
+  } else {
+    selected = scored.slice(0, stops).map(s => s.p);
+  }
 
-  const stops_out = selected.map(p => {
+  let hour = dt.startHour, min = 0;
+  const stops_out: DayStop[] = selected.map((p, i) => {
     const time = fmtTime(hour, min);
-    const total = min + (p.dur || 75) + 30;
+    const travel = i < selected.length - 1 ? travelOptions(p, selected[i + 1]) : null;
+    const dwell = p.dur || 75;
+    let move = 30;
+    if (travel) {
+      const def = travel.opts.find(o => o.mode === "walk") || travel.opts.find(o => o.mode === "transit") || travel.opts[0];
+      move = def ? def.min : 20;
+    }
+    const total = min + dwell + move;
     hour += Math.floor(total / 60);
     min = total % 60;
-    return { time, name: p.name, desc: p.vibe || "", area: p.area || "" };
+    return { time, name: p.name, desc: p.vibe || "", area: p.area || "", lat: p.lat ?? null, lng: p.lng ?? null, travel };
   });
 
   if (addDinner) {
     const lastPlace = selected[selected.length - 1];
     const dinnerName = lastPlace?.dinner || "a restaurant near your last stop";
-    stops_out.push({ time: fmtTime(hour, 0), name: "Dinner", desc: dinnerName, area: "" });
+    stops_out.push({ time: fmtTime(hour, 0), name: "Dinner", desc: dinnerName, area: "", lat: null, lng: null, travel: null });
   }
 
   return { stops: stops_out, outfit: dt.outfit, tip: dt.tip };
+}
+
+const TRAVEL_ICON = { walk: Footprints, transit: Bus, car: Car, ship: Ship } as const;
+function TravelConnector({ leg }: { leg: TravelLeg }) {
+  const [sel, setSel] = useState<string | null>(null);
+  const distLabel = leg.mi < 0.6 ? `${Math.round(leg.km * 1000)} m` : `${leg.mi.toFixed(1)} mi`;
+  return (
+    <div className="pl-travel">
+      <div className="pl-travel-rail" />
+      <div className="pl-travel-opts">
+        {leg.opts.map(o => {
+          const Icon = o.mode === "walk" ? Footprints : o.mode === "transit" ? Bus : o.mode === "car" ? Car : Ship;
+          const on = sel === o.mode;
+          return (
+            <button key={o.mode} className={`pl-travel-pill${on ? " on" : ""}`}
+              onClick={() => setSel(on ? null : o.mode)} title={o.label}>
+              <Icon size={13} />
+              <span>{on ? `~${o.min} min` : o.label}</span>
+            </button>
+          );
+        })}
+        <span className="pl-travel-dist">{distLabel}</span>
+      </div>
+    </div>
+  );
 }
 
 function weatherDayNote(dayTypeId: string, code: number | null, temp: number | null): string | null {
@@ -358,7 +449,7 @@ function weatherDayNote(dayTypeId: string, code: number | null, temp: number | n
 }
 
 function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem[]; wxText: string | null; wxRaw: { code: number; temp: number } | null; onClose: () => void }) {
-  const [step, setStep] = useState<"type" | "duration" | "result">("type");
+  const [step, setStep] = useState<"type" | "duration" | "building" | "result">("type");
   const [dayType, setDayType] = useState<string>("");
   const [durId, setDurId] = useState<string>("");
 
@@ -367,6 +458,12 @@ function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem
     if (!dayType || !dur || !places.length) return null;
     return buildItinerary(places, dayType, dur.stops, dur.dinner);
   }, [places, dayType, dur]);
+
+  useEffect(() => {
+    if (step !== "building") return;
+    const t = setTimeout(() => setStep("result"), 1900);
+    return () => clearTimeout(t);
+  }, [step]);
 
   return (
     <div className="pl-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -412,9 +509,24 @@ function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem
                 </button>
               ))}
             </div>
-            <button className="pl-day-next" disabled={!durId} onClick={() => setStep("result")}>
+            <button className="pl-day-next" disabled={!durId} onClick={() => setStep("building")}>
               Build my day ✦
             </button>
+          </div>
+        )}
+
+        {step === "building" && (
+          <div className="pl-day-building">
+            <div className="pl-orb">
+              <span className="pl-orb-core" />
+              <span className="pl-orb-ring" />
+              <span className="pl-orb-ring r2" />
+              <span className="pl-orb-dot d1" />
+              <span className="pl-orb-dot d2" />
+              <span className="pl-orb-dot d3" />
+            </div>
+            <div className="pl-build-title">Curating your perfect day</div>
+            <div className="pl-build-sub">Charting a route that flows, stop to stop…</div>
           </div>
         )}
 
@@ -445,18 +557,20 @@ function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem
             {/* Timeline */}
             <div className="pl-day-timeline">
               {itinerary.stops.map((stop, i) => (
-                <div key={i} className="pl-day-stop">
-                  <div className="pl-day-time">{stop.time}</div>
-                  <div className="pl-day-stop-right">
-                    <div className="pl-day-dot" />
-                    <div className="pl-day-stop-info">
-                      {stop.area && <div className="pl-day-stop-area">{stop.area}</div>}
-                      <div className="pl-day-stop-name">{stop.name}</div>
-                      {stop.desc && <div className="pl-day-stop-desc">{stop.desc}</div>}
+                <Fragment key={i}>
+                  <div className="pl-day-stop">
+                    <div className="pl-day-time">{stop.time}</div>
+                    <div className="pl-day-stop-right">
+                      <div className="pl-day-dot" />
+                      <div className="pl-day-stop-info">
+                        {stop.area && <div className="pl-day-stop-area">{stop.area}</div>}
+                        <div className="pl-day-stop-name">{stop.name}</div>
+                        {stop.desc && <div className="pl-day-stop-desc">{stop.desc}</div>}
+                      </div>
                     </div>
-                    {i < itinerary.stops.length - 1 && <div className="pl-day-line" />}
                   </div>
-                </div>
+                  {stop.travel && <TravelConnector leg={stop.travel} />}
+                </Fragment>
               ))}
             </div>
 

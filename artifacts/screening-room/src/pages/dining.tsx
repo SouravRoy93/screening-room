@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Search, UtensilsCrossed, ChevronDown, Star, Heart, CalendarCheck, Check } from "lucide-react";
+import { ArrowLeft, Search, UtensilsCrossed, ChevronDown, Star, Heart, CalendarCheck, Check, MapPin } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
 import type { DiningItem } from "@/types";
 
@@ -126,6 +126,48 @@ function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
 const OCCASIONS = ["Any occasion", "Date night", "Celebration", "Business", "Casual", "Family", "Big night out", "See & be seen", "Walk-in", "Group feast"];
 const DIFFICULTIES = ["Any difficulty", "Walk in", "Easy", "Plan ahead", "Hard to get", "Near impossible"];
 
+function DiningMap({ items }: { items: DiningItem[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+  useEffect(() => {
+    const L = (window as any).L;
+    if (!L || !ref.current) return;
+    if (!mapRef.current) {
+      mapRef.current = L.map(ref.current, { center: [40.7128, -74.006], zoom: 12, scrollWheelZoom: false });
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { subdomains: "abcd", maxZoom: 20, attribution: "\u00a9 CARTO" }).addTo(mapRef.current);
+      setTimeout(() => mapRef.current.invalidateSize(), 80);
+    }
+    const map = mapRef.current;
+    (map._pins || []).forEach((m: any) => map.removeLayer(m));
+    map._pins = [];
+    const PAL = ["#ec4899", "#f59e0b", "#8b5cf6", "#10b981", "#3b82f6", "#ef4444", "#14b8a6"];
+    const cap = items.slice(0, 60);
+    const latlngs: [number, number][] = [];
+    let alive = true, i = 0;
+    const worker = async () => {
+      while (i < cap.length && alive) {
+        const idx = i++; const d = cap[idx];
+        const q = encodeURIComponent(`${d.name} ${d.neighborhood || d.city || ""} restaurant`);
+        try {
+          const r = await fetch(`${API_BASE}/places/geocode?q=${q}`);
+          const j = await r.json();
+          if (alive && j.lat && j.lng) {
+            const m = L.circleMarker([j.lat, j.lng], { radius: 8, color: "#fff", weight: 2, fillColor: PAL[idx % PAL.length], fillOpacity: 0.95 }).addTo(map);
+            m.bindPopup(`<b>${d.name}</b><br/><small>${d.cuisine || ""} \u00b7 ${d.neighborhood || d.city || ""}</small>`);
+            map._pins.push(m); latlngs.push([j.lat, j.lng]);
+            if (latlngs.length === 1) map.setView([j.lat, j.lng], 12);
+          }
+        } catch {}
+      }
+    };
+    Promise.all([worker(), worker(), worker(), worker()]).then(() => {
+      if (alive && latlngs.length) map.fitBounds(L.latLngBounds(latlngs).pad(0.2));
+    });
+    return () => { alive = false; };
+  }, [items]);
+  return <div ref={ref} className="pl-map" />;
+}
+
 export default function Dining() {
   const [, nav] = useLocation();
   const { dining } = useDining();
@@ -136,6 +178,7 @@ export default function Dining() {
   const [occasionFilter, setOccasionFilter] = useState("Any occasion");
   const [diffFilter, setDiffFilter] = useState("Any difficulty");
   const [visible, setVisible] = useState(30);
+  const [mapView, setMapView] = useState(false);
 
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -290,6 +333,10 @@ export default function Dining() {
               <button className={`dc-tab${tab === "all" ? " on" : ""}`} onClick={() => setTab("all")}>All</button>
               <button className={`dc-tab${tab === "nearby" ? " on" : ""}`} onClick={() => setTab("nearby")}>📍 Near Me</button>
             </div>
+            <div className="dc-viewseg">
+              <button className={!mapView ? "on" : ""} onClick={() => setMapView(false)}>List</button>
+              <button className={mapView ? "on" : ""} onClick={() => setMapView(true)}><MapPin size={12} /> Map</button>
+            </div>
             <div className="dc-dropdowns">
               <div className="dc-select-wrap">
                 <select className="dc-select" value={cityFilter} onChange={e => setCityFilter(e.target.value)}>
@@ -319,21 +366,27 @@ export default function Dining() {
           </div>
         </div>
 
-        {/* Grid — 5 columns */}
-        <div className="dc-grid">
-          {filtered.slice(0, visible).map(r => <DiningCard key={r.id} r={r} onClick={() => nav(`/dining/${r.id}`)} />)}
-        </div>
+        {mapView ? (
+          <DiningMap items={filtered} />
+        ) : (
+          <>
+            {/* Grid — 5 columns */}
+            <div className="dc-grid">
+              {filtered.slice(0, visible).map(r => <DiningCard key={r.id} r={r} onClick={() => nav(`/dining/${r.id}`)} />)}
+            </div>
 
-        {filtered.length > visible && (
-          <div className="dc-viewmore-wrap">
-            <button className="dc-viewmore" onClick={() => setVisible(v => v + 30)}>
-              VIEW MORE RESTAURANTS <ChevronDown size={14} />
-            </button>
-          </div>
-        )}
+            {filtered.length > visible && (
+              <div className="dc-viewmore-wrap">
+                <button className="dc-viewmore" onClick={() => setVisible(v => v + 30)}>
+                  VIEW MORE RESTAURANTS <ChevronDown size={14} />
+                </button>
+              </div>
+            )}
 
-        {filtered.length === 0 && (
-          <p className="text-center text-muted-foreground text-sm py-16">No restaurants found.</p>
+            {filtered.length === 0 && (
+              <p className="text-center text-muted-foreground text-sm py-16">No restaurants found.</p>
+            )}
+          </>
         )}
       </div>
     </div>
