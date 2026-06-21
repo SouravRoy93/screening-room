@@ -1,5 +1,5 @@
 import type { MediaItem, TrackedItem } from "@/types";
-import { IMG_BASE, colorFor } from "@/types";
+import { IMG_BASE, IMG_POSTER, colorFor } from "@/types";
 
 interface Props {
   item: MediaItem;
@@ -23,9 +23,12 @@ export function MediaCard({ item, tracked, onOpen, onStatus }: Props) {
       <div className="poster">
         {item.poster_path ? (
           <img
-            src={`${IMG_BASE}${item.poster_path}`}
+            src={`${IMG_POSTER}${item.poster_path}`}
+            srcSet={`${IMG_POSTER}${item.poster_path} 185w, ${IMG_BASE}${item.poster_path} 342w`}
+            sizes="(max-width: 600px) 45vw, (max-width: 1100px) 22vw, 180px"
             alt={item.title}
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div
