@@ -14,7 +14,9 @@
   ],
   "recognition": "★★★ Michelin",
   "signature": "the plant-based grand tasting",
-  "blurb": "Daniel Humm's plant-forward temple — fine dining, reimagined."
+  "blurb": "Daniel Humm's plant-forward temple — fine dining, reimagined.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1002,
@@ -31,7 +33,9 @@
   ],
   "recognition": "★★★ Michelin",
   "signature": "the barely-cooked fish progression",
-  "blurb": "Eric Ripert's seafood benchmark — pristine and untouchable."
+  "blurb": "Eric Ripert's seafood benchmark — pristine and untouchable.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1003,
@@ -48,7 +52,9 @@
   ],
   "recognition": "★★★ Michelin",
   "signature": "the 'oysters and pearls'",
-  "blurb": "Thomas Keller's NY flagship with Central Park at your feet."
+  "blurb": "Thomas Keller's NY flagship with Central Park at your feet.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1004,
@@ -65,7 +71,9 @@
   ],
   "recognition": "★★★ Michelin",
   "signature": "the sea urchin bibimbap",
-  "blurb": "Modern Korean fine dining at the very top of its game."
+  "blurb": "Modern Korean fine dining at the very top of its game.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1005,
@@ -82,7 +90,9 @@
   ],
   "recognition": "★★★ Michelin",
   "signature": "the edomae omakase",
-  "blurb": "NYC's newest three-star — pure, traditional edomae sushi."
+  "blurb": "NYC's newest three-star — pure, traditional edomae sushi.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1006,
@@ -99,7 +109,9 @@
   ],
   "recognition": "★★ Michelin · World's 50 Best",
   "signature": "the card-by-card tasting",
-  "blurb": "A 14-seat counter that turned Korean fine dining into theater."
+  "blurb": "A 14-seat counter that turned Korean fine dining into theater.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1007,
@@ -116,7 +128,9 @@
   ],
   "recognition": "★★ Michelin",
   "signature": "the woodland tasting",
-  "blurb": "A dark, intimate counter for the obsessive eater."
+  "blurb": "A dark, intimate counter for the obsessive eater.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1008,
@@ -133,7 +147,9 @@
   ],
   "recognition": "★★ Michelin",
   "signature": "the herring sampler",
-  "blurb": "Scandinavian precision, decades deep."
+  "blurb": "Scandinavian precision, decades deep.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1009,
@@ -150,7 +166,9 @@
   ],
   "recognition": "★★ Michelin",
   "signature": "the tasting with the skyline",
-  "blurb": "63 floors up in a 1930s landmark — dinner with a view to match."
+  "blurb": "63 floors up in a 1930s landmark — dinner with a view to match.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1010,
@@ -167,7 +185,9 @@
   ],
   "recognition": "★★ Michelin",
   "signature": "the seasonal kaiseki",
-  "blurb": "An eight-seat hideaway behind a tea bar."
+  "blurb": "An eight-seat hideaway behind a tea bar.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1011,
@@ -184,7 +204,9 @@
   ],
   "recognition": "★★ Michelin",
   "signature": "the chocolate dessert",
-  "blurb": "Museum-side dining that quietly dazzles."
+  "blurb": "Museum-side dining that quietly dazzles.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1012,
@@ -201,7 +223,9 @@
   ],
   "recognition": "★ Michelin · Institution",
   "signature": "the duo of beef",
-  "blurb": "Daniel Boulud's UES grande dame — jackets and all."
+  "blurb": "Daniel Boulud's UES grande dame — jackets and all.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1013,
@@ -218,7 +242,9 @@
   ],
   "recognition": "★ Michelin · Institution",
   "signature": "the seasonal tasting",
-  "blurb": "The platonic ideal of a New York restaurant."
+  "blurb": "The platonic ideal of a New York restaurant.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1014,
@@ -235,7 +261,9 @@
   ],
   "recognition": "★ Michelin",
   "signature": "the tout le lapin",
-  "blurb": "Candlelit French romance done impeccably."
+  "blurb": "Candlelit French romance done impeccably.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1015,
@@ -252,7 +280,9 @@
   ],
   "recognition": "★ Michelin",
   "signature": "the butcher's feast",
-  "blurb": "Korean BBQ meets steakhouse — and earns a Michelin star."
+  "blurb": "Korean BBQ meets steakhouse — and earns a Michelin star.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1016,
@@ -269,7 +299,9 @@
   ],
   "recognition": "Institution since 1887",
   "signature": "the porterhouse for two",
-  "blurb": "Cash-era charm and the city's most mythologized steak."
+  "blurb": "Cash-era charm and the city's most mythologized steak.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1017,
@@ -286,7 +318,9 @@
   ],
   "recognition": "Institution since 1885",
   "signature": "the mutton chop",
-  "blurb": "Pipes on the ceiling, mutton on the plate."
+  "blurb": "Pipes on the ceiling, mutton on the plate.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1018,
@@ -303,7 +337,9 @@
   ],
   "recognition": "Institution since 1896",
   "signature": "the lemon chicken",
-  "blurb": "The most impossible table in America — the tables are 'owned.'"
+  "blurb": "The most impossible table in America — the tables are 'owned.'",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1019,
@@ -320,7 +356,9 @@
   ],
   "recognition": "Institution since 1888",
   "signature": "the hot pastrami on rye",
-  "blurb": "Pastrami, history, and the most famous scene in the movies."
+  "blurb": "Pastrami, history, and the most famous scene in the movies.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1020,
@@ -337,7 +375,9 @@
   ],
   "recognition": "Institution since 1997",
   "signature": "the seafood plateau",
-  "blurb": "Keith McNally's eternal Parisian fantasy."
+  "blurb": "Keith McNally's eternal Parisian fantasy.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1021,
@@ -354,7 +394,9 @@
   ],
   "recognition": "Institution",
   "signature": "the Black Label burger",
-  "blurb": "The burger that launched a thousand imitators."
+  "blurb": "The burger that launched a thousand imitators.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1022,
@@ -371,7 +413,9 @@
   ],
   "recognition": "Landmark room",
   "signature": "the prime rib cart",
-  "blurb": "Power-lunch theater in the old Four Seasons space."
+  "blurb": "Power-lunch theater in the old Four Seasons space.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1023,
@@ -388,7 +432,9 @@
   ],
   "recognition": "Revived landmark (1879)",
   "signature": "the Parker House rolls",
-  "blurb": "A gaslit Brooklyn landmark, gloriously revived."
+  "blurb": "A gaslit Brooklyn landmark, gloriously revived.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1024,
@@ -405,7 +451,9 @@
   ],
   "recognition": "Critic's pick",
   "signature": "the duck frites",
-  "blurb": "The downtown bistro everyone wants to be a regular at."
+  "blurb": "The downtown bistro everyone wants to be a regular at.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1025,
@@ -422,7 +470,9 @@
   ],
   "recognition": "★ Michelin · Institution",
   "signature": "the Brooklyn Bridge chocolate",
-  "blurb": "Manhattan skyline, on the water — pure occasion."
+  "blurb": "Manhattan skyline, on the water — pure occasion.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1026,
@@ -439,7 +489,9 @@
   ],
   "recognition": "Scene icon",
   "signature": "the spicy rigatoni vodka",
-  "blurb": "Tableside theater and the rigatoni that broke the internet."
+  "blurb": "Tableside theater and the rigatoni that broke the internet.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1027,
@@ -456,7 +508,9 @@
   ],
   "recognition": "Missy Robbins · critic's darling",
   "signature": "the mafaldini with pink peppercorn",
-  "blurb": "Missy Robbins' pasta temple in a converted auto shop."
+  "blurb": "Missy Robbins' pasta temple in a converted auto shop.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1028,
@@ -473,7 +527,9 @@
   ],
   "recognition": "Critic's darling",
   "signature": "the pinwheel lasagna for two",
-  "blurb": "The lasagna with a citywide cult following."
+  "blurb": "The lasagna with a citywide cult following.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1029,
@@ -490,7 +546,9 @@
   ],
   "recognition": "★ Michelin",
   "signature": "the 'grandma's tortellini'",
-  "blurb": "Hand-rolled Emilia-Romagna pasta, nightly sellout."
+  "blurb": "Hand-rolled Emilia-Romagna pasta, nightly sellout.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1030,
@@ -507,7 +565,9 @@
   ],
   "recognition": "Major scene",
   "signature": "the chicken parm course",
-  "blurb": "Major Food Group's love letter to Little Italy."
+  "blurb": "Major Food Group's love letter to Little Italy.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1031,
@@ -524,7 +584,9 @@
   ],
   "recognition": "Critic's darling",
   "signature": "the lasagne al forno",
-  "blurb": "A tiny Tuscan room with a famously good Negroni."
+  "blurb": "A tiny Tuscan room with a famously good Negroni.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1032,
@@ -541,7 +603,9 @@
   ],
   "recognition": "Beloved",
   "signature": "the insalata verde & svizzerina",
-  "blurb": "The most charming walk-in in the Village."
+  "blurb": "The most charming walk-in in the Village.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1033,
@@ -558,7 +622,9 @@
   ],
   "recognition": "Reliable star",
   "signature": "the spaghetti & the garganelli",
-  "blurb": "The dependable date-night Italian everyone loves."
+  "blurb": "The dependable date-night Italian everyone loves.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1034,
@@ -575,7 +641,9 @@
   ],
   "recognition": "Cult pizza",
   "signature": "the thin-crust pie (BYO, cash)",
-  "blurb": "Candlelit, cash-only, BYO — the pizza pilgrimage."
+  "blurb": "Candlelit, cash-only, BYO — the pizza pilgrimage.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1035,
@@ -592,7 +660,9 @@
   ],
   "recognition": "#1 NYT 2023 · scene",
   "signature": "the oxtail & rice",
-  "blurb": "Kwame Onwuachi's love letter to the Bronx — the hottest seat in town."
+  "blurb": "Kwame Onwuachi's love letter to the Bronx — the hottest seat in town.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1036,
@@ -609,7 +679,9 @@
   ],
   "recognition": "★ Michelin",
   "signature": "the gunpowder dosa",
-  "blurb": "Regional South Indian cooking that earned a Michelin star."
+  "blurb": "Regional South Indian cooking that earned a Michelin star.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1037,
@@ -626,7 +698,9 @@
   ],
   "recognition": "Critic's darling",
   "signature": "the unapologetic regional spice",
-  "blurb": "Fiery, no-holds-barred regional Indian."
+  "blurb": "Fiery, no-holds-barred regional Indian.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1038,
@@ -643,7 +717,9 @@
   ],
   "recognition": "World's 50 Best alum",
   "signature": "the husk meringue",
-  "blurb": "Enrique Olvera's sleek, design-forward Mexican."
+  "blurb": "Enrique Olvera's sleek, design-forward Mexican.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1039,
@@ -660,7 +736,9 @@
   ],
   "recognition": "Critic's darling",
   "signature": "the burrata with salsa verde",
-  "blurb": "The little wine bar that changed how NYC eats."
+  "blurb": "The little wine bar that changed how NYC eats.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1040,
@@ -677,7 +755,9 @@
   ],
   "recognition": "Daniel Boulud · ★ Michelin",
   "signature": "the lobster",
-  "blurb": "A plant-and-light-filled grand room by Grand Central."
+  "blurb": "A plant-and-light-filled grand room by Grand Central.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1041,
@@ -694,7 +774,9 @@
   ],
   "recognition": "★ Michelin",
   "signature": "the gruyère fritters",
-  "blurb": "Approachable excellence at the base of a landmark tower."
+  "blurb": "Approachable excellence at the base of a landmark tower.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1042,
@@ -711,7 +793,9 @@
   ],
   "recognition": "Famed omakase",
   "signature": "the 20-course omakase",
-  "blurb": "The omakase made famous by 'Jiro Dreams of Sushi.'"
+  "blurb": "The omakase made famous by 'Jiro Dreams of Sushi.'",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1043,
@@ -728,7 +812,9 @@
   ],
   "recognition": "Cult",
   "signature": "the prime rib",
-  "blurb": "32 seats, zero availability — the city's coziest impossible table."
+  "blurb": "32 seats, zero availability — the city's coziest impossible table.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1044,
@@ -745,7 +831,9 @@
   ],
   "recognition": "★ Michelin",
   "signature": "the fusilli with octopus & bone marrow",
-  "blurb": "Coastal Italian luxury across from the park."
+  "blurb": "Coastal Italian luxury across from the park.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1045,
@@ -762,7 +850,9 @@
   ],
   "recognition": "Historic",
   "signature": "the cold sesame noodles",
-  "blurb": "The room that brought Sichuan to New York, reborn."
+  "blurb": "The room that brought Sichuan to New York, reborn.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1046,
@@ -779,7 +869,9 @@
   ],
   "recognition": "Cult Cantonese",
   "signature": "the Peking duck",
-  "blurb": "Bring the wine, order the duck, feast loudly."
+  "blurb": "Bring the wine, order the duck, feast loudly.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1047,
@@ -796,7 +888,9 @@
   ],
   "recognition": "★ Michelin",
   "signature": "the foie gras with cinco cebollas",
-  "blurb": "Elbow-to-elbow Spanish with a legendary wine list."
+  "blurb": "Elbow-to-elbow Spanish with a legendary wine list.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1048,
@@ -813,7 +907,9 @@
   ],
   "recognition": "Marcus Samuelsson",
   "signature": "the seafood tower",
-  "blurb": "Marcus Samuelsson's Afro-Scandinavian ocean showpiece."
+  "blurb": "Marcus Samuelsson's Afro-Scandinavian ocean showpiece.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1049,
@@ -830,7 +926,9 @@
   ],
   "recognition": "Hot table",
   "signature": "the cheeseburger spring rolls",
-  "blurb": "Cantonese-American with a party in the room."
+  "blurb": "Cantonese-American with a party in the room.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1050,
@@ -847,7 +945,9 @@
   ],
   "recognition": "April Bloomfield return",
   "signature": "the roast chicken",
-  "blurb": "April Bloomfield's beloved return, Brooklyn-side."
+  "blurb": "April Bloomfield's beloved return, Brooklyn-side.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1051,
@@ -865,7 +965,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Hand-rolled pasta with seasonal ingredients",
-  "blurb": "Warm West Village Italian with exceptional housemade pasta and natural wines."
+  "blurb": "Warm West Village Italian with exceptional housemade pasta and natural wines.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1052,
@@ -883,7 +985,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Handmade pasta with seasonal ingredients",
-  "blurb": "Warm West Village spot serving elevated traditional Italian comfort food."
+  "blurb": "Warm West Village spot serving elevated traditional Italian comfort food.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1053,
@@ -901,7 +1005,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House-made pasta with seasonal ingredients",
-  "blurb": "West Village trattoria serving rustic Italian fare with warmth and care."
+  "blurb": "West Village trattoria serving rustic Italian fare with warmth and care.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1054,
@@ -919,7 +1025,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House-made pasta with seasonal preparations",
-  "blurb": "Intimate West Village spot serving thoughtful, traditional Italian fare."
+  "blurb": "Intimate West Village spot serving thoughtful, traditional Italian fare.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1055,
@@ -937,7 +1045,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Affogato and housemade pastries",
-  "blurb": "Sophisticated Italian spot serving refined cuisine and impeccable coffee."
+  "blurb": "Sophisticated Italian spot serving refined cuisine and impeccable coffee.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1056,
@@ -955,7 +1065,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Handmade pasta with seasonal preparations",
-  "blurb": "West Village Italian spot serving refined, approachable housemade pastas nightly."
+  "blurb": "West Village Italian spot serving refined, approachable housemade pastas nightly.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1057,
@@ -973,7 +1085,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House-made pasta with seasonal preparations",
-  "blurb": "Warmly lit West Village trattoria serving refined Italian classics."
+  "blurb": "Warmly lit West Village trattoria serving refined Italian classics.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1058,
@@ -991,7 +1105,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House-made pasta",
-  "blurb": "Warm West Village trattoria serving rustic Italian classics with neighborhood charm."
+  "blurb": "Warm West Village trattoria serving rustic Italian classics with neighborhood charm.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1059,
@@ -1009,7 +1125,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Multi-course Italian tasting menu with seasonal ingredients",
-  "blurb": "Elegant Italian fine dining in the heart of West Village."
+  "blurb": "Elegant Italian fine dining in the heart of West Village.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1060,
@@ -1027,7 +1145,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Table-grilled wagyu and premium cuts",
-  "blurb": "High-energy izakaya where diners grill superior Japanese beef tableside."
+  "blurb": "High-energy izakaya where diners grill superior Japanese beef tableside.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1061,
@@ -1045,7 +1165,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Omakase chef's selection",
-  "blurb": "Intimate counter temple for pristine, artfully composed sushi experiences."
+  "blurb": "Intimate counter temple for pristine, artfully composed sushi experiences.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1062,
@@ -1063,7 +1185,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Grilled skewers and creative small plates",
-  "blurb": "Lively East Village izakaya with stellar ratings and casual charm."
+  "blurb": "Lively East Village izakaya with stellar ratings and casual charm.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1063,
@@ -1081,7 +1205,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase selection",
-  "blurb": "Intimate counter sushi with pristine fish and assured technique."
+  "blurb": "Intimate counter sushi with pristine fish and assured technique.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1064,
@@ -1099,7 +1225,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Yakitori and sake selection",
-  "blurb": "Lively East Village izakaya with stellar grilled skewers and vibrant energy."
+  "blurb": "Lively East Village izakaya with stellar grilled skewers and vibrant energy.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1065,
@@ -1117,7 +1245,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House ramen with carefully crafted broths",
-  "blurb": "Beloved East Village ramen spot delivering bold, satisfying bowls nightly."
+  "blurb": "Beloved East Village ramen spot delivering bold, satisfying bowls nightly.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1066,
@@ -1135,7 +1265,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Omakase experience with premium daily fish selection",
-  "blurb": "Intimate sushi counter showcasing pristine fish and expert craftsmanship."
+  "blurb": "Intimate sushi counter showcasing pristine fish and expert craftsmanship.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1067,
@@ -1153,7 +1285,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Fresh omakase selection",
-  "blurb": "Refined sushi craftsmanship in East Village's beloved neighborhood counter."
+  "blurb": "Refined sushi craftsmanship in East Village's beloved neighborhood counter.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1068,
@@ -1171,7 +1305,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Yakitori and sake pairings",
-  "blurb": "Lively East Village izakaya serving expertly grilled skewers and Japanese comfort food."
+  "blurb": "Lively East Village izakaya serving expertly grilled skewers and Japanese comfort food.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1069,
@@ -1189,7 +1325,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Pristine nigiri and seasonal sashimi selection",
-  "blurb": "Refined Japanese craftsmanship in intimate East Village setting."
+  "blurb": "Refined Japanese craftsmanship in intimate East Village setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1070,
@@ -1207,7 +1345,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Omakase progression with seasonal fish selection",
-  "blurb": "Meticulous sushi craftsmanship in intimate East Village setting."
+  "blurb": "Meticulous sushi craftsmanship in intimate East Village setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1071,
@@ -1225,7 +1365,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Rich tonkotsu broth with perfectly cooked noodles",
-  "blurb": "Excellent ramen spot delivering consistent quality in vibrant East Village."
+  "blurb": "Excellent ramen spot delivering consistent quality in vibrant East Village.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1072,
@@ -1243,7 +1385,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Omakase sushi experience with sake pairings",
-  "blurb": "Intimate sushi counter offering personalized omakase in Midtown."
+  "blurb": "Intimate sushi counter offering personalized omakase in Midtown.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1073,
@@ -1261,7 +1405,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase selection with premium sushi-grade fish",
-  "blurb": "Intimate Midtown counter showcasing pristine sushi craftsmanship and artistry."
+  "blurb": "Intimate Midtown counter showcasing pristine sushi craftsmanship and artistry.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1074,
@@ -1279,7 +1425,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's daily omakase selection",
-  "blurb": "Midtown omakase gem delivering pristine sushi at an intimate counter."
+  "blurb": "Midtown omakase gem delivering pristine sushi at an intimate counter.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1075,
@@ -1297,7 +1445,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase progression",
-  "blurb": "Intimate sushi counter crafting pristine daily selections with precision."
+  "blurb": "Intimate sushi counter crafting pristine daily selections with precision.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1076,
@@ -1315,7 +1465,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase selection with premium nigiri",
-  "blurb": "Intimate sushi counter showcasing pristine fish and artisanal technique."
+  "blurb": "Intimate sushi counter showcasing pristine fish and artisanal technique.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1077,
@@ -1333,7 +1485,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Omakase progression featuring seasonal fish and nigiri",
-  "blurb": "Intimate sushi counter delivering pristine fish and expert craftsmanship."
+  "blurb": "Intimate sushi counter delivering pristine fish and expert craftsmanship.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1078,
@@ -1351,7 +1505,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase selection",
-  "blurb": "Pristine sushi counter experience in Midtown with meticulous seasonal offerings."
+  "blurb": "Pristine sushi counter experience in Midtown with meticulous seasonal offerings.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1079,
@@ -1369,7 +1525,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase selection with pristine seasonal fish",
-  "blurb": "Intimate omakase counter delivering precise, elegant sushi craftsmanship."
+  "blurb": "Intimate omakase counter delivering precise, elegant sushi craftsmanship.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1080,
@@ -1387,7 +1545,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Omakase progression of pristine seasonal sushi",
-  "blurb": "Intimate Midtown counter showcasing chef's finest daily selections."
+  "blurb": "Intimate Midtown counter showcasing chef's finest daily selections.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1081,
@@ -1405,7 +1565,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase selection",
-  "blurb": "Intimate sushi counter showcasing pristine fish and expert craftsmanship."
+  "blurb": "Intimate sushi counter showcasing pristine fish and expert craftsmanship.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1082,
@@ -1423,7 +1585,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chef's omakase selection",
-  "blurb": "Intimate sushi counter showcasing pristine fish and masterful technique."
+  "blurb": "Intimate sushi counter showcasing pristine fish and masterful technique.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1083,
@@ -1441,7 +1605,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Chicken pot pie",
-  "blurb": "Homey New American comfort food in a convivial Tribeca setting."
+  "blurb": "Homey New American comfort food in a convivial Tribeca setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1084,
@@ -1459,7 +1625,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Cheeseburger with hand-cut fries",
-  "blurb": "Tribeca hotspot delivering elevated comfort food in a lively setting."
+  "blurb": "Tribeca hotspot delivering elevated comfort food in a lively setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1085,
@@ -1477,7 +1645,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Seasonal New American tasting menu",
-  "blurb": "Refined Tribeca dining with locally-sourced ingredients and polished technique."
+  "blurb": "Refined Tribeca dining with locally-sourced ingredients and polished technique.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1086,
@@ -1495,7 +1665,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Seasonal American fare with refined technique",
-  "blurb": "Elevated comfort food in sophisticated Tribeca setting."
+  "blurb": "Elevated comfort food in sophisticated Tribeca setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1087,
@@ -1513,7 +1685,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House-made pasta and craft cocktails",
-  "blurb": "Sophisticated Tribeca dining with elevated comfort food and lively atmosphere."
+  "blurb": "Sophisticated Tribeca dining with elevated comfort food and lively atmosphere.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1088,
@@ -1531,7 +1705,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Seasonal American fare with refined technique",
-  "blurb": "Tribeca gem serving thoughtful New American cooking in relaxed elegance."
+  "blurb": "Tribeca gem serving thoughtful New American cooking in relaxed elegance.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1089,
@@ -1549,7 +1725,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Elevated views with seasonal American cuisine",
-  "blurb": "Design-forward rooftop with polished New American fare and city vistas."
+  "blurb": "Design-forward rooftop with polished New American fare and city vistas.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1090,
@@ -1567,7 +1745,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House gumbo",
-  "blurb": "Spirited New Orleans-inspired comfort in Tribeca."
+  "blurb": "Spirited New Orleans-inspired comfort in Tribeca.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1091,
@@ -1585,7 +1765,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Classic cocktails in a storied, theatrical setting",
-  "blurb": "Tribeca institution blending retro charm with sophisticated cocktails and cuisine."
+  "blurb": "Tribeca institution blending retro charm with sophisticated cocktails and cuisine.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1092,
@@ -1603,7 +1785,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Seasonal tasting menu with Italian-inspired techniques",
-  "blurb": "Refined New American cooking in a sophisticated Tribeca setting."
+  "blurb": "Refined New American cooking in a sophisticated Tribeca setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1093,
@@ -1621,7 +1805,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Seasonal small plates with refined technique",
-  "blurb": "Tribeca's convivial spot for contemporary American cooking and lively atmosphere."
+  "blurb": "Tribeca's convivial spot for contemporary American cooking and lively atmosphere.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1094,
@@ -1639,7 +1825,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Choucroute garnie",
-  "blurb": "Warm Upper East Side classic serving rustic Alsatian comfort with effortless charm."
+  "blurb": "Warm Upper East Side classic serving rustic Alsatian comfort with effortless charm.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1095,
@@ -1657,7 +1845,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "French bistro classics with refined execution",
-  "blurb": "Elegant Upper East Side French brasserie with timeless appeal."
+  "blurb": "Elegant Upper East Side French brasserie with timeless appeal.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1096,
@@ -1675,7 +1865,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "French classics in an elegant, intimate setting",
-  "blurb": "Charming French supper club delivering classic Parisian elegance uptown."
+  "blurb": "Charming French supper club delivering classic Parisian elegance uptown.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1097,
@@ -1693,7 +1885,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Traditional French bistro fare with refined preparations",
-  "blurb": "Elegant Upper East Side French brasserie for timeless Gallic dining."
+  "blurb": "Elegant Upper East Side French brasserie for timeless Gallic dining.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1098,
@@ -1711,7 +1905,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Traditional French bistro fare with refined technique",
-  "blurb": "Elegant Upper East Side brasserie serving timeless French classics."
+  "blurb": "Elegant Upper East Side brasserie serving timeless French classics.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1099,
@@ -1729,7 +1925,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Classic French bistro fare with refined technique",
-  "blurb": "Upper East Side French bistro delivering timeless comfort with accessible elegance."
+  "blurb": "Upper East Side French bistro delivering timeless comfort with accessible elegance.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1100,
@@ -1747,7 +1945,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Classical French preparations with refined technique",
-  "blurb": "Sophisticated French dining on the Upper East Side, polished and romantic."
+  "blurb": "Sophisticated French dining on the Upper East Side, polished and romantic.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1101,
@@ -1765,7 +1965,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Classic French bistro fare with seasonal preparations",
-  "blurb": "Unpretentious Upper East Side French bistro with warm hospitality and reliable cooking."
+  "blurb": "Unpretentious Upper East Side French bistro with warm hospitality and reliable cooking.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1102,
@@ -1783,7 +1985,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Sole meunière",
-  "blurb": "Timeless Upper East Side French dining with reliable classics and convivial atmosphere."
+  "blurb": "Timeless Upper East Side French dining with reliable classics and convivial atmosphere.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1103,
@@ -1801,7 +2005,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Classic French bistro fare with impeccable execution",
-  "blurb": "Timeless Upper East Side French dining with refined elegance and tradition."
+  "blurb": "Timeless Upper East Side French dining with refined elegance and tradition.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1104,
@@ -1819,7 +2025,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "French classics with refined technique",
-  "blurb": "Sophisticated Upper East Side French dining with polished execution and warmth."
+  "blurb": "Sophisticated Upper East Side French dining with polished execution and warmth.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1105,
@@ -1837,7 +2045,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Classic French preparations with refined execution",
-  "blurb": "Elegant Upper East Side French dining with timeless sophistication."
+  "blurb": "Elegant Upper East Side French dining with timeless sophistication.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1106,
@@ -1855,7 +2065,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Bubbling sundubu jjigae and Korean BBQ",
-  "blurb": "Koreatown stalwart serving authentic Korean comfort food with reliably excellent execution."
+  "blurb": "Koreatown stalwart serving authentic Korean comfort food with reliably excellent execution.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1107,
@@ -1873,7 +2085,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Hot stone BBQ tableside grilling",
-  "blurb": "Sizzling tableside Korean BBQ in the heart of Koreatown."
+  "blurb": "Sizzling tableside Korean BBQ in the heart of Koreatown.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1108,
@@ -1891,7 +2105,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Silken homemade tofu with dipping sauces",
-  "blurb": "Authentic Korean comfort food in the heart of Koreatown."
+  "blurb": "Authentic Korean comfort food in the heart of Koreatown.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1109,
@@ -1909,7 +2125,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Marinated short ribs grilled tableside",
-  "blurb": "Vibrant Koreatown spot for interactive Korean BBQ with high-quality meats."
+  "blurb": "Vibrant Koreatown spot for interactive Korean BBQ with high-quality meats.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1110,
@@ -1927,7 +2145,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Tabletop grilled meats with house-made banchan",
-  "blurb": "Lively Koreatown spot for grilled meats and vibrant banchan spreads."
+  "blurb": "Lively Koreatown spot for grilled meats and vibrant banchan spreads.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1111,
@@ -1945,7 +2165,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Marbled beef grilled tableside with house banchan",
-  "blurb": "Vibrant Koreatown destination for interactive Korean BBQ and premium cuts."
+  "blurb": "Vibrant Koreatown destination for interactive Korean BBQ and premium cuts.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1112,
@@ -1963,7 +2185,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Authentic Korean comfort dishes",
-  "blurb": "Reliable Koreatown standby for craveable Korean fare and high ratings."
+  "blurb": "Reliable Koreatown standby for craveable Korean fare and high ratings.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1113,
@@ -1981,7 +2205,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Marinated short ribs grilled tableside",
-  "blurb": "Stellar Korean barbecue in Koreatown with exceptional meats and convivial energy."
+  "blurb": "Stellar Korean barbecue in Koreatown with exceptional meats and convivial energy.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1114,
@@ -1999,7 +2225,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Handmade noodles and banchan-focused small plates",
-  "blurb": "Vibrant Koreatown destination for authentic Korean comfort with spirited energy."
+  "blurb": "Vibrant Koreatown destination for authentic Korean comfort with spirited energy.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1115,
@@ -2017,7 +2245,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Ginseng chicken soup (samgyetang)",
-  "blurb": "Spirited Korean comfort cooking in the heart of Koreatown."
+  "blurb": "Spirited Korean comfort cooking in the heart of Koreatown.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1116,
@@ -2035,7 +2265,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Table-grilled meats and banchan spreads",
-  "blurb": "High-rated Koreatown spot for spirited Korean BBQ and vibrant dining."
+  "blurb": "High-rated Koreatown spot for spirited Korean BBQ and vibrant dining.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1117,
@@ -2053,7 +2285,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Marinated short ribs grilled tableside",
-  "blurb": "Lively Korean BBQ where diners grill premium meats at the table."
+  "blurb": "Lively Korean BBQ where diners grill premium meats at the table.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1118,
@@ -2071,7 +2305,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Ceviches and grilled fish with house-made tortillas",
-  "blurb": "Lively Lower East Side favorite for refined Mexican cuisine and spirits."
+  "blurb": "Lively Lower East Side favorite for refined Mexican cuisine and spirits.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1119,
@@ -2089,7 +2325,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Fresh ceviche and grilled fish tacos",
-  "blurb": "Lower East Side gem serving pristine Mexican seafood with tropical flair."
+  "blurb": "Lower East Side gem serving pristine Mexican seafood with tropical flair.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1120,
@@ -2107,7 +2345,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "House moles and Spanish-Mexican fusion plates",
-  "blurb": "Spirited Lower East Side spot blending Mexican tradition with Spanish flair."
+  "blurb": "Spirited Lower East Side spot blending Mexican tradition with Spanish flair.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1121,
@@ -2125,7 +2365,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Margaritas and street tacos",
-  "blurb": "Spirited Lower East Side cantina serving vibrant Mexican fare and classic cocktails."
+  "blurb": "Spirited Lower East Side cantina serving vibrant Mexican fare and classic cocktails.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1122,
@@ -2143,7 +2385,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Slow-cooked carnitas with warm tortillas",
-  "blurb": "Lower East Side institution for authentic, melt-in-mouth carnitas."
+  "blurb": "Lower East Side institution for authentic, melt-in-mouth carnitas.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1123,
@@ -2161,7 +2405,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Street-style tacos",
-  "blurb": "Lively Lower East Side favorite serving bold, authentic Mexican fare."
+  "blurb": "Lively Lower East Side favorite serving bold, authentic Mexican fare.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1124,
@@ -2179,7 +2425,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Mezcal cocktails with housemade infusions",
-  "blurb": "Lower East Side hotspot for premium mezcal and refined Mexican fare."
+  "blurb": "Lower East Side hotspot for premium mezcal and refined Mexican fare.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1125,
@@ -2197,7 +2445,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Birria tacos with consomé",
-  "blurb": "Authentic Lower East Side birria spot with devoted neighborhood following."
+  "blurb": "Authentic Lower East Side birria spot with devoted neighborhood following.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1126,
@@ -2215,7 +2465,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Carne asada tacos",
-  "blurb": "Spirited Lower East Side haunt for authentic Mexican fare and margaritas."
+  "blurb": "Spirited Lower East Side haunt for authentic Mexican fare and margaritas.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1127,
@@ -2233,7 +2485,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Vegan carne asada tacos",
-  "blurb": "Colorful, plant-based Mexican cooking on the Lower East Side."
+  "blurb": "Colorful, plant-based Mexican cooking on the Lower East Side.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1128,
@@ -2251,7 +2505,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Breakfast burritos with house chorizo",
-  "blurb": "Vibrant Lower East Side spot for authentic, no-frills Mexican fare."
+  "blurb": "Vibrant Lower East Side spot for authentic, no-frills Mexican fare.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1129,
@@ -2269,7 +2525,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Guacamole prepared tableside",
-  "blurb": "Vibrant Mexican spot with lively energy and fresh classic dishes."
+  "blurb": "Vibrant Mexican spot with lively energy and fresh classic dishes.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1130,
@@ -2287,7 +2545,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Hand-pulled noodles in chili oil",
-  "blurb": "Refined Sichuan cuisine in Chinatown's most buzzed-about destination."
+  "blurb": "Refined Sichuan cuisine in Chinatown's most buzzed-about destination.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1131,
@@ -2305,7 +2565,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Hand-pulled noodles and Shanghai soup dumplings",
-  "blurb": "Beloved neighborhood spot for authentic Shanghai classics and lively dim sum service."
+  "blurb": "Beloved neighborhood spot for authentic Shanghai classics and lively dim sum service.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1132,
@@ -2323,7 +2585,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Shrimp cheung fun, hand-pulled noodles",
-  "blurb": "Frenetic Chinatown institution serving authentic dim sum and noodles since 1938."
+  "blurb": "Frenetic Chinatown institution serving authentic dim sum and noodles since 1938.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1133,
@@ -2341,7 +2605,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Har gow and siu mai dim sum",
-  "blurb": "Spirited Cantonese spot serving authentic dim sum to Chinatown crowds."
+  "blurb": "Spirited Cantonese spot serving authentic dim sum to Chinatown crowds.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1134,
@@ -2359,7 +2625,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Hand-pulled noodles and steamed dumplings",
-  "blurb": "Beloved Chinatown spot for authentic Cantonese fare and lively dining."
+  "blurb": "Beloved Chinatown spot for authentic Cantonese fare and lively dining.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1135,
@@ -2377,7 +2645,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Soup dumplings (xiaolongbao)",
-  "blurb": "Legendary Shanghai spot for expertly crafted soup dumplings and dim sum."
+  "blurb": "Legendary Shanghai spot for expertly crafted soup dumplings and dim sum.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1136,
@@ -2395,7 +2665,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Fuzhou-style shrimp dumplings",
-  "blurb": "Lively Chinatown spot serving authentic Fuzhou dumplings and noodles."
+  "blurb": "Lively Chinatown spot serving authentic Fuzhou dumplings and noodles.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1137,
@@ -2413,7 +2685,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Handmade noodles and traditional dim sum",
-  "blurb": "Chinatown institution serving authentic Cantonese classics since 1973."
+  "blurb": "Chinatown institution serving authentic Cantonese classics since 1973.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1138,
@@ -2431,7 +2705,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Dim sum cart service",
-  "blurb": "Authentic Cantonese dining in Chinatown with dim sum and traditional favorites."
+  "blurb": "Authentic Cantonese dining in Chinatown with dim sum and traditional favorites.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1139,
@@ -2449,7 +2725,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Har gow and siu mai",
-  "blurb": "Legendary Chinatown dim sum destination with cart service and reliable classics."
+  "blurb": "Legendary Chinatown dim sum destination with cart service and reliable classics.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1140,
@@ -2467,7 +2745,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Cart-service dim sum selection",
-  "blurb": "Lively Chinatown destination for traditional dim sum and spirited service."
+  "blurb": "Lively Chinatown destination for traditional dim sum and spirited service.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1141,
@@ -2485,7 +2765,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Hand-pleated dumplings",
-  "blurb": "Exceptional dumplings and bold flavors in vibrant Chinatown."
+  "blurb": "Exceptional dumplings and bold flavors in vibrant Chinatown.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1142,
@@ -2503,7 +2785,9 @@
   ],
   "recognition": "",
   "signature": "Prime dry-aged steaks with craft cocktails",
-  "blurb": "Sophisticated steakhouse delivering premium beef and vibrant atmosphere."
+  "blurb": "Sophisticated steakhouse delivering premium beef and vibrant atmosphere.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1143,
@@ -2521,7 +2805,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Prime steaks with French technique and classic sides",
-  "blurb": "Sophisticated French steakhouse delivering impeccable beef in Flatiron."
+  "blurb": "Sophisticated French steakhouse delivering impeccable beef in Flatiron.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1144,
@@ -2539,7 +2825,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Dry-aged beef cooked over charcoal at your table",
-  "blurb": "Sophisticated Korean steakhouse with interactive grilling and premium cuts."
+  "blurb": "Sophisticated Korean steakhouse with interactive grilling and premium cuts.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1145,
@@ -2557,7 +2845,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Prime dry-aged steaks with classic sides",
-  "blurb": "Timeless steakhouse serving prime cuts in a sophisticated setting."
+  "blurb": "Timeless steakhouse serving prime cuts in a sophisticated setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1146,
@@ -2575,7 +2865,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Prime dry-aged steaks with classical French preparations",
-  "blurb": "Flatiron steakhouse delivering refined French technique and premium cuts."
+  "blurb": "Flatiron steakhouse delivering refined French technique and premium cuts.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1147,
@@ -2593,7 +2885,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Prime dry-aged steaks",
-  "blurb": "Sophisticated Flatiron steakhouse delivering prime beef and classic elegance."
+  "blurb": "Sophisticated Flatiron steakhouse delivering prime beef and classic elegance.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1148,
@@ -2611,7 +2905,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Prime dry-aged steaks",
-  "blurb": "Flatiron institution serving exemplary steaks in a timeless setting."
+  "blurb": "Flatiron institution serving exemplary steaks in a timeless setting.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1149,
@@ -2629,7 +2925,9 @@
   ],
   "recognition": "Local favorite",
   "signature": "Prime-aged steaks with Italian preparations",
-  "blurb": "Refined Italian steakhouse delivering exceptional beef in Flatiron's sophisticated dining scene."
+  "blurb": "Refined Italian steakhouse delivering exceptional beef in Flatiron's sophisticated dining scene.",
+  "city": "New York",
+  "country": "United States"
  },
  {
   "id": 1150,
@@ -2647,6 +2945,593 @@
   ],
   "recognition": "Local favorite",
   "signature": "Skirt steak with chimichurri",
-  "blurb": "Robust steakhouse fare in Flatiron's convivial, bustling setting."
+  "blurb": "Robust steakhouse fare in Flatiron's convivial, bustling setting.",
+  "city": "New York",
+  "country": "United States"
+ },
+ {
+  "id": 1151,
+  "name": "Soothr",
+  "cuisine": "Thai",
+  "format": "Modern Thai kitchen",
+  "neighborhood": "East Village",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 2,
+  "occasion": [
+   "Casual",
+   "Date night",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Curry dishes",
+  "blurb": "Vibrant East Village Thai spot with bold flavors and welcoming energy.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Counter seating for kitchen views",
+  "arrival": "Street parking available, near subway",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 3,
+   "business": 2
+  }
+ },
+ {
+  "id": 1152,
+  "name": "Mitr Thai Restaurant",
+  "cuisine": "Thai",
+  "format": "Vibrant neighborhood Thai gem",
+  "neighborhood": "Midtown (Theater District)",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Beloved Thai spot with authentic flavors and exceptional ratings.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Center seating for energy",
+  "arrival": "Street parking limited; subway accessible (Times Square area)",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 3,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 5,
+   "consistency": 5,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1153,
+  "name": "Elephant Ear",
+  "cuisine": "Thai",
+  "format": "Vibrant Thai street-to-table",
+  "neighborhood": "Hell's Kitchen",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai with elephant ear noodles",
+  "blurb": "Spirited Thai spot delivering bold, authentic flavors in casual Hell's Kitchen setting.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Counter seating for kitchen views",
+  "arrival": "Street parking available; subway accessible via A/C/E lines",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 3,
+   "business": 2
+  }
+ },
+ {
+  "id": 1154,
+  "name": "Thai Villa",
+  "cuisine": "Thai",
+  "format": "Vibrant neighborhood Thai kitchen",
+  "neighborhood": "Flatiron / Union Square",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Beloved neighborhood Thai spot with authentic flavors and bustling energy.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Communal seating or window seats",
+  "arrival": "Street parking limited; subway accessible (N/R/W nearby)",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1155,
+  "name": "Hey Thai",
+  "cuisine": "Thai",
+  "format": "Vibrant neighborhood Thai kitchen",
+  "neighborhood": "Financial District/Tribeca",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Beloved Thai spot serving authentic flavors in a casual, energetic setting.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Counter seating for kitchen views",
+  "arrival": "Street parking limited; subway accessible",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 3,
+   "clientele": 3,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1156,
+  "name": "Thai Pavilion NYC",
+  "cuisine": "Thai",
+  "format": "Vibrant Thai kitchen",
+  "neighborhood": "Midtown Manhattan",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Spirited Thai spot delivering authentic flavors in lively Midtown setting.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Window seats along 56th Street",
+  "arrival": "Street parking limited; Subway (N/R/W) nearby",
+  "privateDining": "Limited",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1157,
+  "name": "Wanglang NYC",
+  "cuisine": "Thai",
+  "format": "Vibrant street-food temple",
+  "neighborhood": "Chelsea",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Energetic Thai spot delivering bold, authentic flavors in casual Chelsea setting.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Counter seating for kitchen views",
+  "arrival": "Street parking tight; subway accessible (A/C/E nearby)",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 3,
+   "clientele": 3,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1158,
+  "name": "LumLum",
+  "cuisine": "Thai",
+  "format": "Vibrant Thai street-food restaurant",
+  "neighborhood": "Midtown West (Theater District)",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Lively Thai spot with bold flavors and energetic atmosphere.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Counter seating for energy and kitchen views",
+  "arrival": "Midtown transit accessible; street parking limited",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 3,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1159,
+  "name": "Pranakhon",
+  "cuisine": "Thai",
+  "format": "Vibrant Thai street-food parlor",
+  "neighborhood": "Greenwich Village",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Lively Greenwich Village Thai spot with bold flavors and high-energy charm.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Counter seating for peak energy",
+  "arrival": "Street parking limited; nearby subway access",
+  "privateDining": "Limited",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1160,
+  "name": "Chalong Southern Thai",
+  "cuisine": "Thai",
+  "format": "Vibrant Southern Thai hotspot",
+  "neighborhood": "Midtown West",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Southern Thai curries",
+  "blurb": "Lively, authentic Southern Thai with bold flavors and enthusiastic crowds.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, diverse crowd",
+  "bestTables": "Counter seating for kitchen views",
+  "arrival": "Street parking challenging; subway accessible (A/C/E lines nearby)",
+  "privateDining": "Limited",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1161,
+  "name": "Imm Thai NYC",
+  "cuisine": "Thai",
+  "format": "Vibrant street-level Thai kitchen",
+  "neighborhood": "Financial District / Lower Manhattan",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai, Larb",
+  "blurb": "Authentic Thai comfort food in bustling downtown Manhattan location.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, mixed crowd",
+  "bestTables": "Counter seating for kitchen views",
+  "arrival": "Walk-in friendly; near subway (Broadway-Nassau)",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 3,
+   "clientele": 3,
+   "privacy": 2,
+   "beverage": 2,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1162,
+  "name": "THEP Thai Restaurant",
+  "cuisine": "Thai",
+  "format": "Vibrant neighborhood Thai",
+  "neighborhood": "Upper East Side",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Beloved Upper East Side Thai with stellar ratings and authentic flavor.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Window seats for people-watching",
+  "arrival": "Street parking limited; subway nearby",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 3,
+   "beverage": 3,
+   "view": 3,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 3,
+   "business": 3
+  }
+ },
+ {
+  "id": 1163,
+  "name": "CHADA NYC",
+  "cuisine": "Thai",
+  "format": "Vibrant Thai kitchen",
+  "neighborhood": "Greenwich Village",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Group dinner",
+   "Quick bite"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Lively Greenwich Village Thai spot with confident cooking and loyal following.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Counter seating for kitchen views",
+  "arrival": "Street parking limited; subway accessible (A/C/E lines nearby)",
+  "privateDining": "No",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 2
+  }
+ },
+ {
+  "id": 1164,
+  "name": "Dagg Thai Restaurant",
+  "cuisine": "Thai",
+  "format": "Vibrant neighborhood Thai",
+  "neighborhood": "Midtown East",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Beloved Thai spot delivering authentic flavors in a lively, unpretentious setting.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, mixed crowd",
+  "bestTables": "Counter seating for quick service",
+  "arrival": "Street parking challenging; nearby subway access",
+  "privateDining": "Limited",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 2,
+   "beverage": 3,
+   "view": 2,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 2,
+   "business": 3
+  }
+ },
+ {
+  "id": 1165,
+  "name": "Up Thai",
+  "cuisine": "Thai",
+  "format": "Vibrant neighborhood Thai",
+  "neighborhood": "Upper East Side",
+  "borough": "New York",
+  "city": "New York",
+  "country": "United States",
+  "price": 2,
+  "rope": 1,
+  "occasion": [
+   "Casual",
+   "Quick bite",
+   "Group dinner"
+  ],
+  "recognition": "Local favorite",
+  "signature": "Pad Thai",
+  "blurb": "Beloved Upper East Side Thai spot with exceptional ratings and accessible charm.",
+  "chef": "",
+  "noise": "Lively",
+  "dress": "Casual, relaxed crowd",
+  "bestTables": "Window seats along 2nd Ave",
+  "arrival": "Street parking limited; subway accessible",
+  "privateDining": "Limited",
+  "scores": {
+   "food": 4,
+   "service": 4,
+   "ambiance": 4,
+   "clientele": 4,
+   "privacy": 3,
+   "beverage": 3,
+   "view": 3,
+   "value": 4,
+   "consistency": 4,
+   "romantic": 3,
+   "business": 3
+  }
  }
 ]
