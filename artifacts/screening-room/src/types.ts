@@ -130,6 +130,7 @@ export function colorFor(genre: string): [string, string] {
 }
 
 export const IMG_BASE = "https://image.tmdb.org/t/p/w342";
-export const IMG_POSTER = "https://image.tmdb.org/t/p/w185";   // small grid poster (mobile-friendly)
+export const IMG_POSTER = "https://image.tmdb.org/t/p/w185";     // small grid poster (small phones)
+export const IMG_POSTER_LG = "https://image.tmdb.org/t/p/w500";  // crisp poster for retina / desktop
 export const IMG_BACKDROP = "https://image.tmdb.org/t/p/w1280";
 export const IMG_PROFILE = "https://image.tmdb.org/t/p/w185";
