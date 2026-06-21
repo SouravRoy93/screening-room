@@ -30,7 +30,7 @@ async function discover(city, cuisine) {
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": GKEY,
-      "X-Goog-FieldMask": "places.displayName,places.priceLevel,places.rating,places.userRatingCount,places.types,places.primaryTypeDisplayName,places.shortFormattedAddress,places.formattedAddress"
+      "X-Goog-FieldMask": "places.id,places.location,places.displayName,places.priceLevel,places.rating,places.userRatingCount,places.types,places.primaryTypeDisplayName,places.shortFormattedAddress,places.formattedAddress"
     },
     body: JSON.stringify({
       textQuery: `best ${cuisine} restaurants in ${city.name}`,
@@ -45,6 +45,9 @@ async function discover(city, cuisine) {
     .filter(p => (p.types || []).some(t => /restaurant|food|cafe|bar/.test(t)))
     .map(p => ({
       name: (p.displayName && p.displayName.text || "").trim(),
+      placeId: p.id || null,
+      lat: (p.location && p.location.latitude) || null,
+      lng: (p.location && p.location.longitude) || null,
       priceLevel: p.priceLevel || null,
       rating: p.rating || null, ratings: p.userRatingCount || null,
       primaryType: p.primaryTypeDisplayName && p.primaryTypeDisplayName.text || null,
@@ -71,6 +74,8 @@ function record(id, cand, e, city, cuisine) {
   const s = e.scores || {};
   return {
     id, name: cand.name,
+    placeId: cand.placeId || null,
+    lat: cand.lat || null, lng: cand.lng || null,
     cuisine: norm(e.cuisine) || cuisine,
     format: norm(e.format) || "Restaurant",
     neighborhood: norm(e.neighborhood) || city.short,
