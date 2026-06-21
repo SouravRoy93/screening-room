@@ -281,4 +281,78 @@ router.get("/places/photo", async (req, res): Promise<void> => {
   }
 });
 
+// ── Generic place search (id + location) — for places detail & dining geocoding ──
+async function searchPlace(query: string): Promise<{ id: string; lat: number | null; lng: number | null } | null> {
+  if (!PLACES_KEY) return null;
+  const r = await fetch(`${PLACES_BASE}/places:searchText`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Goog-Api-Key": PLACES_KEY, "X-Goog-FieldMask": "places.id,places.location" },
+    body: JSON.stringify({ textQuery: query, maxResultCount: 1 }),
+  });
+  if (!r.ok) return null;
+  const d = await r.json() as { places?: { id: string; location?: { latitude: number; longitude: number } }[] };
+  const p = d.places?.[0];
+  if (!p) return null;
+  return { id: p.id, lat: p.location?.latitude ?? null, lng: p.location?.longitude ?? null };
+}
+
+// ── Geocode by name (cached) — used by the dining map for items without coords ──
+const geoCache = new Map<string, { lat: number | null; lng: number | null }>();
+router.get("/places/geocode", async (req, res): Promise<void> => {
+  const q = (req.query.q as string || "").trim();
+  if (!q) { res.json({ lat: null, lng: null }); return; }
+  const key = q.toLowerCase();
+  if (geoCache.has(key)) { res.json(geoCache.get(key)); return; }
+  try {
+    const hit = await searchPlace(q);
+    const out = { lat: hit?.lat ?? null, lng: hit?.lng ?? null };
+    geoCache.set(key, out);
+    res.json(out);
+  } catch { res.json({ lat: null, lng: null }); }
+});
+
+// ── Place detail (reviews + full-res photos + maps link) for the Places detail page ──
+const placeDetailCache = new Map<string, unknown>();
+router.get("/places/detail", async (req, res): Promise<void> => {
+  const placeIdQ = (req.query.placeId as string) || "";
+  const name = (req.query.name as string) || "";
+  const area = (req.query.area as string) || "";
+  if (!PLACES_KEY) { res.json({ reviews: [], photos: [], maps_url: null }); return; }
+  const cacheKey = placeIdQ || `${name}|${area}`;
+  if (placeDetailCache.has(cacheKey)) { res.json(placeDetailCache.get(cacheKey)); return; }
+  try {
+    let placeId = placeIdQ;
+    if (!placeId && name) {
+      const hit = await searchPlace(`${name} ${area} New York`);
+      placeId = hit?.id || "";
+    }
+    if (!placeId) { res.json({ reviews: [], photos: [], maps_url: null }); return; }
+
+    const detail = await getPlaceDetails(placeId) as Record<string, unknown>;
+    const rawPhotos = (detail.photos as { name: string }[] | undefined) || [];
+    const photos = (await Promise.all(rawPhotos.slice(0, 6).map(p => resolveCdnUrl(p.name, 1280))))
+      .filter((u): u is string => Boolean(u));
+    const reviews = ((detail.reviews as Record<string, unknown>[] | undefined) || [])
+      .slice(0, 5)
+      .map(r => ({
+        author: (r.authorAttribution as Record<string, string>)?.displayName || "Anonymous",
+        rating: r.rating,
+        text: (r.text as Record<string, string>)?.text || "",
+        relativeTime: r.relativePublishTimeDescription,
+      }));
+    const out = {
+      place_id: placeId,
+      maps_url: detail.googleMapsUri || null,
+      rating: detail.rating || null,
+      user_rating_count: detail.userRatingCount || null,
+      photos,
+      reviews,
+    };
+    placeDetailCache.set(cacheKey, out);
+    res.json(out);
+  } catch {
+    res.json({ reviews: [], photos: [], maps_url: null });
+  }
+});
+
 export default router;
