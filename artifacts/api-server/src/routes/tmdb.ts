@@ -53,15 +53,32 @@ function toMediaCard(item: Record<string, unknown>, mt: "movie" | "tv") {
   };
 }
 
+// Streaming availability (TMDB watch/providers, powered by JustWatch).
+// Returns the region's Stream / Rent / Buy provider lists plus the JustWatch link.
+function pickWatch(wp: any, region = "US") {
+  const r = wp && wp.results ? wp.results[region] : null;
+  if (!r) return null;
+  const map = (arr: any): { provider_id: number; name: string; logo_path: string | null }[] =>
+    (Array.isArray(arr) ? arr : []).map((x: any) => ({ provider_id: x.provider_id, name: x.provider_name, logo_path: x.logo_path || null }));
+  const seen = new Set<number>();
+  const stream = [...map(r.flatrate), ...map(r.free), ...map(r.ads)]
+    .filter((x) => (seen.has(x.provider_id) ? false : (seen.add(x.provider_id), true)));
+  const rent = map(r.rent);
+  const buy = map(r.buy);
+  if (!stream.length && !rent.length && !buy.length) return null;
+  return { link: (r.link as string) || null, stream, rent, buy };
+}
+
 router.get("/tmdb/movie/:tmdb_id", async (req, res): Promise<void> => {
   const p = GetMovieDetailParams.safeParse({ tmdb_id: Number(req.params.tmdb_id) });
   if (!p.success) { res.status(400).json({ error: "Invalid tmdb_id" }); return; }
 
   try {
-    const [detail, credits, videos] = await Promise.all([
+    const [detail, credits, videos, providers] = await Promise.all([
       tmdbFetch(`movie/${p.data.tmdb_id}`),
       tmdbFetch(`movie/${p.data.tmdb_id}/credits`),
       tmdbFetch(`movie/${p.data.tmdb_id}/videos`),
+      tmdbFetch(`movie/${p.data.tmdb_id}/watch/providers`).catch(() => null),
     ]);
 
     const trailer = (videos.results as Record<string, string>[])
@@ -88,6 +105,7 @@ router.get("/tmdb/movie/:tmdb_id", async (req, res): Promise<void> => {
         order: c.order,
       })),
       trailer: trailer ? { key: trailer.key, name: trailer.name, site: trailer.site, type: trailer.type } : null,
+      watch: pickWatch(providers),
       number_of_seasons: null,
       next_episode_to_air: null,
     });
@@ -120,10 +138,11 @@ router.get("/tmdb/tv/:tmdb_id", async (req, res): Promise<void> => {
   if (!p.success) { res.status(400).json({ error: "Invalid tmdb_id" }); return; }
 
   try {
-    const [detail, credits, videos] = await Promise.all([
+    const [detail, credits, videos, providers] = await Promise.all([
       tmdbFetch(`tv/${p.data.tmdb_id}`),
       tmdbFetch(`tv/${p.data.tmdb_id}/credits`),
       tmdbFetch(`tv/${p.data.tmdb_id}/videos`),
+      tmdbFetch(`tv/${p.data.tmdb_id}/watch/providers`).catch(() => null),
     ]);
 
     const trailer = (videos.results as Record<string, string>[])
@@ -150,6 +169,7 @@ router.get("/tmdb/tv/:tmdb_id", async (req, res): Promise<void> => {
         order: c.order,
       })),
       trailer: trailer ? { key: trailer.key, name: trailer.name, site: trailer.site, type: trailer.type } : null,
+      watch: pickWatch(providers),
       number_of_seasons: detail.number_of_seasons || null,
       next_episode_to_air: detail.next_episode_to_air || null,
     });
