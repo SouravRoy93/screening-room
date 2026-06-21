@@ -1990,3 +1990,39 @@
 .w2w-logo:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.45); }
 .w2w-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .w2w-logo-txt { font-size: 9px; color: #111; text-align: center; padding: 2px; font-weight: 600; }
+
+/* ===== Dining list/map toggle ===== */
+.dc-viewseg { display: inline-flex; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+.dc-viewseg button { display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); background: none; border: none; padding: 6px 13px; cursor: pointer; transition: .15s; }
+.dc-viewseg button:hover { color: rgba(255,255,255,0.85); }
+.dc-viewseg button.on { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ===== Place detail — full (uncropped) hero image ===== */
+.mdp-backdrop-blur { object-fit: cover; filter: blur(34px) brightness(0.45); transform: scale(1.18); z-index: 0; }
+.mdp-backdrop-full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; z-index: 1; }
+
+/* ===== Perfect Day — travel connectors between stops ===== */
+.pl-travel { display: flex; align-items: center; gap: 12px; margin: 0 0 10px 84px; }
+.pl-travel-rail { width: 2px; height: 26px; border-radius: 2px; background: linear-gradient(rgba(243,217,154,0.45), rgba(243,217,154,0.04)); }
+.pl-travel-opts { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.pl-travel-pill { display: inline-flex; align-items: center; gap: 5px; font: inherit; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 4px 10px; cursor: pointer; transition: .18s; white-space: nowrap; }
+.pl-travel-pill:hover { border-color: rgba(243,217,154,0.5); color: #f3d99a; }
+.pl-travel-pill.on { background: linear-gradient(135deg,#f5dc97,#caa24e); color: #1a1407; border-color: transparent; box-shadow: 0 2px 10px rgba(202,162,78,0.3); }
+.pl-travel-dist { font-size: 10.5px; color: rgba(255,255,255,0.35); margin-left: 2px; white-space: nowrap; }
+
+/* ===== Perfect Day — exotic "curating" animation ===== */
+.pl-day-building { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 360px; padding: 40px 20px; text-align: center; }
+.pl-orb { position: relative; width: 130px; height: 130px; margin-bottom: 30px; }
+.pl-orb-core { position: absolute; top: 50%; left: 50%; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff7e0, #f3d99a 42%, #caa24e 78%); box-shadow: 0 0 30px 7px rgba(202,162,78,0.55); animation: plPulse 1.8s ease-in-out infinite; }
+.pl-orb-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(243,217,154,0.35); animation: plSpin 3.4s linear infinite; }
+.pl-orb-ring.r2 { inset: 20px; border-color: rgba(236,72,153,0.32); animation: plSpin 2.3s linear infinite reverse; }
+.pl-orb-dot { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; }
+.pl-orb-dot.d1 { background: #f3d99a; box-shadow: 0 0 8px #f3d99a; animation: plOrbit 2.8s linear infinite; }
+.pl-orb-dot.d2 { background: #ec4899; box-shadow: 0 0 8px #ec4899; animation: plOrbit 2.8s linear infinite; animation-delay: -0.93s; }
+.pl-orb-dot.d3 { background: #8b5cf6; box-shadow: 0 0 8px #8b5cf6; animation: plOrbit 2.8s linear infinite; animation-delay: -1.86s; }
+@keyframes plOrbit { from { transform: rotate(0deg) translateX(58px) rotate(0deg); } to { transform: rotate(360deg) translateX(58px) rotate(-360deg); } }
+@keyframes plSpin { to { transform: rotate(360deg); } }
+@keyframes plPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.82; } }
+.pl-build-title { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 600; letter-spacing: 1px; color: #f3d99a; margin-bottom: 7px; }
+.pl-build-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-style: italic; animation: plShimmer 2s ease-in-out infinite; }
+@keyframes plShimmer { 0%,100% { opacity: 0.45; } 50% { opacity: 1; } }
