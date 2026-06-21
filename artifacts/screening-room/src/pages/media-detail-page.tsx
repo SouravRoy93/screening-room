@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { Star, Play, ChevronLeft, Bell, BellOff, Bookmark, Eye, CheckCircle, Film, Tv, Volume2 } from "lucide-react";
+import { Star, Play, ChevronLeft, ChevronDown, Bell, BellOff, Bookmark, Eye, CheckCircle, Film, Tv, Volume2 } from "lucide-react";
 import { IMG_BACKDROP, IMG_BASE, IMG_PROFILE } from "@/types";
 import type { MediaItem, TrackedItem } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
@@ -111,6 +111,38 @@ function RecCard({ item, onClick }: { item: RecItem; onClick: () => void }) {
         <p className="mdp-rec-score">★ {item.vote_average.toFixed(1)}</p>
       ) : null}
     </button>
+  );
+}
+
+function WhereToWatch({ watch }: { watch: WatchInfo }) {
+  const [open, setOpen] = useState(false);
+  const seen = new Set<number>();
+  const all = [...watch.stream, ...watch.rent, ...watch.buy].filter(
+    p => (seen.has(p.provider_id) ? false : (seen.add(p.provider_id), true))
+  );
+  if (!all.length) return null;
+  return (
+    <div className={`w2w${open ? " open" : ""}`}>
+      <button className="w2w-head" onClick={() => setOpen(o => !o)} aria-expanded={open}>
+        <span className="w2w-head-left">
+          <span className="w2w-label">Where to watch</span>
+          <span className="w2w-count">{all.length} {all.length === 1 ? "service" : "services"}</span>
+        </span>
+        <ChevronDown size={18} className="w2w-chev" />
+      </button>
+      <div className="w2w-panel">
+        <div className="w2w-grid">
+          {all.map(pv => (
+            <a key={pv.provider_id} href={watch.link || undefined} target="_blank" rel="noopener noreferrer"
+              className="w2w-logo" title={pv.name}>
+              {pv.logo_path
+                ? <img src={`https://image.tmdb.org/t/p/w185${pv.logo_path}`} alt={pv.name} loading="lazy" />
+                : <span className="w2w-logo-txt">{pv.name}</span>}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -321,40 +353,8 @@ export default function MediaDetailPage() {
           </div>
         )}
 
-        {/* Where to watch (TMDB watch providers, via JustWatch) */}
-        {detail?.watch && (detail.watch.stream.length > 0 || detail.watch.rent.length > 0 || detail.watch.buy.length > 0) && (() => {
-          const watch = detail.watch;
-          return (
-            <div className="mdp-section">
-              <div className="mdp-section-label">Where to watch</div>
-              {([["Stream", watch.stream], ["Rent", watch.rent], ["Buy", watch.buy]] as [string, WatchProvider[]][]).map(([label, list]) =>
-                list.length > 0 ? (
-                  <div key={label} style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 7 }}>{label}</div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
-                      {list.map(pv => (
-                        <a key={pv.provider_id} href={watch.link || undefined} target="_blank" rel="noopener noreferrer"
-                          title={`${pv.name} — open on JustWatch`}
-                          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 46, height: 46, borderRadius: 11, overflow: "hidden", border: "1px solid rgba(255,255,255,0.12)", background: "#fff", flexShrink: 0 }}>
-                          {pv.logo_path
-                            ? <img src={`https://image.tmdb.org/t/p/w92${pv.logo_path}`} alt={pv.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                            : <span style={{ fontSize: 9, color: "#111", padding: 2, textAlign: "center" }}>{pv.name}</span>}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                ) : null
-              )}
-              {watch.link && (
-                <a href={watch.link} target="_blank" rel="noopener noreferrer"
-                  style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 13, fontWeight: 600, color: "#ffd36b", textDecoration: "none" }}>
-                  Where to watch — all options ↗
-                </a>
-              )}
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 8 }}>Streaming availability via JustWatch</div>
-            </div>
-          );
-        })()}
+        {/* Where to watch — luxury dropdown, combined providers, via JustWatch */}
+        {detail?.watch && <WhereToWatch watch={detail.watch} />}
 
         {/* Next episode (TV) */}
         {mediaType === "tv" && detail?.next_episode_to_air && (
