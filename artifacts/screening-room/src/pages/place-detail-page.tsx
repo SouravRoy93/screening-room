@@ -3,6 +3,17 @@ import { useLocation, useParams } from "wouter";
 import { ChevronLeft, CheckCircle, ExternalLink } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+interface PlaceLive {
+  place_id?: string;
+  maps_url: string | null;
+  rating: number | null;
+  user_rating_count: number | null;
+  photos: string[];
+  reviews: { author: string; rating: number; text: string; relativeTime: string }[];
+}
+
 function getLS<T>(k: string, def: T): T {
   try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; }
 }
@@ -17,6 +28,24 @@ export default function PlaceDetailPage() {
 
   const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
   const [visited, setVisited] = useState<Record<number, boolean>>(() => getLS("pl_visited", {}));
+  const [detail, setDetail] = useState<PlaceLive | null>(null);
+
+  useEffect(() => {
+    if (!place) return;
+    let alive = true;
+    setDetail(null);
+    const qs = place.placeId
+      ? `placeId=${encodeURIComponent(place.placeId)}`
+      : `name=${encodeURIComponent(place.name)}&area=${encodeURIComponent(place.area || "")}`;
+    fetch(`${API_BASE}/places/detail?${qs}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (alive && d) setDetail(d); })
+      .catch(() => {});
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [place?.id]);
+
+  const heroImg = detail?.photos?.[0] || place?.img || null;
 
   const isSaved = place ? !!saved[place.id] : false;
   const isVisited = place ? !!visited[place.id] : false;
@@ -50,8 +79,11 @@ export default function PlaceDetailPage() {
 
       {/* ── HERO ── */}
       <div className="mdp-hero">
-        {place.img ? (
-          <img src={place.img} alt="" className="mdp-backdrop" />
+        {heroImg ? (
+          <>
+            <img src={heroImg} alt="" className="mdp-backdrop mdp-backdrop-blur" aria-hidden="true" />
+            <img src={heroImg} alt={place.name} className="mdp-backdrop-full" />
+          </>
         ) : (
           <div className="mdp-backdrop-placeholder" />
         )}
@@ -145,6 +177,34 @@ export default function PlaceDetailPage() {
         {/* Insider tip */}
         {place.insider && (
           <div className="pl-insider"><span>Insider tip</span> {place.insider}</div>
+        )}
+
+        {/* Google reviews */}
+        {detail && detail.reviews && detail.reviews.length > 0 && (
+          <div className="ddp-reviews-section" style={{ marginTop: 24 }}>
+            <div className="ddp-reviews-head">GOOGLE REVIEWS</div>
+            {detail.reviews.slice(0, 5).map((rev, i) => {
+              const full = Math.round(rev.rating || 0);
+              return (
+                <div key={i} className="ddp-review-card">
+                  <div className="ddp-review-top">
+                    <span className="ddp-review-author">{rev.author}</span>
+                    <span style={{ fontSize: 12, letterSpacing: 1 }}>
+                      <span style={{ color: "#ffd36b" }}>{"\u2605".repeat(full)}</span>
+                      <span style={{ color: "rgba(255,255,255,0.18)" }}>{"\u2605".repeat(5 - full)}</span>
+                    </span>
+                  </div>
+                  <p className="ddp-review-text">{rev.text}</p>
+                  {rev.relativeTime && <p className="ddp-review-time">{rev.relativeTime}</p>}
+                </div>
+              );
+            })}
+            {detail.maps_url && (
+              <a href={detail.maps_url} target="_blank" rel="noopener noreferrer" className="ddp-more-google">
+                More google reviews <ExternalLink size={12} />
+              </a>
+            )}
+          </div>
         )}
 
         {/* Score bars */}
