@@ -1,6 +1,9 @@
 // ============================================================================
 //  GROW ENTERTAINMENT — daily growth engine for the Films/TV catalog.
-//  Writes artifacts/screening-room/public/catalog.json (the file the app reads).
+//  Writes:
+//    • artifacts/screening-room/public/catalog.json       (full catalog)
+//    • artifacts/screening-room/public/catalog-top.json    (top ~500 by popularity,
+//      a tiny file the app loads first for an instant entertainment page)
 //
 //  Source: TMDB. The catalog ACCUMULATES — each run merges new titles, refreshes
 //  popularity, de-dupes by (media_type + tmdb_id), and re-sorts by popularity.
@@ -15,14 +18,17 @@
 //   { tmdb_id, media_type, title, year, genres[], poster_path, vote_average,
 //     popularity, release_date }
 //
-//  Env: TMDB_KEY (required). Optional: CATALOG_FILE, MAX_CATALOG (default 15000),
+//  Env: TMDB_KEY (required). Optional: CATALOG_FILE, CATALOG_TOP_FILE,
+//       MAX_CATALOG (default 15000), TOP_COUNT (default 500),
 //       DISCOVER_PAGES (deep pages per media type per run, default 30).
 // ============================================================================
 import { loadJson, saveJson, intEnv } from "./_shared.mjs";
 
 const TMDB_KEY = process.env.TMDB_KEY || process.env.TMDB_API_KEY;
 const CATALOG_FILE = process.env.CATALOG_FILE || "artifacts/screening-room/public/catalog.json";
+const TOP_FILE = process.env.CATALOG_TOP_FILE || CATALOG_FILE.replace(/catalog\.json$/, "catalog-top.json");
 const MAX_CATALOG = intEnv("MAX_CATALOG", 15000);
+const TOP_COUNT = intEnv("TOP_COUNT", 500);
 const PER_RUN = intEnv("DISCOVER_PAGES", 30);
 
 const GENRES = {
@@ -128,6 +134,7 @@ async function main() {
   if (merged.length > MAX_CATALOG) merged = merged.slice(0, MAX_CATALOG);
 
   saveJson(CATALOG_FILE, merged, 0);
-  console.log("Catalog: " + before + " -> " + merged.length + " titles  (added " + (merged.length - before) + "; fetched " + pages + " pages, " + failed + " failed; cap " + MAX_CATALOG + ").");
+  saveJson(TOP_FILE, merged.slice(0, TOP_COUNT), 0);   // tiny head file for instant first paint
+  console.log("Catalog: " + before + " -> " + merged.length + " titles  (added " + (merged.length - before) + "; fetched " + pages + " pages, " + failed + " failed; cap " + MAX_CATALOG + "). Top file: " + Math.min(TOP_COUNT, merged.length) + ".");
 }
 main().catch(e => { console.error(e); process.exit(1); });
