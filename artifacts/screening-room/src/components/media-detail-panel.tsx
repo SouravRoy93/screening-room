@@ -21,6 +21,19 @@ interface Trailer {
   type: string;
 }
 
+interface WatchProvider {
+  provider_id: number;
+  name: string;
+  logo_path: string | null;
+}
+
+interface WatchInfo {
+  link: string | null;
+  stream: WatchProvider[];
+  rent: WatchProvider[];
+  buy: WatchProvider[];
+}
+
 interface DetailData {
   tmdb_id: number;
   media_type: "movie" | "tv";
@@ -36,6 +49,7 @@ interface DetailData {
   tagline: string | null;
   cast: CastMember[];
   trailer: Trailer | null;
+  watch: WatchInfo | null;
   number_of_seasons: number | null;
   next_episode_to_air: unknown;
 }
@@ -97,6 +111,7 @@ export function MediaDetailPanel({ item, tracked, onClose, onStatus, onRating, o
   if (!item) return null;
 
   const d = detail;
+  const w = d?.watch ?? null;
   const backdropUrl = d?.backdrop_path ? `${IMG_BACKDROP}${d.backdrop_path}` : null;
   const currentRating = tracked?.rating ?? null;
   const displayRating = hoverRating ?? currentRating;
@@ -266,6 +281,39 @@ export function MediaDetailPanel({ item, tracked, onClose, onStatus, onRating, o
           )}
           {d?.overview && (
             <p className="text-sm text-muted-foreground leading-relaxed mb-5">{d.overview}</p>
+          )}
+
+          {/* Where to watch (TMDB watch providers, via JustWatch) */}
+          {w && (w.stream.length > 0 || w.rent.length > 0 || w.buy.length > 0) && (
+            <div className="mb-5">
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Where to watch</h3>
+              {([["Stream", w.stream], ["Rent", w.rent], ["Buy", w.buy]] as [string, WatchProvider[]][]).map(([label, list]) =>
+                list.length > 0 ? (
+                  <div key={label} style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>{label}</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {list.map(pv => (
+                        <a key={pv.provider_id} href={w.link || undefined} target="_blank" rel="noopener noreferrer"
+                          title={`${pv.name} — open on JustWatch`}
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 42, height: 42, borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,0.12)", background: "#fff", flexShrink: 0 }}>
+                          {pv.logo_path
+                            ? <img src={`https://image.tmdb.org/t/p/w92${pv.logo_path}`} alt={pv.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <span style={{ fontSize: 9, color: "#111", padding: 2, textAlign: "center" }}>{pv.name}</span>}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ) : null
+              )}
+              {w.link && (
+                <a href={w.link} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg mt-1 text-sm font-medium transition-opacity hover:opacity-90"
+                  style={{ background: "rgba(255,211,107,0.14)", border: "1px solid rgba(255,211,107,0.35)", color: "#ffd36b" }}>
+                  Where to watch — all options ↗
+                </a>
+              )}
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 6 }}>Streaming availability via JustWatch</div>
+            </div>
           )}
 
           {/* Cast */}
