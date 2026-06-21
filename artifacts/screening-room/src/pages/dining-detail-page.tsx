@@ -355,7 +355,12 @@ export default function DiningDetailPage() {
           <div className="ddp-section" style={{ marginTop: 18 }}>
             <div className="ddp-section-label">Our take</div>
             {r.recognition && <p style={{ color: "#f0b429", fontWeight: 600, margin: "4px 0 8px" }}>★ {r.recognition}</p>}
-            {r.signature && <p className="ddp-blurb" style={{ marginBottom: 10 }}>✦ {r.signature}</p>}
+            {r.signature && (
+              <div className="ddp-must-order">
+                <span className="ddp-must-order-label">MUST ORDER</span>
+                <span className="ddp-must-order-text">{r.signature}</span>
+              </div>
+            )}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px", fontSize: 13, marginBottom: 14 }}>
               {([
@@ -466,6 +471,11 @@ export default function DiningDetailPage() {
               <button className="ddp-see-more-reviews" onClick={() => setShowAllReviews(v => !v)}>
                 {showAllReviews ? "Show fewer reviews" : `See all ${places.reviews.length} reviews`}
               </button>
+            )}
+            {places.maps_url && (
+              <a href={places.maps_url} target="_blank" rel="noopener noreferrer" className="ddp-more-google">
+                More google reviews <ExternalLink size={12} />
+              </a>
             )}
           </div>
         )}
