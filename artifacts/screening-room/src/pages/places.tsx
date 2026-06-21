@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, Search, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, ChevronDown, Search, ExternalLink, Heart, Check } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import type { PlaceItem } from "@/types";
@@ -185,11 +185,11 @@ function PlaceCard({ p, saved, visited, onSave, onVisit }: {
           {(p.scores?.mustVisit ?? 0) >= 5 && <span style={{ color: "#ffd36b" }}>★ Must-visit</span>}
         </div>
         <div className="pl-card-actions" onClick={e => e.stopPropagation()}>
-          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave}>
-            {saved ? "♥ Saved" : "♡ Want to go"}
+          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave} aria-label="Want to go">
+            <Heart size={13} /><span>{saved ? "Saved" : "Want to go"}</span>
           </button>
-          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit}>
-            {visited ? <><CheckCircle size={11} /> Been</> : "Been there"}
+          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit} aria-label="Been there">
+            <Check size={13} /><span>{visited ? "Been" : "Been there"}</span>
           </button>
         </div>
       </div>
@@ -197,6 +197,32 @@ function PlaceCard({ p, saved, visited, onSave, onVisit }: {
   );
 }
 
+
+function PaginatedPlaceGrid({ items, saved, visited, toggleSave, toggleVisit, label = "places" }: {
+  items: PlaceItem[]; saved: Record<number, boolean>; visited: Record<number, boolean>;
+  toggleSave: (id: number) => void; toggleVisit: (id: number) => void; label?: string;
+}) {
+  const [vis, setVis] = useState(30);
+  useEffect(() => { setVis(30); }, [items]);
+  return (
+    <>
+      <div className="pl-grid">
+        {items.slice(0, vis).map(p => (
+          <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
+            onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
+            onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
+        ))}
+      </div>
+      {items.length > vis && (
+        <div className="pl-viewmore-wrap">
+          <button className="pl-viewmore" onClick={() => setVis(v => v + 30)}>
+            VIEW MORE {label.toUpperCase()} <ChevronDown size={14} />
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
 
 // ─── Live Google Place Card ──────────────────────────────────────────────────
 
@@ -223,11 +249,11 @@ function LivePlaceCard({ p, saved, visited, onSave, onVisit }: {
           {p.rating && <span>★ {p.rating.toFixed(1)}{p.user_rating_count ? ` (${p.user_rating_count.toLocaleString()})` : ""}</span>}
         </div>
         <div className="pl-card-actions" onClick={e => e.stopPropagation()}>
-          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave}>
-            {saved ? "♥ Saved" : "♡ Want to go"}
+          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave} aria-label="Want to go">
+            <Heart size={13} /><span>{saved ? "Saved" : "Want to go"}</span>
           </button>
-          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit}>
-            {visited ? <><CheckCircle size={11} /> Been</> : "Been there"}
+          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit} aria-label="Been there">
+            <Check size={13} /><span>{visited ? "Been" : "Been there"}</span>
           </button>
           <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="pl-card-btn pl-card-btn-maps" onClick={e => e.stopPropagation()}>
             <ExternalLink size={10} />
@@ -628,16 +654,10 @@ export default function Places() {
               <h1>Saved</h1>
               <p>Your collection — places kept for the right moment.</p>
             </div>
-            <div className="pl-grid">
-              {Object.keys(saved).length === 0
-                ? <div className="pl-empty">Nothing saved yet — tap ♡ on a place you love.</div>
-                : places.filter(p => saved[p.id]).map(p => (
-                  <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                    onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
-                    onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
-                ))
-              }
-            </div>
+            {Object.keys(saved).length === 0
+              ? <div className="pl-grid"><div className="pl-empty">Nothing saved yet — tap ♡ on a place you love.</div></div>
+              : <PaginatedPlaceGrid items={places.filter(p => saved[p.id])} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />
+            }
           </>
         )}
 
@@ -714,13 +734,7 @@ export default function Places() {
                         <span className="pl-sec-title">In our guide</span>
                         <span className="pl-sec-note">{localResults.length} found</span>
                       </div>
-                      <div className="pl-grid">
-                        {localResults.map(p => (
-                          <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                            onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
-                            onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
-                        ))}
-                      </div>
+                      <PaginatedPlaceGrid items={localResults} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />
                     </div>
                   ) : null;
                 })()}
@@ -790,13 +804,7 @@ export default function Places() {
                       <span className="pl-sec-title">{sec.title}</span>
                       {sec.note && <span className="pl-sec-note">{sec.note}</span>}
                     </div>
-                    <div className="pl-grid">
-                      {sec.items.map(p => (
-                        <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
-                          onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
-                          onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
-                      ))}
-                    </div>
+                    <PaginatedPlaceGrid items={sec.items} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />
                   </div>
                 ))}
               </>

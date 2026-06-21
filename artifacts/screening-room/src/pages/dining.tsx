@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
-import { ArrowLeft, Search, UtensilsCrossed, ChevronDown, Star } from "lucide-react";
+import { ArrowLeft, Search, UtensilsCrossed, ChevronDown, Star, Heart, CalendarCheck, Check } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
 import type { DiningItem } from "@/types";
 
@@ -33,7 +33,14 @@ async function fetchThumbnail(id: number, name: string, neighborhood: string, bo
   return p;
 }
 
-const ROPE_LABEL: Record<number, string> = { 3: "PLAN AHEAD", 4: "HARD TO GET", 5: "NEAR IMPOSSIBLE" };
+const ROPE: Record<number, { label: string; cls: string }> = {
+  0: { label: "WALK-IN", cls: "r0" },
+  1: { label: "WALK-IN", cls: "r0" },
+  2: { label: "EASY", cls: "r2" },
+  3: { label: "PLAN AHEAD", cls: "r3" },
+  4: { label: "HARD TO GET", cls: "r4" },
+  5: { label: "NEAR IMPOSSIBLE", cls: "r5" },
+};
 const priceStr = (p: number) => "$".repeat(Math.max(1, Math.min(4, p)));
 
 function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
@@ -74,7 +81,7 @@ function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
     if (type === "visited") { const v = !visited; setVisited(v); localStorage.setItem(key, v ? "1" : "0"); }
   };
 
-  const ropeLabel = r.rope !== undefined ? ROPE_LABEL[r.rope] : null;
+  const diff = r.rope !== undefined ? ROPE[r.rope] : null;
 
   return (
     <div ref={ref} className="dc-card" onClick={onClick}>
@@ -86,14 +93,17 @@ function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
           <div className="dc-photo-placeholder"><UtensilsCrossed size={24} color="rgba(255,255,255,0.1)" /></div>
         )}
         <div className="dc-photo-gradient" />
-        {ropeLabel && <div className="dc-rope-badge">{ropeLabel}</div>}
+        {diff && <div className={`dc-rope-badge ${diff.cls}`}>{diff.label}</div>}
         {r.recognition && <div className="dc-recog">{r.recognition}</div>}
       </div>
 
       {/* Body */}
       <div className="dc-body">
+        {(r.neighborhood || r.city) && (
+          <div className="dc-area">{[r.neighborhood, r.city].filter(Boolean).join(" · ")}</div>
+        )}
         <h3 className="dc-name">{r.name}</h3>
-        <p className="dc-meta">{r.cuisine}{r.neighborhood ? ` · ${r.neighborhood}` : ""}{r.city ? ` · ${r.city}` : ""}{` · ${priceStr(r.price)}`}</p>
+        <p className="dc-meta">{r.cuisine}{` · ${priceStr(r.price)}`}</p>
 
         {r.format && <div className="dc-format-chip">{r.format.toUpperCase()}</div>}
 
@@ -103,14 +113,10 @@ function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
           </div>
         )}
 
-        {r.signature && (
-          <p className="dc-order"><span className="dc-order-label">ORDER</span> {r.signature}</p>
-        )}
-
         <div className="dc-btns" onClick={e => e.stopPropagation()}>
-          <button className={`dc-btn${saved ? " on" : ""}`} onClick={e => toggle("saved", e)}>Want to go</button>
-          <button className={`dc-btn${booked ? " on" : ""}`} onClick={e => toggle("booked", e)}>Booked</button>
-          <button className={`dc-btn${visited ? " on" : ""}`} onClick={e => toggle("visited", e)}>Been</button>
+          <button className={`dc-btn${saved ? " on" : ""}`} onClick={e => toggle("saved", e)} aria-label="Want to go"><Heart size={14} /><span>Want</span></button>
+          <button className={`dc-btn${booked ? " on" : ""}`} onClick={e => toggle("booked", e)} aria-label="Booked"><CalendarCheck size={14} /><span>Booked</span></button>
+          <button className={`dc-btn${visited ? " on2" : ""}`} onClick={e => toggle("visited", e)} aria-label="Been"><Check size={14} /><span>Been</span></button>
         </div>
       </div>
     </div>
@@ -129,6 +135,7 @@ export default function Dining() {
   const [cuisineFilter, setCuisineFilter] = useState("All cuisines");
   const [occasionFilter, setOccasionFilter] = useState("Any occasion");
   const [diffFilter, setDiffFilter] = useState("Any difficulty");
+  const [visible, setVisible] = useState(30);
 
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -160,6 +167,8 @@ export default function Dining() {
     }
     return items;
   }, [dining, cityFilter, cuisineFilter, occasionFilter, diffFilter]);
+
+  useEffect(() => { setVisible(30); }, [cityFilter, cuisineFilter, occasionFilter, diffFilter, tab]);
 
   const runSearch = useCallback(async (val: string) => {
     const trimmed = val.trim();
@@ -310,10 +319,18 @@ export default function Dining() {
           </div>
         </div>
 
-        {/* Grid — 4 columns matching Entertainment */}
+        {/* Grid — 5 columns */}
         <div className="dc-grid">
-          {filtered.map(r => <DiningCard key={r.id} r={r} onClick={() => nav(`/dining/${r.id}`)} />)}
+          {filtered.slice(0, visible).map(r => <DiningCard key={r.id} r={r} onClick={() => nav(`/dining/${r.id}`)} />)}
         </div>
+
+        {filtered.length > visible && (
+          <div className="dc-viewmore-wrap">
+            <button className="dc-viewmore" onClick={() => setVisible(v => v + 30)}>
+              VIEW MORE RESTAURANTS <ChevronDown size={14} />
+            </button>
+          </div>
+        )}
 
         {filtered.length === 0 && (
           <p className="text-center text-muted-foreground text-sm py-16">No restaurants found.</p>
