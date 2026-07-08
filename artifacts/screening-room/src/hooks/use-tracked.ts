@@ -32,7 +32,7 @@ export function useTracked(vertical: string, userId: string | undefined) {
     const existing = tracked[key];
 
     if (existing && existing.status === status) {
-      await supabase.from("tracked_items").delete().eq("id", existing.id!);
+      await supabase.from("tracked_items").delete().eq("id", existing.id!).eq("user_id", userId);
       setTracked(prev => { const n = { ...prev }; delete n[key]; return n; });
     } else {
       const row = {

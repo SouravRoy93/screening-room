@@ -21,6 +21,11 @@ router.post("/notifications/episodes", async (req, res): Promise<void> => {
     return;
   }
 
+  const MAX_IDS = 50;
+  if (parsed.data.tmdb_ids.length > MAX_IDS) {
+    res.status(400).json({ error: `Too many ids (max ${MAX_IDS})` });
+    return;
+  }
   const { tmdb_ids } = parsed.data;
   const today = new Date().toISOString().slice(0, 10);
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
