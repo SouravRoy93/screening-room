@@ -124,8 +124,14 @@ export default function Hub() {
       <div className="hub-top">
         <div className="hub-brand">Screening Room</div>
         <div className="hub-user">
-          {displayName && <span>Hi, {displayName}</span>}
-          <button onClick={() => sb.auth.signOut()}>Sign out</button>
+          {user ? (
+            <>
+              {displayName && <span>Hi, {displayName}</span>}
+              <button onClick={() => sb.auth.signOut()}>Sign out</button>
+            </>
+          ) : (
+            <button onClick={() => nav("/auth")}>Sign in</button>
+          )}
         </div>
       </div>
 
@@ -178,10 +184,14 @@ export default function Hub() {
             <button onClick={() => nav("/privacy")} style={{ color: "rgba(255,255,255,0.5)", textDecoration: "underline" }}>
               Privacy & Terms
             </button>
-            <span style={{ color: "rgba(255,255,255,0.25)", margin: "0 8px" }}>·</span>
-            <button onClick={deleteAccount} style={{ color: "rgba(255,255,255,0.5)", textDecoration: "underline" }}>
-              Delete account
-            </button>
+            {user && (
+              <>
+                <span style={{ color: "rgba(255,255,255,0.25)", margin: "0 8px" }}>·</span>
+                <button onClick={deleteAccount} style={{ color: "rgba(255,255,255,0.5)", textDecoration: "underline" }}>
+                  Delete account
+                </button>
+              </>
+            )}
           </p>
         </footer>
       </div>

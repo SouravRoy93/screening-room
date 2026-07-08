@@ -22,7 +22,7 @@ import NotFound from "@/pages/not-found";
 const queryClient = new QueryClient();
 
 function AppRouter() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [, nav] = useLocation();
 
   // When the user arrives from a password-reset email, Supabase emits
@@ -48,13 +48,11 @@ function AppRouter() {
     );
   }
 
-  if (!user) {
-    return <Auth />;
-  }
-
+  // Public browse: anyone can explore the catalogs; tracking prompts sign-in.
   return (
     <Switch>
       <Route path="/" component={Hub} />
+      <Route path="/auth" component={Auth} />
       <Route path="/reset" component={ResetPassword} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/films" component={Films} />

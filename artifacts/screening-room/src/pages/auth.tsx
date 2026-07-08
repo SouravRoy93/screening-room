@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuroraBg } from "@/components/aurora-bg";
 import { supabase } from "@/lib/supabase";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Auth() {
+  const [, nav] = useLocation();
+  const { user } = useAuth();
+  useEffect(() => { if (user) nav("/"); }, [user, nav]);
+
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
