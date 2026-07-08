@@ -1,8 +1,10 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/lib/supabase";
 import { ErrorBoundary } from "@/components/error-boundary";
 import Auth from "@/pages/auth";
 import Hub from "@/pages/hub";
@@ -13,12 +15,24 @@ import DiningDetailPage from "@/pages/dining-detail-page";
 import Places from "@/pages/places";
 import PlaceDetailPage from "@/pages/place-detail-page";
 import Social from "@/pages/social";
+import ResetPassword from "@/pages/reset-password";
+import Privacy from "@/pages/privacy";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
 function AppRouter() {
   const { user, loading } = useAuth();
+  const [, nav] = useLocation();
+
+  // When the user arrives from a password-reset email, Supabase emits
+  // PASSWORD_RECOVERY — route them to the new-password form.
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") nav("/reset");
+    });
+    return () => subscription.unsubscribe();
+  }, [nav]);
 
   if (loading) {
     return (
@@ -41,6 +55,8 @@ function AppRouter() {
   return (
     <Switch>
       <Route path="/" component={Hub} />
+      <Route path="/reset" component={ResetPassword} />
+      <Route path="/privacy" component={Privacy} />
       <Route path="/films" component={Films} />
       <Route path="/films/:type/:id" component={MediaDetailPage} />
       <Route path="/dining" component={Dining} />

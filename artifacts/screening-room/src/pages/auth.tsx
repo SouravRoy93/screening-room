@@ -27,6 +27,17 @@ export default function Auth() {
     }
   }
 
+  async function forgotPassword() {
+    if (!email) { setMsg({ type: "error", text: "Enter your email first." }); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset`,
+    });
+    setLoading(false);
+    if (error) setMsg({ type: "error", text: error.message });
+    else setMsg({ type: "ok", text: "Password reset email sent — check your inbox." });
+  }
+
   async function magicLink() {
     if (!email) { setMsg({ type: "error", text: "Enter your email first." }); return; }
     setLoading(true);
@@ -133,15 +144,26 @@ export default function Auth() {
           </button>
         </form>
 
-        {/* Magic link */}
-        <button
-          onClick={magicLink}
-          disabled={loading}
-          className="text-sm font-medium mb-6 hover:opacity-80 transition-opacity"
-          style={{ color: "#8b5cf6" }}
-        >
-          Email me a magic link instead
-        </button>
+        {/* Magic link / forgot password */}
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={magicLink}
+            disabled={loading}
+            className="text-sm font-medium hover:opacity-80 transition-opacity"
+            style={{ color: "#8b5cf6" }}
+          >
+            Email me a magic link instead
+          </button>
+          {mode === "signin" && (
+            <button
+              onClick={forgotPassword}
+              disabled={loading}
+              className="text-sm font-medium hover:opacity-80 transition-opacity text-muted-foreground"
+            >
+              Forgot password?
+            </button>
+          )}
+        </div>
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-5">
