@@ -791,7 +791,7 @@ export default function Places() {
       {/* Sticky header */}
       <header className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
         style={{ background: "rgba(8,8,13,0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <button onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
+        <button aria-label="Back" onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <MapPin className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />

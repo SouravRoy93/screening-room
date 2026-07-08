@@ -89,7 +89,7 @@ export default function PlaceDetailPage() {
         )}
         <div className="mdp-hero-gradient" />
 
-        <button className="mdp-back" onClick={() => nav("/places")}>
+        <button aria-label="Back" className="mdp-back" onClick={() => nav("/places")}>
           <ChevronLeft size={20} />
           Places
         </button>

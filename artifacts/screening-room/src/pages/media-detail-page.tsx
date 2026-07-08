@@ -248,7 +248,7 @@ export default function MediaDetailPage() {
         <div className="mdp-hero-gradient" />
 
         {/* Back button */}
-        <button className="mdp-back" onClick={() => nav("/films")}>
+        <button aria-label="Back" className="mdp-back" onClick={() => nav("/films")}>
           <ChevronLeft size={20} />
           Entertainment
         </button>

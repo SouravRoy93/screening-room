@@ -163,8 +163,8 @@ export default function Films() {
               <button className={tab === "stats" ? "active" : ""} onClick={() => setTab("stats")}>Stats</button>
             </div>
             {alerts.length > 0 && (
-              <div style={{ position: "relative" }}>
-                <Bell style={{ width: 18, height: 18, color: "#ffd36b" }} />
+              <div style={{ position: "relative" }} role="status" aria-label={`${alerts.length} new episode alerts`}>
+                <Bell aria-hidden="true" style={{ width: 18, height: 18, color: "#ffd36b" }} />
                 <span style={{ position: "absolute", top: -4, right: -4, width: 14, height: 14, borderRadius: "50%", background: "#ec4899", color: "#fff", fontSize: 9, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {alerts.length}
                 </span>

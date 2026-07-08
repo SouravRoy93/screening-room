@@ -17,7 +17,7 @@ const CATS = [
   {
     v: "dining",
     name: "Dining",
-    sub: "New York · 50 tables",
+    sub: "Curated tables, city by city",
     c1: "#f59e0b",
     c2: "#ef4444",
     glow: "rgba(245,158,11,.5)",
