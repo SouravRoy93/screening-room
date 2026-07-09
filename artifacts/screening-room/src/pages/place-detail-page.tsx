@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { ChevronLeft, CheckCircle, ExternalLink } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
+import { pushSave } from "@/lib/cloud-saves";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
@@ -55,6 +56,7 @@ export default function PlaceDetailPage() {
     const next = { ...saved, [place.id]: !saved[place.id] };
     if (!next[place.id]) delete next[place.id];
     setSaved(next); setLS("pl_saved", next);
+    void pushSave("places", place.id, place.name, { saved: !!next[place.id], visited: !!visited[place.id] });
   }
 
   function toggleVisit() {
@@ -62,6 +64,7 @@ export default function PlaceDetailPage() {
     const next = { ...visited, [place.id]: !visited[place.id] };
     if (!next[place.id]) delete next[place.id];
     setVisited(next); setLS("pl_visited", next);
+    void pushSave("places", place.id, place.name, { saved: !!saved[place.id], visited: !!next[place.id] });
   }
 
   useEffect(() => { window.scrollTo(0, 0); }, [id]);
@@ -89,7 +92,7 @@ export default function PlaceDetailPage() {
         )}
         <div className="mdp-hero-gradient" />
 
-        <button className="mdp-back" onClick={() => nav("/places")}>
+        <button aria-label="Back" className="mdp-back" onClick={() => nav("/places")}>
           <ChevronLeft size={20} />
           Places
         </button>

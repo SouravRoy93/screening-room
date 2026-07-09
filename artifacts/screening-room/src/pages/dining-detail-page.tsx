@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, useLocation } from "wouter";
 import { ChevronLeft, Star, ExternalLink, MapPin, Clock, Globe, Bookmark, CheckCircle } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
+import { pushSave } from "@/lib/cloud-saves";
 import type { DiningItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -201,14 +202,26 @@ export default function DiningDetailPage() {
     if (restaurant) fetchPlaces(restaurant);
   }, [restaurant, fetchPlaces]);
 
+  // Mirror flags + journal to Supabase (curated items only; live results stay local)
+  const syncCloud = useCallback((flags: { saved: boolean; booked: boolean; visited: boolean }, journal?: { notes: string; dish: string; withWho: string; tags: string[] }) => {
+    if (isLive || !restaurant || !restaurant.id) return;
+    void pushSave("dining", restaurant.id, restaurant.name, flags, journal && {
+      notes: journal.notes || undefined,
+      dish: journal.dish || undefined,
+      withWho: journal.withWho || undefined,
+      tags: journal.tags.length ? journal.tags : undefined,
+    });
+  }, [isLive, restaurant]);
+
   const persistNotes = useCallback(() => {
     localStorage.setItem(notesKey, notes);
     localStorage.setItem(dishKey, dish);
     localStorage.setItem(withKey, withWho);
     localStorage.setItem(tagsKey, JSON.stringify([...tags]));
+    syncCloud({ saved, booked, visited }, { notes, dish, withWho, tags: [...tags] });
     setNotesSaved(true);
     setTimeout(() => setNotesSaved(false), 1500);
-  }, [notes, dish, withWho, tags, notesKey, dishKey, withKey, tagsKey]);
+  }, [notes, dish, withWho, tags, notesKey, dishKey, withKey, tagsKey, saved, booked, visited, syncCloud]);
 
   const autoSave = (fn: () => void) => {
     if (notesTimer.current) clearTimeout(notesTimer.current);
@@ -289,21 +302,21 @@ export default function DiningDetailPage() {
         <div className="ddp-actions-row">
           <button
             className={`ddp-act-btn${saved ? " active" : ""}`}
-            onClick={() => { setSaved(v => { localStorage.setItem(savedKey, !v ? "1" : "0"); return !v; }); }}
+            onClick={() => { setSaved(v => { localStorage.setItem(savedKey, !v ? "1" : "0"); syncCloud({ saved: !v, booked, visited }); return !v; }); }}
           >
             <Bookmark size={14} fill={saved ? "currentColor" : "none"} />
             Want to go
           </button>
           <button
             className={`ddp-act-btn${booked ? " active" : ""}`}
-            onClick={() => { setBooked(v => { localStorage.setItem(bookedKey, !v ? "1" : "0"); return !v; }); }}
+            onClick={() => { setBooked(v => { localStorage.setItem(bookedKey, !v ? "1" : "0"); syncCloud({ saved, booked: !v, visited }); return !v; }); }}
           >
             <CheckCircle size={14} fill={booked ? "currentColor" : "none"} />
             Booked
           </button>
           <button
             className={`ddp-act-btn${visited ? " active" : ""}`}
-            onClick={() => { setVisited(v => { localStorage.setItem(visitedKey, !v ? "1" : "0"); return !v; }); }}
+            onClick={() => { setVisited(v => { localStorage.setItem(visitedKey, !v ? "1" : "0"); syncCloud({ saved, booked, visited: !v }); return !v; }); }}
           >
             <CheckCircle size={14} fill={visited ? "currentColor" : "none"} />
             Been here

@@ -25,7 +25,8 @@ const GENRES_TV: Record<number, string> = {
   10767: "Talk", 10768: "War & Politics", 37: "Western",
 };
 
-async function tmdbFetch(path: string, params: Record<string, string> = {}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function tmdbFetch(path: string, params: Record<string, string> = {}): Promise<any> {
   const url = new URL(`${TMDB_BASE}/${path}`);
   url.searchParams.set("api_key", TMDB_KEY);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);

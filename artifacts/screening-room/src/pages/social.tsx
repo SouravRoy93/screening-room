@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft, Share2, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Social() {
@@ -8,8 +10,37 @@ export default function Social() {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  const [shareEnabled, setShareEnabled] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("share_enabled")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => setShareEnabled(!!data?.share_enabled));
+  }, [user]);
+
+  async function toggleShare() {
+    if (!user) return;
+    setShareLoading(true);
+    const next = !shareEnabled;
+    const { error } = await supabase.from("profiles").upsert({
+      user_id: user.id,
+      display_name: user.email?.split("@")[0] || null,
+      share_enabled: next,
+      updated_at: new Date().toISOString(),
+    });
+    setShareLoading(false);
+    if (error) { toast({ title: "Couldn't update sharing", description: error.message, variant: "destructive" }); return; }
+    setShareEnabled(next);
+    toast({ title: next ? "Public profile enabled" : "Public profile disabled" });
+  }
+
   const shareLink = () => {
-    const url = window.location.origin;
+    const url = user && shareEnabled ? `${window.location.origin}/u/${user.id}` : window.location.origin;
     navigator.clipboard
       .writeText(url)
       .then(() => toast({ title: "Link copied!" }))
@@ -39,9 +70,11 @@ export default function Social() {
               <Share2 className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground mb-1">Invite a friend</h3>
+              <h3 className="font-semibold text-foreground mb-1">Share your taste</h3>
               <p className="text-sm text-muted-foreground mb-3">
-                Share Screening Room with people whose taste you trust.
+                {shareEnabled
+                  ? "Copies your public profile link — your recently watched, ready to show off."
+                  : "Copies an invite link. Enable your public profile below to share your list instead."}
               </p>
               <button
                 onClick={shareLink}
@@ -53,6 +86,45 @@ export default function Social() {
             </div>
           </div>
         </div>
+
+        {/* Public profile (opt-in) */}
+        {user && (
+          <div
+            className="rounded-2xl p-5 mb-8"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="font-semibold text-foreground mb-1">Public profile</h3>
+                <p className="text-sm text-muted-foreground">
+                  {shareEnabled
+                    ? "Anyone with your link can see your recently watched titles and counts."
+                    : "Off by default. Turn on to share your watch activity via a link."}
+                </p>
+              </div>
+              <button
+                onClick={toggleShare}
+                disabled={shareLoading}
+                aria-pressed={shareEnabled}
+                className="px-4 py-2 rounded-lg text-sm font-medium shrink-0 transition-opacity hover:opacity-90"
+                style={shareEnabled
+                  ? { background: "linear-gradient(135deg,#8b5cf6,#ec4899)", color: "#fff" }
+                  : { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff" }}
+              >
+                {shareLoading ? "…" : shareEnabled ? "On" : "Off"}
+              </button>
+            </div>
+            {shareEnabled && (
+              <button
+                onClick={() => nav(`/u/${user.id}`)}
+                className="text-sm font-medium mt-3 hover:opacity-80"
+                style={{ color: "#8b5cf6" }}
+              >
+                Preview your public profile →
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Friend profiles — coming soon */}
         <div

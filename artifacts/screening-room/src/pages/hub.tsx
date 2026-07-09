@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 const CATS = [
   {
@@ -17,7 +18,7 @@ const CATS = [
   {
     v: "dining",
     name: "Dining",
-    sub: "New York · 50 tables",
+    sub: "Curated tables, city by city",
     c1: "#f59e0b",
     c2: "#ef4444",
     glow: "rgba(245,158,11,.5)",
@@ -82,6 +83,17 @@ function CatIcon({ type }: { type: string }) {
 export default function Hub() {
   const [, nav] = useLocation();
   const { user, supabase: sb } = useAuth();
+  const { toast } = useToast();
+
+  async function deleteAccount() {
+    const sure = window.confirm(
+      "Permanently delete your account and all tracked items? This cannot be undone."
+    );
+    if (!sure) return;
+    const { error } = await sb.rpc("delete_my_account");
+    if (error) { toast({ title: "Couldn't delete account", description: error.message, variant: "destructive" }); return; }
+    await sb.auth.signOut();
+  }
   const [skip, setSkip] = useState(false);
   const playedRef = useRef(false);
 
@@ -112,8 +124,14 @@ export default function Hub() {
       <div className="hub-top">
         <div className="hub-brand">Screening Room</div>
         <div className="hub-user">
-          {displayName && <span>Hi, {displayName}</span>}
-          <button onClick={() => sb.auth.signOut()}>Sign out</button>
+          {user ? (
+            <>
+              {displayName && <span>Hi, {displayName}</span>}
+              <button onClick={() => sb.auth.signOut()}>Sign out</button>
+            </>
+          ) : (
+            <button onClick={() => nav("/auth")}>Sign in</button>
+          )}
         </div>
       </div>
 
@@ -155,6 +173,27 @@ export default function Hub() {
         </div>
 
         <div className={`hub-hint${skip ? " skip" : ""}`}>Tap a world to dive in</div>
+
+        {/* Footer: attribution + legal */}
+        <footer style={{ marginTop: 48, paddingBottom: 24, textAlign: "center" }}>
+          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 6 }}>
+            This product uses the TMDB API but is not endorsed or certified by TMDB.
+            Place data and reviews powered by Google.
+          </p>
+          <p style={{ fontSize: 11 }}>
+            <button onClick={() => nav("/privacy")} style={{ color: "rgba(255,255,255,0.5)", textDecoration: "underline" }}>
+              Privacy & Terms
+            </button>
+            {user && (
+              <>
+                <span style={{ color: "rgba(255,255,255,0.25)", margin: "0 8px" }}>·</span>
+                <button onClick={deleteAccount} style={{ color: "rgba(255,255,255,0.5)", textDecoration: "underline" }}>
+                  Delete account
+                </button>
+              </>
+            )}
+          </p>
+        </footer>
       </div>
     </div>
   );

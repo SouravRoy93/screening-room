@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
+import { toast } from "@/hooks/use-toast";
 import type { TrackedItem, MediaItem } from "@/types";
 
 export type TrackKey = string; // "media_type:tmdb_id"
@@ -26,8 +27,15 @@ export function useTracked(vertical: string, userId: string | undefined) {
 
   useEffect(() => { load(); }, [load]);
 
+  const promptSignIn = () => {
+    toast({
+      title: "Sign in to track",
+      description: "Create a free account to save your watchlist and ratings.",
+    });
+  };
+
   const setStatus = useCallback(async (item: MediaItem, status: "want" | "watching" | "watched") => {
-    if (!userId) return;
+    if (!userId) { promptSignIn(); return; }
     const key: TrackKey = `${item.media_type}:${item.tmdb_id}`;
     const existing = tracked[key];
 
@@ -58,7 +66,7 @@ export function useTracked(vertical: string, userId: string | undefined) {
   }, [userId, vertical, tracked]);
 
   const saveRating = useCallback(async (item: MediaItem, rating: number) => {
-    if (!userId) return;
+    if (!userId) { promptSignIn(); return; }
     const key: TrackKey = `${item.media_type}:${item.tmdb_id}`;
     const row = {
       user_id: userId,

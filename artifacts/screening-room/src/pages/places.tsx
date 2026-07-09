@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, ChevronDown, Search, ExternalLink, Heart, Check, Footprints, Bus, Car, Ship } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
+import { pushSave, hydratePlaces, migratePlacesLocal } from "@/lib/cloud-saves";
 import type { PlaceItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -674,6 +675,18 @@ export default function Places() {
   const salutation = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || null;
 
+  // Cloud sync: backfill local saves once, then merge cloud saves into state.
+  useEffect(() => {
+    if (!user || places.length === 0) return;
+    (async () => {
+      await migratePlacesLocal(places);
+      const merged = await hydratePlaces();
+      setSaved(merged.saved);
+      setVisited(merged.visited);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, places.length]);
+
   function onboardDone(styles: string[], pace: string) {
     setProfStyles(styles);
     setLS("pl_styles", styles);
@@ -685,6 +698,8 @@ export default function Places() {
     if (!next[id]) delete next[id];
     setSaved(next);
     setLS("pl_saved", next);
+    const item = places.find(pl => pl.id === id);
+    if (item) void pushSave("places", id, item.name, { saved: !!next[id], visited: !!visited[id] });
   }
 
   function toggleVisit(id: number) {
@@ -692,6 +707,8 @@ export default function Places() {
     if (!next[id]) delete next[id];
     setVisited(next);
     setLS("pl_visited", next);
+    const item = places.find(pl => pl.id === id);
+    if (item) void pushSave("places", id, item.name, { saved: !!saved[id], visited: !!next[id] });
   }
 
   function toggleLiveSave(id: string) {
@@ -791,7 +808,7 @@ export default function Places() {
       {/* Sticky header */}
       <header className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
         style={{ background: "rgba(8,8,13,0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <button onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
+        <button aria-label="Back" onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <MapPin className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />

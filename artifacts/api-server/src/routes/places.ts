@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { BoundedMap } from "../lib/bounded-map";
 
 const router: IRouter = Router();
 const PLACES_KEY = process.env.GOOGLE_API_KEY || process.env.GOOGLE_PLACES_API_KEY || "";
@@ -41,7 +42,7 @@ async function resolveCdnUrl(photoName: string, maxWidth = 800): Promise<string 
 }
 
 // ── Live restaurant search ───────────────────────────────────────────────────
-const searchCache = new Map<string, { ts: number; results: unknown[] }>();
+const searchCache = new BoundedMap<string, { ts: number; results: unknown[] }>(300);
 
 router.get("/places/search", async (req, res): Promise<void> => {
   const q = (req.query.q as string || "").trim();
@@ -99,7 +100,7 @@ router.get("/places/search", async (req, res): Promise<void> => {
 });
 
 // ── General landmark / attraction search ─────────────────────────────────────
-const exploreCache = new Map<string, { ts: number; results: unknown[] }>();
+const exploreCache = new BoundedMap<string, { ts: number; results: unknown[] }>(300);
 
 router.get("/places/explore", async (req, res): Promise<void> => {
   const q = (req.query.q as string || "").trim();
@@ -157,7 +158,7 @@ router.get("/places/explore", async (req, res): Promise<void> => {
 });
 
 // ── Thumbnail cache ─────────────────────────────────────────────────────────
-const thumbCache = new Map<string, string | null>();
+const thumbCache = new BoundedMap<string, string | null>(1000);
 
 router.get("/places/thumbnail/:id", async (req, res): Promise<void> => {
   const { name, neighborhood, borough } = req.query as Record<string, string>;
@@ -245,7 +246,7 @@ router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
 });
 
 // ── Curated place photo (resolve a stored photoName / placeId live) ──────────
-const curatedPhotoCache = new Map<string, string | null>();
+const curatedPhotoCache = new BoundedMap<string, string | null>(1000);
 
 router.get("/places/photo", async (req, res): Promise<void> => {
   const photoName = (req.query.name as string) || "";
@@ -297,7 +298,7 @@ async function searchPlace(query: string): Promise<{ id: string; lat: number | n
 }
 
 // ── Geocode by name (cached) — used by the dining map for items without coords ──
-const geoCache = new Map<string, { lat: number | null; lng: number | null }>();
+const geoCache = new BoundedMap<string, { lat: number | null; lng: number | null }>(1000);
 router.get("/places/geocode", async (req, res): Promise<void> => {
   const q = (req.query.q as string || "").trim();
   if (!q) { res.json({ lat: null, lng: null }); return; }
@@ -312,7 +313,7 @@ router.get("/places/geocode", async (req, res): Promise<void> => {
 });
 
 // ── Place detail (reviews + full-res photos + maps link) for the Places detail page ──
-const placeDetailCache = new Map<string, unknown>();
+const placeDetailCache = new BoundedMap<string, unknown>(500);
 router.get("/places/detail", async (req, res): Promise<void> => {
   const placeIdQ = (req.query.placeId as string) || "";
   const name = (req.query.name as string) || "";

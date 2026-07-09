@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { ArrowLeft, Search, UtensilsCrossed, ChevronDown, Star, Heart, CalendarCheck, Check, MapPin } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
+import { useAuth } from "@/hooks/use-auth";
+import { pushSave, hydrateDining, migrateDiningLocal } from "@/lib/cloud-saves";
 import type { DiningItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -76,9 +78,11 @@ function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
   const toggle = (type: "saved" | "booked" | "visited", e: React.MouseEvent) => {
     e.stopPropagation();
     const key = `sr_dining_${type === "saved" ? "saved" : type === "booked" ? "booked" : "visited"}_${r.id}`;
-    if (type === "saved") { const v = !saved; setSaved(v); localStorage.setItem(key, v ? "1" : "0"); }
-    if (type === "booked") { const v = !booked; setBooked(v); localStorage.setItem(key, v ? "1" : "0"); }
-    if (type === "visited") { const v = !visited; setVisited(v); localStorage.setItem(key, v ? "1" : "0"); }
+    const next = { saved, booked, visited };
+    if (type === "saved") { next.saved = !saved; setSaved(next.saved); localStorage.setItem(key, next.saved ? "1" : "0"); }
+    if (type === "booked") { next.booked = !booked; setBooked(next.booked); localStorage.setItem(key, next.booked ? "1" : "0"); }
+    if (type === "visited") { next.visited = !visited; setVisited(next.visited); localStorage.setItem(key, next.visited ? "1" : "0"); }
+    void pushSave("dining", r.id, r.name, next);   // mirror to cloud when signed in
   };
 
   const diff = r.rope !== undefined ? ROPE[r.rope] : null;
@@ -171,6 +175,20 @@ function DiningMap({ items }: { items: DiningItem[] }) {
 export default function Dining() {
   const [, nav] = useLocation();
   const { dining } = useDining();
+  const { user } = useAuth();
+  const [savesVersion, setSavesVersion] = useState(0);
+
+  // Cloud sync: backfill local saves to Supabase once, then pull cloud saves
+  // into localStorage and remount cards so they pick the merged state up.
+  useEffect(() => {
+    if (!user || dining.length === 0) return;
+    (async () => {
+      await migrateDiningLocal(dining);
+      await hydrateDining();
+      setSavesVersion(v => v + 1);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, dining.length]);
   const [q, setQ] = useState("");
   const [tab, setTab] = useState<"trending" | "all" | "nearby">("trending");
   const [cityFilter, setCityFilter] = useState("All cities");
@@ -278,7 +296,7 @@ export default function Dining() {
       {/* Header */}
       <header className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
         style={{ background: "rgba(8,8,13,0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <button onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
+        <button aria-label="Back" onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <UtensilsCrossed className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />
@@ -372,7 +390,7 @@ export default function Dining() {
           <>
             {/* Grid — 5 columns */}
             <div className="dc-grid">
-              {filtered.slice(0, visible).map(r => <DiningCard key={r.id} r={r} onClick={() => nav(`/dining/${r.id}`)} />)}
+              {filtered.slice(0, visible).map(r => <DiningCard key={`${r.id}-${savesVersion}`} r={r} onClick={() => nav(`/dining/${r.id}`)} />)}
             </div>
 
             {filtered.length > visible && (
