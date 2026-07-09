@@ -68,6 +68,25 @@ export default function Films() {
   const [genreFilter, setGenreFilter] = useState("all");
   const [alerts, setAlerts] = useState<EpisodeAlert[]>([]);
 
+  // ── Taste onboarding (P1-9): pick favourite genres once, Discover reorders ──
+  const [tasteGenres, setTasteGenres] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("sr_taste_genres") || "[]"); } catch { return []; }
+  });
+  const [showTaste, setShowTaste] = useState(
+    () => !localStorage.getItem("sr_taste_genres") && !localStorage.getItem("sr_taste_skipped"),
+  );
+  const [tastePick, setTastePick] = useState<Set<string>>(new Set());
+
+  const saveTaste = (genres: string[]) => {
+    localStorage.setItem("sr_taste_genres", JSON.stringify(genres));
+    setTasteGenres(genres);
+    setShowTaste(false);
+  };
+  const skipTaste = () => {
+    localStorage.setItem("sr_taste_skipped", "1");
+    setShowTaste(false);
+  };
+
   const openDetail = (item: MediaItem) => nav(`/films/${item.media_type}/${item.tmdb_id}`);
 
   useEffect(() => {
@@ -103,8 +122,18 @@ export default function Films() {
     let items = catalog;
     if (typeFilter !== "all") items = items.filter(i => i.media_type === typeFilter);
     if (genreFilter !== "all") items = items.filter(i => (i.genres || []).includes(genreFilter));
+    // Personalise: boost titles matching the user's favourite genres while
+    // keeping popularity as the base signal (catalog arrives popularity-sorted).
+    if (tasteGenres.length && genreFilter === "all") {
+      const fav = new Set(tasteGenres);
+      const score = (i: MediaItem) => {
+        const matches = (i.genres || []).reduce((n, g) => n + (fav.has(g) ? 1 : 0), 0);
+        return (i.popularity ?? 0) * (1 + 0.6 * matches);
+      };
+      items = [...items].sort((a, b) => score(b) - score(a));
+    }
     return items;
-  }, [q, searchResults, catalog, typeFilter, genreFilter]);
+  }, [q, searchResults, catalog, typeFilter, genreFilter, tasteGenres]);
 
   // Render the grid in windows so first paint stays light and it scales to a
   // very large catalog. Show 60, auto-append on scroll via an IntersectionObserver.
@@ -173,6 +202,57 @@ export default function Films() {
           </div>
         </div>
       </div>
+
+      {/* Taste onboarding overlay */}
+      {showTaste && tab === "discover" && !loading && (
+        <div
+          role="dialog"
+          aria-label="Pick your favourite genres"
+          style={{ position: "fixed", inset: 0, zIndex: 60, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(5,5,10,0.82)", backdropFilter: "blur(8px)", padding: 24 }}
+        >
+          <div style={{ maxWidth: 460, width: "100%", borderRadius: 20, padding: 24, background: "#111118", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <h2 style={{ fontFamily: "'Oswald', sans-serif", fontSize: 22, marginBottom: 6, color: "#fff" }}>What do you love watching?</h2>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 16 }}>
+              Pick a few genres and we'll put more of them up front. You can always search and filter everything.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+              {ALL_GENRES.map(g => {
+                const on = tastePick.has(g);
+                return (
+                  <button
+                    key={g}
+                    onClick={() => setTastePick(prev => { const n = new Set(prev); if (n.has(g)) n.delete(g); else n.add(g); return n; })}
+                    aria-pressed={on}
+                    style={{
+                      padding: "7px 14px", borderRadius: 999, fontSize: 13, fontWeight: 600,
+                      border: on ? "1px solid transparent" : "1px solid rgba(255,255,255,0.15)",
+                      background: on ? "linear-gradient(135deg,#8b5cf6,#ec4899)" : "rgba(255,255,255,0.05)",
+                      color: on ? "#fff" : "rgba(255,255,255,0.7)",
+                    }}
+                  >
+                    {g}
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={skipTaste} style={{ padding: "9px 16px", fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
+                Skip
+              </button>
+              <button
+                onClick={() => saveTaste([...tastePick])}
+                disabled={tastePick.size === 0}
+                style={{
+                  padding: "9px 18px", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff",
+                  background: "linear-gradient(135deg,#8b5cf6,#ec4899)", opacity: tastePick.size === 0 ? 0.45 : 1,
+                }}
+              >
+                Personalise my feed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* DISCOVER */}
       {tab === "discover" && (
