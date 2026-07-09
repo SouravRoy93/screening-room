@@ -17,6 +17,7 @@ import PlaceDetailPage from "@/pages/place-detail-page";
 import Social from "@/pages/social";
 import ResetPassword from "@/pages/reset-password";
 import Privacy from "@/pages/privacy";
+import PublicProfilePage from "@/pages/public-profile";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ function AppRouter() {
       <Route path="/auth" component={Auth} />
       <Route path="/reset" component={ResetPassword} />
       <Route path="/privacy" component={Privacy} />
+      <Route path="/u/:id" component={PublicProfilePage} />
       <Route path="/films" component={Films} />
       <Route path="/films/:type/:id" component={MediaDetailPage} />
       <Route path="/dining" component={Dining} />
