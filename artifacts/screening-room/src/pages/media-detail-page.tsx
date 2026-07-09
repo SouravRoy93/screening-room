@@ -277,7 +277,7 @@ export default function MediaDetailPage() {
                 </span>
               )}
             </div>
-            {detail?.genres?.length > 0 && (
+            {!!detail?.genres?.length && (
               <div className="mdp-genres">
                 {detail.genres.slice(0, 4).map(g => (
                   <span key={g} className="mdp-genre-chip">{g}</span>

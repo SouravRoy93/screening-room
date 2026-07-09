@@ -6,7 +6,8 @@ const router: IRouter = Router();
 const TMDB_KEY = process.env.TMDB_KEY || process.env.VITE_TMDB_KEY || "";
 const TMDB_BASE = "https://api.themoviedb.org/3";
 
-async function tmdbFetch(path: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function tmdbFetch(path: string): Promise<any> {
   const url = new URL(`${TMDB_BASE}/${path}`);
   url.searchParams.set("api_key", TMDB_KEY);
   const r = await fetch(url.toString());
