@@ -51,12 +51,17 @@ export function mockupPreviewPlugin(): Plugin {
     }));
   }
 
+  // JSON.stringify alone does not escape characters that can break out of a
+  // JS string literal in generated source (e.g. U+2028/U+2029, or </script>).
+  // Escape them so the generated module map is always well-formed (CWE-94/116).
+  const jsStr = (v: string): string =>
+    JSON.stringify(v).replace(/[\u2028\u2029<>]/g, (ch) =>
+      ({ "\u2028": "\\u2028", "\u2029": "\\u2029", "<": "\\u003C", ">": "\\u003E" } as Record<string, string>)[ch],
+    );
+
   function generateSource(components: Array<DiscoveredComponent>): string {
     const entries = components
-      .map(
-        (c) =>
-          `  ${JSON.stringify(c.globKey)}: () => import(${JSON.stringify(c.importPath)})`,
-      )
+      .map((c) => `  ${jsStr(c.globKey)}: () => import(${jsStr(c.importPath)})`)
       .join(",\n");
 
     return [

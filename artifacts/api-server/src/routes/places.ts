@@ -5,8 +5,19 @@ const router: IRouter = Router();
 const PLACES_KEY = process.env.GOOGLE_API_KEY || process.env.GOOGLE_PLACES_API_KEY || "";
 const PLACES_BASE = "https://places.googleapis.com/v1";
 
+// ── Input safety for outgoing Google requests (prevents SSRF / path injection) ──
+// Google place IDs and photo resource names have a constrained character set;
+// validating them before they reach a request URL breaks any user-controlled
+// path/host manipulation (CWE-918). Free text only ever goes in an encoded
+// query string, but we still strip control/structural characters and cap length.
+const SAFE_PLACE_ID = /^[A-Za-z0-9_-]+$/;
+const SAFE_PHOTO_NAME = /^[A-Za-z0-9_./-]+$/;
+function cleanQueryText(s: string): string {
+  return s.replace(/[^\p{L}\p{N}\s,&'.-]/gu, " ").replace(/\s+/g, " ").trim().slice(0, 120);
+}
+
 async function findPlace(name: string, neighborhood: string, borough: string): Promise<string | null> {
-  const query = `${name} restaurant ${neighborhood} ${borough} New York`;
+  const query = cleanQueryText(`${name} restaurant ${neighborhood} ${borough} New York`);
   const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=place_id&key=${PLACES_KEY}`;
   const r = await fetch(url);
   if (!r.ok) return null;
@@ -21,6 +32,9 @@ async function getPlaceDetails(placeId: string) {
     "photos", "reviews", "googleMapsUri", "priceLevel", "types",
     "currentOpeningHours",
   ].join(",");
+  if (!SAFE_PLACE_ID.test(placeId)) {
+    throw Object.assign(new Error("Invalid place id"), { status: 400 });
+  }
   const url = `${PLACES_BASE}/places/${placeId}?fields=${fields}&key=${PLACES_KEY}&languageCode=en`;
   const r = await fetch(url, {
     headers: { "X-Goog-Api-Key": PLACES_KEY, "X-Goog-FieldMask": fields },
@@ -34,6 +48,7 @@ async function getPlaceDetails(placeId: string) {
 
 // Resolve to actual CDN URL server-side so the API key is never exposed to the browser
 async function resolveCdnUrl(photoName: string, maxWidth = 800): Promise<string | null> {
+  if (!SAFE_PHOTO_NAME.test(photoName) || photoName.includes("..")) return null;
   const url = `${PLACES_BASE}/${photoName}/media?maxWidthPx=${maxWidth}&key=${PLACES_KEY}&skipHttpRedirect=true`;
   const r = await fetch(url, { headers: { "X-Goog-Api-Key": PLACES_KEY } });
   if (!r.ok) return null;
