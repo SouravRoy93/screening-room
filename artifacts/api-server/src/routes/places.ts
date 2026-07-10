@@ -19,7 +19,11 @@ function cleanQueryText(s: string): string {
 
 async function findPlace(name: string, neighborhood: string, borough: string): Promise<string | null> {
   const query = cleanQueryText(`${name} restaurant ${neighborhood} ${borough} New York`);
-  const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=place_id&key=${PLACES_KEY}`;
+  const url = new URL("https://maps.googleapis.com/maps/api/place/findplacefromtext/json");
+  url.searchParams.set("input", query);
+  url.searchParams.set("inputtype", "textquery");
+  url.searchParams.set("fields", "place_id");
+  url.searchParams.set("key", PLACES_KEY);
   const r = await fetch(url);
   if (!r.ok) return null;
   const data = await r.json() as { candidates?: { place_id: string }[] };
@@ -191,7 +195,7 @@ router.get("/places/thumbnail/:id", async (req, res): Promise<void> => {
 
   try {
     const placeId = await findPlace(name, neighborhood || "", borough || "");
-    if (!placeId) { thumbCache.set(cacheKey, null); res.json({ photo_url: null }); return; }
+    if (!placeId || !SAFE_PLACE_ID.test(placeId)) { thumbCache.set(cacheKey, null); res.json({ photo_url: null }); return; }
 
     const url = `${PLACES_BASE}/places/${placeId}?fields=photos&key=${PLACES_KEY}`;
     const r = await fetch(url, { headers: { "X-Goog-Api-Key": PLACES_KEY, "X-Goog-FieldMask": "photos" } });
@@ -284,7 +288,7 @@ router.get("/places/photo", async (req, res): Promise<void> => {
     let url = photoName ? await resolveCdnUrl(photoName, w) : null;
     // 2) stored Google photo tokens EXPIRE — fall back to a FRESH lookup by the
     //    stable placeId, which always returns a currently-valid photo.
-    if (!url && placeId) {
+    if (!url && placeId && SAFE_PLACE_ID.test(placeId)) {
       const r = await fetch(`${PLACES_BASE}/places/${placeId}?fields=photos&key=${PLACES_KEY}`, {
         headers: { "X-Goog-Api-Key": PLACES_KEY, "X-Goog-FieldMask": "photos" },
       });
