@@ -3,7 +3,7 @@ import { BoundedMap } from "../lib/bounded-map";
 
 const router: IRouter = Router();
 const PLACES_KEY = process.env.GOOGLE_API_KEY || process.env.GOOGLE_PLACES_API_KEY || "";
-const PLACES_BASE = "https://places.googleapis.com/v1";
+const PLACES_BASE = "https://places.googleapis.com/v1"; // fixed host; all user input is validated (see qstr / SAFE_* below)
 
 // ── Input safety for outgoing Google requests (prevents SSRF / path injection) ──
 // Google place IDs and photo resource names have a constrained character set;
