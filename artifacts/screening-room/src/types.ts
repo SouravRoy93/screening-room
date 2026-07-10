@@ -42,6 +42,9 @@ export interface DiningItem {
   // multi-city
   city?: string;
   country?: string;
+  // geo (present on curated NYC items; used by the pairing engine)
+  lat?: number;
+  lng?: number;
   // richer traits
   chef?: string;
   noise?: string;

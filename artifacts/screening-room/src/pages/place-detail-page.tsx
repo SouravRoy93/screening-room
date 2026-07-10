@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { ChevronLeft, CheckCircle, ExternalLink } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
+import { useAuth } from "@/hooks/use-auth";
+import { NearbyDining } from "@/components/nearby-dining";
 import { pushSave } from "@/lib/cloud-saves";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -24,6 +26,7 @@ export default function PlaceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [, nav] = useLocation();
   const { places } = usePlaces();
+  const { user } = useAuth();
 
   const place = places.find(p => String(p.id) === id);
 
@@ -142,6 +145,9 @@ export default function PlaceDetailPage() {
             <ExternalLink size={13} /> Maps
           </a>
         </div>
+
+        {/* Cross-vertical pairing: appears once the user shows interest. */}
+        <NearbyDining place={place} userId={user?.id} enabled={isSaved || isVisited} />
 
         {/* Facts */}
         <div className="pl-facts">

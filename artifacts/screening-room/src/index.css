@@ -2031,3 +2031,27 @@
 .pl-day-stop-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
 .pl-day-dwell { font-size: 11px; font-weight: 600; color: #caa24e; background: rgba(243,217,154,0.1); border: 1px solid rgba(243,217,154,0.25); border-radius: 20px; padding: 2px 9px; white-space: nowrap; }
 .pl-day-stop-note { font-size: 11px; color: rgba(255,255,255,0.42); font-style: italic; line-height: 1.3; }
+
+/* ── Cross-vertical "Where to eat nearby" shelf (place detail) ── */
+.nd-section { margin-top: 28px; animation: ndReveal .4s ease; }
+@keyframes ndReveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.nd-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: #fff; }
+.nd-head svg { color: #f0a; opacity: .85; }
+.nd-title { font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 600; letter-spacing: .01em; margin: 0; }
+.nd-note { margin-left: auto; font-size: 11px; color: rgba(255,255,255,.4); }
+.nd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 460px) { .nd-grid { grid-template-columns: 1fr; } }
+.nd-card {
+  text-align: left; display: flex; flex-direction: column; gap: 5px;
+  padding: 13px 14px; border-radius: 14px; cursor: pointer;
+  background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.09);
+  color: #fff; transition: background .15s, border-color .15s, transform .12s; text-decoration: none;
+}
+.nd-card:hover { background: rgba(255,255,255,.08); border-color: rgba(240,0,170,.35); transform: translateY(-1px); }
+.nd-card-top { display: flex; align-items: baseline; gap: 6px; }
+.nd-name { font-weight: 650; font-size: 14.5px; line-height: 1.25; }
+.nd-fav { color: #f472b6; font-size: 13px; }
+.nd-meta { font-size: 12px; color: rgba(255,255,255,.55); }
+.nd-reason { font-size: 12px; color: rgba(255,211,107,.9); line-height: 1.4; }
+.nd-empty { font-size: 13px; color: rgba(255,255,255,.45); padding: 4px 2px; }
+.nd-skel { height: 92px; background: rgba(255,255,255,.05); animation: pulse 1.5s ease-in-out infinite; cursor: default; }

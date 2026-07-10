@@ -356,4 +356,96 @@ router.get("/places/detail", async (req, res): Promise<void> => {
   }
 });
 
+// ── Live nearby-dining fallback (for places outside curated dining cities) ──
+// Mirrors the pairing engine's spirit: bias the Google query by the place's
+// mood-derived context, return a small ranked set with a walk time + reason.
+const nearbyDiningCache = new BoundedMap<string, unknown>(400);
+
+function haversineM(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const R = 6371000, toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+
+router.get("/places/dining-nearby", async (req, res): Promise<void> => {
+  // Coerce query params to strings defensively: Express represents repeated
+  // params (?context=a&context=b) as arrays, so a bare `as string` cast would
+  // be a lie and string methods could behave unexpectedly (CWE-843).
+  const asStr = (v: unknown): string => (typeof v === "string" ? v : "");
+  const lat = parseFloat(asStr(req.query.lat));
+  const lng = parseFloat(asStr(req.query.lng));
+  const context = (asStr(req.query.context) || "popular restaurant").slice(0, 60);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) { res.json([]); return; }
+  if (!PLACES_KEY) { res.json([]); return; }
+
+  const cacheKey = `${lat.toFixed(4)},${lng.toFixed(4)}|${context.toLowerCase()}`;
+  const cached = nearbyDiningCache.get(cacheKey);
+  if (cached) { res.json(cached); return; }
+
+  try {
+    const body = {
+      textQuery: context,
+      includedType: "restaurant",
+      locationBias: { circle: { center: { latitude: lat, longitude: lng }, radius: 1500 } },
+      maxResultCount: 8,
+    };
+    const r = await fetch(`${PLACES_BASE}/places:searchText`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": PLACES_KEY,
+        "X-Goog-FieldMask":
+          "places.id,places.displayName,places.rating,places.userRatingCount,places.location,places.primaryTypeDisplayName,places.googleMapsUri,places.photos",
+      },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) { res.json([]); return; }
+    const data = (await r.json()) as { places?: Record<string, unknown>[] };
+    const places = data.places || [];
+
+    const scored = places.map((p) => {
+      const loc = p.location as { latitude: number; longitude: number } | undefined;
+      const distM = loc ? haversineM({ lat, lng }, { lat: loc.latitude, lng: loc.longitude }) : null;
+      const walkMin = distM != null ? Math.max(1, Math.round((distM * 1.3) / 80)) : null;
+      const rating = (p.rating as number) || null;
+      const ratingCount = (p.userRatingCount as number) || null;
+      // Simple blended rank: rating quality + proximity.
+      const q = rating ? (rating - 3) / 2 : 0; // 3★→0, 5★→1
+      const prox = walkMin != null ? Math.max(0, 1 - walkMin / 25) : 0.2;
+      const rank = 0.55 * Math.max(0, q) + 0.45 * prox;
+      return { p, loc, walkMin, rating, ratingCount, rank };
+    });
+    scored.sort((a, b) => b.rank - a.rank);
+
+    const out = await Promise.all(
+      scored.slice(0, 4).map(async (s) => {
+        const p = s.p;
+        const photos = p.photos as { name: string }[] | undefined;
+        const photo_url = photos?.[0] ? await resolveCdnUrl(photos[0].name, 400) : null;
+        const cuisine = (p.primaryTypeDisplayName as { text: string } | undefined)?.text || null;
+        const walk = s.walkMin != null ? `${s.walkMin}-min walk` : "nearby";
+        const reason = s.rating
+          ? `${walk} · ${s.rating}★ (${s.ratingCount ?? 0}) — highly rated close by`
+          : `${walk} · a nearby option`;
+        return {
+          name: (p.displayName as { text: string })?.text || "",
+          cuisine,
+          reason,
+          rating: s.rating,
+          user_rating_count: s.ratingCount,
+          photo_url,
+          maps_url: (p.googleMapsUri as string) || null,
+          walkMin: s.walkMin,
+        };
+      }),
+    );
+
+    nearbyDiningCache.set(cacheKey, out);
+    res.json(out);
+  } catch {
+    res.json([]);
+  }
+});
+
 export default router;
