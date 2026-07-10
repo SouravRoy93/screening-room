@@ -12,6 +12,7 @@ const PLACES_BASE = "https://places.googleapis.com/v1";
 // query string, but we still strip control/structural characters and cap length.
 const SAFE_PLACE_ID = /^[A-Za-z0-9_-]+$/;
 const SAFE_PHOTO_NAME = /^[A-Za-z0-9_./-]+$/;
+function qstr(v: unknown): string { return typeof v === "string" ? v : ""; } // Express query params may be arrays (CWE-843)
 function cleanQueryText(s: string): string {
   return s.replace(/[^\p{L}\p{N}\s,&'.-]/gu, " ").replace(/\s+/g, " ").trim().slice(0, 120);
 }
@@ -60,7 +61,7 @@ async function resolveCdnUrl(photoName: string, maxWidth = 800): Promise<string 
 const searchCache = new BoundedMap<string, { ts: number; results: unknown[] }>(300);
 
 router.get("/places/search", async (req, res): Promise<void> => {
-  const q = (req.query.q as string || "").trim();
+  const q = qstr(req.query.q).trim();
   if (!q || q.length < 2) { res.json([]); return; }
   if (!PLACES_KEY) { res.json([]); return; }
 
@@ -118,7 +119,7 @@ router.get("/places/search", async (req, res): Promise<void> => {
 const exploreCache = new BoundedMap<string, { ts: number; results: unknown[] }>(300);
 
 router.get("/places/explore", async (req, res): Promise<void> => {
-  const q = (req.query.q as string || "").trim();
+  const q = qstr(req.query.q).trim();
   if (!q || q.length < 2) { res.json([]); return; }
   if (!PLACES_KEY) { res.json([]); return; }
 
@@ -176,7 +177,9 @@ router.get("/places/explore", async (req, res): Promise<void> => {
 const thumbCache = new BoundedMap<string, string | null>(1000);
 
 router.get("/places/thumbnail/:id", async (req, res): Promise<void> => {
-  const { name, neighborhood, borough } = req.query as Record<string, string>;
+  const name = qstr(req.query.name);
+  const neighborhood = qstr(req.query.neighborhood);
+  const borough = qstr(req.query.borough);
   if (!name) { res.json({ photo_url: null }); return; }
   if (!PLACES_KEY) { res.json({ photo_url: null }); return; }
 
@@ -206,7 +209,9 @@ router.get("/places/thumbnail/:id", async (req, res): Promise<void> => {
 
 // ── Full restaurant detail ───────────────────────────────────────────────────
 router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
-  const { name, neighborhood, borough } = req.query as Record<string, string>;
+  const name = qstr(req.query.name);
+  const neighborhood = qstr(req.query.neighborhood);
+  const borough = qstr(req.query.borough);
   if (!name) { res.status(400).json({ error: "name required" }); return; }
   if (!PLACES_KEY) { res.status(503).json({ error: "Google Places not configured" }); return; }
 
@@ -264,9 +269,9 @@ router.get("/places/restaurant/:id", async (req, res): Promise<void> => {
 const curatedPhotoCache = new BoundedMap<string, string | null>(1000);
 
 router.get("/places/photo", async (req, res): Promise<void> => {
-  const photoName = (req.query.name as string) || "";
-  const placeId   = (req.query.placeId as string) || "";
-  const w = Math.min(parseInt((req.query.w as string) || "640", 10) || 640, 1600);
+  const photoName = qstr(req.query.name);
+  const placeId   = qstr(req.query.placeId);
+  const w = Math.min(parseInt(qstr(req.query.w) || "640", 10) || 640, 1600);
   if (!PLACES_KEY) { res.json({ photo_url: null }); return; }
 
   const cacheKey = (photoName || placeId) + ":" + w;
@@ -315,7 +320,7 @@ async function searchPlace(query: string): Promise<{ id: string; lat: number | n
 // ── Geocode by name (cached) — used by the dining map for items without coords ──
 const geoCache = new BoundedMap<string, { lat: number | null; lng: number | null }>(1000);
 router.get("/places/geocode", async (req, res): Promise<void> => {
-  const q = (req.query.q as string || "").trim();
+  const q = qstr(req.query.q).trim();
   if (!q) { res.json({ lat: null, lng: null }); return; }
   const key = q.toLowerCase();
   if (geoCache.has(key)) { res.json(geoCache.get(key)); return; }
@@ -330,9 +335,9 @@ router.get("/places/geocode", async (req, res): Promise<void> => {
 // ── Place detail (reviews + full-res photos + maps link) for the Places detail page ──
 const placeDetailCache = new BoundedMap<string, unknown>(500);
 router.get("/places/detail", async (req, res): Promise<void> => {
-  const placeIdQ = (req.query.placeId as string) || "";
-  const name = (req.query.name as string) || "";
-  const area = (req.query.area as string) || "";
+  const placeIdQ = qstr(req.query.placeId);
+  const name = qstr(req.query.name);
+  const area = qstr(req.query.area);
   if (!PLACES_KEY) { res.json({ reviews: [], photos: [], maps_url: null }); return; }
   const cacheKey = placeIdQ || `${name}|${area}`;
   if (placeDetailCache.has(cacheKey)) { res.json(placeDetailCache.get(cacheKey)); return; }
@@ -384,13 +389,9 @@ function haversineM(a: { lat: number; lng: number }, b: { lat: number; lng: numb
 }
 
 router.get("/places/dining-nearby", async (req, res): Promise<void> => {
-  // Coerce query params to strings defensively: Express represents repeated
-  // params (?context=a&context=b) as arrays, so a bare `as string` cast would
-  // be a lie and string methods could behave unexpectedly (CWE-843).
-  const asStr = (v: unknown): string => (typeof v === "string" ? v : "");
-  const lat = parseFloat(asStr(req.query.lat));
-  const lng = parseFloat(asStr(req.query.lng));
-  const context = (asStr(req.query.context) || "popular restaurant").slice(0, 60);
+  const lat = parseFloat(qstr(req.query.lat));
+  const lng = parseFloat(qstr(req.query.lng));
+  const context = (qstr(req.query.context) || "popular restaurant").slice(0, 60);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) { res.json([]); return; }
   if (!PLACES_KEY) { res.json([]); return; }
 
