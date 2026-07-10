@@ -369,9 +369,13 @@ function haversineM(a: { lat: number; lng: number }, b: { lat: number; lng: numb
 }
 
 router.get("/places/dining-nearby", async (req, res): Promise<void> => {
-  const lat = parseFloat((req.query.lat as string) || "");
-  const lng = parseFloat((req.query.lng as string) || "");
-  const context = ((req.query.context as string) || "popular restaurant").slice(0, 60);
+  // Coerce query params to strings defensively: Express represents repeated
+  // params (?context=a&context=b) as arrays, so a bare `as string` cast would
+  // be a lie and string methods could behave unexpectedly (CWE-843).
+  const asStr = (v: unknown): string => (typeof v === "string" ? v : "");
+  const lat = parseFloat(asStr(req.query.lat));
+  const lng = parseFloat(asStr(req.query.lng));
+  const context = (asStr(req.query.context) || "popular restaurant").slice(0, 60);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) { res.json([]); return; }
   if (!PLACES_KEY) { res.json([]); return; }
 
