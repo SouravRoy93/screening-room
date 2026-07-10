@@ -26,7 +26,15 @@ let _authTokenGetter: AuthTokenGetter | null = null;
  * Pass `null` to clear the base URL.
  */
 export function setBaseUrl(url: string | null): void {
-  _baseUrl = url ? url.replace(/\/+$/, "") : null;
+  _baseUrl = url ? stripTrailingSlashes(url) : null;
+}
+
+// Linear trailing-slash strip. Avoids the /\/+$/ regex, whose unanchored `+`
+// backtracks to quadratic time on strings with many '/' (CWE-1333 / ReDoS).
+function stripTrailingSlashes(s: string): string {
+  let end = s.length;
+  while (end > 0 && s.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  return s.slice(0, end);
 }
 
 /**
