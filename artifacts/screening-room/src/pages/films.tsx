@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Bell } from "lucide-react";
 import { MediaCard } from "@/components/media-card";
 import { EpisodeBanner } from "@/components/episode-banner";
+import { RatingsBarChart, WatchedOverTimeChart } from "@/components/ratings-chart";
 import { useCatalog } from "@/hooks/use-catalog";
 import { useTracked } from "@/hooks/use-tracked";
 import { useAuth } from "@/hooks/use-auth";
@@ -150,6 +151,7 @@ export default function Films() {
 
   const libraryItems = useMemo(() => Object.values(tracked).filter(t => t.status === libStatus), [tracked, libStatus]);
   const allWatched = useMemo(() => Object.values(tracked).filter(t => t.status === "watched"), [tracked]);
+  const allRated = useMemo(() => Object.values(tracked).filter(t => t.rating), [tracked]);
 
   const stats = useMemo(() => ({
     total: Object.keys(tracked).length,
@@ -367,7 +369,21 @@ export default function Films() {
           </div>
 
           {allWatched.length > 0 ? (
-            <GenreBars items={allWatched} />
+            <>
+              <GenreBars items={allWatched} />
+              {allRated.length >= 3 && (
+                <div className="stats-charts">
+                  <div className="chart-card">
+                    <div className="sl">Your ratings</div>
+                    <RatingsBarChart items={allRated} />
+                  </div>
+                  <div className="chart-card">
+                    <div className="sl">Watched over time</div>
+                    <WatchedOverTimeChart items={allWatched} />
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="empty">Watch and rate some movies to see your stats.</div>
           )}

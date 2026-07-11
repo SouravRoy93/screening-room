@@ -2055,3 +2055,13 @@
 .nd-reason { font-size: 12px; color: rgba(255,211,107,.9); line-height: 1.4; }
 .nd-empty { font-size: 13px; color: rgba(255,255,255,.45); padding: 4px 2px; }
 .nd-skel { height: 92px; background: rgba(255,255,255,.05); animation: pulse 1.5s ease-in-out infinite; cursor: default; }
+
+/* ── Stats charts (films) ── */
+.stats-charts { display: grid; grid-template-columns: 1fr; gap: 12px; padding: 16px 20px 0; }
+@media(min-width:700px) { .stats-charts { grid-template-columns: 1fr 1fr; } }
+.chart-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 14px 12px 8px; }
+.chart-card .sl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); margin: 0 0 8px 8px; }
+
+/* ── Dining: My tables section heads ── */
+.dc-mine-head { font-family: 'Oswald', sans-serif; font-size: 17px; font-weight: 600; color: #fff; margin: 22px 0 10px; }
+.dc-mine-head span { font-size: 12px; color: var(--mut); font-family: inherit; margin-left: 6px; }

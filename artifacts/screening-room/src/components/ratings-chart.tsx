@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell, LineChart, Line, PieChart, Pie, Legend
+  ResponsiveContainer, Cell, LineChart, Line,
 } from "recharts";
 import type { TrackedItem } from "@/types";
 
@@ -13,7 +13,9 @@ export function RatingsBarChart({ items }: Props) {
   const data = useMemo(() => {
     const counts = Array.from({ length: 10 }, (_, i) => ({ rating: String(i + 1), count: 0 }));
     items.forEach(it => {
-      if (it.rating) counts[it.rating - 1].count++;
+      if (!it.rating) return;
+      const idx = Math.round(it.rating) - 1;
+      if (idx >= 0 && idx < 10) counts[idx].count++;
     });
     return counts;
   }, [items]);
@@ -70,41 +72,6 @@ export function WatchedOverTimeChart({ items }: Props) {
         />
         <Line type="monotone" dataKey="count" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: "#8b5cf6" }} />
       </LineChart>
-    </ResponsiveContainer>
-  );
-}
-
-export function GenrePieChart({ items }: Props) {
-  const data = useMemo(() => {
-    const counts: Record<string, number> = {};
-    items.forEach(it => {
-      it.genres?.forEach(g => { counts[g] = (counts[g] || 0) + 1; });
-    });
-    return Object.entries(counts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 6)
-      .map(([name, value]) => ({ name, value }));
-  }, [items]);
-
-  const COLORS = ["#8b5cf6", "#ec4899", "#ffd36b", "#3bc9db", "#69db7c", "#f06595"];
-
-  if (data.length === 0) return null;
-
-  return (
-    <ResponsiveContainer width="100%" height={200}>
-      <PieChart>
-        <Pie data={data} cx="50%" cy="50%" outerRadius={70} dataKey="value">
-          {data.map((_, i) => (
-            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-          ))}
-        </Pie>
-        <Legend iconSize={8} wrapperStyle={{ fontSize: 11, color: "#9ca3af" }} />
-        <Tooltip
-          contentStyle={{ background: "#14141d", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }}
-          labelStyle={{ color: "#ffd36b" }}
-          itemStyle={{ color: "#e5e7eb" }}
-        />
-      </PieChart>
     </ResponsiveContainer>
   );
 }

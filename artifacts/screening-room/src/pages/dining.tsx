@@ -4,6 +4,7 @@ import { ArrowLeft, Search, UtensilsCrossed, ChevronDown, Star, Heart, CalendarC
 import { useDining } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import { pushSave, hydrateDining, migrateDiningLocal } from "@/lib/cloud-saves";
+import { recognitionScore, haversineMeters } from "@/lib/pairing";
 import type { DiningItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -45,7 +46,7 @@ const ROPE: Record<number, { label: string; cls: string }> = {
 };
 const priceStr = (p: number) => "$".repeat(Math.max(1, Math.min(4, p)));
 
-function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
+function DiningCard({ r, onClick, onFlags }: { r: DiningItem; onClick: () => void; onFlags?: () => void }) {
   const [photo, setPhoto] = useState<string | null>(null);
   const [photoLoaded, setPhotoLoaded] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -82,7 +83,8 @@ function DiningCard({ r, onClick }: { r: DiningItem; onClick: () => void }) {
     if (type === "saved") { next.saved = !saved; setSaved(next.saved); localStorage.setItem(key, next.saved ? "1" : "0"); }
     if (type === "booked") { next.booked = !booked; setBooked(next.booked); localStorage.setItem(key, next.booked ? "1" : "0"); }
     if (type === "visited") { next.visited = !visited; setVisited(next.visited); localStorage.setItem(key, next.visited ? "1" : "0"); }
-    void pushSave("dining", r.id, r.name, next);   // mirror to cloud when signed in
+    void pushSave("dining", r.id, r.name, next);
+    onFlags?.();   // mirror to cloud when signed in
   };
 
   const diff = r.rope !== undefined ? ROPE[r.rope] : null;
@@ -190,7 +192,18 @@ export default function Dining() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, dining.length]);
   const [q, setQ] = useState("");
-  const [tab, setTab] = useState<"trending" | "all" | "nearby">("trending");
+  const [tab, setTab] = useState<"trending" | "all" | "nearby" | "mine">("trending");
+  const [geo, setGeo] = useState<{ lat: number; lng: number } | null>(null);
+  const [geoErr, setGeoErr] = useState(false);
+  useEffect(() => {
+    if (tab !== "nearby" || geo || geoErr) return;
+    if (!navigator.geolocation) { setGeoErr(true); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setGeoErr(true),
+      { timeout: 8000 },
+    );
+  }, [tab, geo, geoErr]);
   const [cityFilter, setCityFilter] = useState("All cities");
   const [cuisineFilter, setCuisineFilter] = useState("All cuisines");
   const [occasionFilter, setOccasionFilter] = useState("Any occasion");
@@ -228,6 +241,45 @@ export default function Dining() {
     }
     return items;
   }, [dining, cityFilter, cuisineFilter, occasionFilter, diffFilter]);
+
+  // The user's own tables, read from the same flags the cards write.
+  const myFlags = useMemo(() => {
+    const f = { saved: new Set<number>(), booked: new Set<number>(), visited: new Set<number>() };
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i) || "";
+        const m = /^sr_dining_(saved|booked|visited)_(\d+)$/.exec(k);
+        if (m && localStorage.getItem(k) === "1") f[m[1] as "saved" | "booked" | "visited"].add(Number(m[2]));
+      }
+    } catch { /* private mode */ }
+    return f;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savesVersion, dining.length]);
+  const mine = useMemo(() => ({
+    saved: dining.filter(d => myFlags.saved.has(d.id) && !myFlags.visited.has(d.id)),
+    booked: dining.filter(d => myFlags.booked.has(d.id)),
+    visited: dining.filter(d => myFlags.visited.has(d.id)),
+  }), [dining, myFlags]);
+  const mineCount = new Set([...myFlags.saved, ...myFlags.booked, ...myFlags.visited]).size;
+
+  // Tabs actually order the shelf: trending = recognition-led, nearby = distance-led.
+  const shown = useMemo(() => {
+    if (tab === "trending") {
+      return [...filtered].sort((a, b) =>
+        recognitionScore(b.recognition) - recognitionScore(a.recognition) ||
+        (a.rope ?? 5) - (b.rope ?? 5) || a.id - b.id);
+    }
+    if (tab === "nearby" && geo) {
+      const withD = filtered
+        .filter(d => typeof d.lat === "number" && typeof d.lng === "number")
+        .map(d => ({ d, m: haversineMeters(geo, { lat: d.lat!, lng: d.lng! }) }))
+        .sort((a, b) => a.m - b.m)
+        .map(x => x.d);
+      const coordless = filtered.filter(d => !(typeof d.lat === "number" && typeof d.lng === "number"));
+      return [...withD, ...coordless];
+    }
+    return filtered;
+  }, [filtered, tab, geo]);
 
   useEffect(() => { setVisible(30); }, [cityFilter, cuisineFilter, occasionFilter, diffFilter, tab]);
 
@@ -350,6 +402,7 @@ export default function Dining() {
               <button className={`dc-tab${tab === "trending" ? " on" : ""}`} onClick={() => setTab("trending")}>🔥 Trending</button>
               <button className={`dc-tab${tab === "all" ? " on" : ""}`} onClick={() => setTab("all")}>All</button>
               <button className={`dc-tab${tab === "nearby" ? " on" : ""}`} onClick={() => setTab("nearby")}>📍 Near Me</button>
+              <button className={`dc-tab${tab === "mine" ? " on" : ""}`} onClick={() => setTab("mine")}>♥ My tables{mineCount > 0 ? ` (${mineCount})` : ""}</button>
             </div>
             <div className="dc-viewseg">
               <button className={!mapView ? "on" : ""} onClick={() => setMapView(false)}>List</button>
@@ -384,16 +437,40 @@ export default function Dining() {
           </div>
         </div>
 
-        {mapView ? (
-          <DiningMap items={filtered} />
+        {tab === "mine" ? (
+          mineCount === 0 ? (
+            <p className="text-center text-muted-foreground text-sm py-16">
+              Nothing here yet — tap ♥ Want, Booked, or Been on any table and it lands in your list.
+            </p>
+          ) : (
+            <>
+              {([["Want to go", mine.saved], ["Booked", mine.booked], ["Been", mine.visited]] as [string, DiningItem[]][])
+                .filter(([, items]) => items.length > 0)
+                .map(([label, items]) => (
+                  <section key={label}>
+                    <h2 className="dc-mine-head">{label} <span>{items.length}</span></h2>
+                    <div className="dc-grid">
+                      {items.map(r => <DiningCard key={`${r.id}-${savesVersion}`} r={r} onClick={() => nav(`/dining/${r.id}`)} onFlags={() => setSavesVersion(v => v + 1)} />)}
+                    </div>
+                  </section>
+                ))}
+            </>
+          )
+        ) : mapView ? (
+          <DiningMap items={shown} />
         ) : (
           <>
+            {tab === "nearby" && !geo && (
+              <p className="text-center text-muted-foreground text-sm py-3">
+                {geoErr ? "Location unavailable — showing every table." : "Finding tables near you…"}
+              </p>
+            )}
             {/* Grid — 5 columns */}
             <div className="dc-grid">
-              {filtered.slice(0, visible).map(r => <DiningCard key={`${r.id}-${savesVersion}`} r={r} onClick={() => nav(`/dining/${r.id}`)} />)}
+              {shown.slice(0, visible).map(r => <DiningCard key={`${r.id}-${savesVersion}`} r={r} onClick={() => nav(`/dining/${r.id}`)} onFlags={() => setSavesVersion(v => v + 1)} />)}
             </div>
 
-            {filtered.length > visible && (
+            {shown.length > visible && (
               <div className="dc-viewmore-wrap">
                 <button className="dc-viewmore" onClick={() => setVisible(v => v + 30)}>
                   VIEW MORE RESTAURANTS <ChevronDown size={14} />
@@ -401,7 +478,7 @@ export default function Dining() {
               </div>
             )}
 
-            {filtered.length === 0 && (
+            {shown.length === 0 && (
               <p className="text-center text-muted-foreground text-sm py-16">No restaurants found.</p>
             )}
           </>
