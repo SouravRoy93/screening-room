@@ -666,6 +666,7 @@ export default function Places() {
   const [liveLoading, setLiveLoading] = useState(false);
   const [liveSaved, setLiveSaved] = useState<Record<string, boolean>>(() => getLS("gpl_saved", {}));
   const [liveVisited, setLiveVisited] = useState<Record<string, boolean>>(() => getLS("gpl_visited", {}));
+  const [savedSeg, setSavedSeg] = useState<"saved" | "been">("saved");
   const liveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [wxText, setWxText] = useState<string | null>(null);
   const [wxRaw, setWxRaw] = useState<{ code: number; temp: number } | null>(null);
@@ -711,14 +712,24 @@ export default function Places() {
     if (item) void pushSave("places", id, item.name, { saved: !!saved[id], visited: !!next[id] });
   }
 
-  function toggleLiveSave(id: string) {
+  function snapshotLive(p?: LivePlace) {
+    if (!p) return;
+    const meta = getLS<Record<string, Partial<LivePlace>>>("gpl_meta", {});
+    meta[p.place_id] = {
+      place_id: p.place_id, name: p.name, rating: p.rating,
+      user_rating_count: p.user_rating_count, short_address: p.short_address,
+      address: p.address, photo_url: p.photo_url,
+    };
+    setLS("gpl_meta", meta);
+  }
+  function toggleLiveSave(id: string, place?: LivePlace) {
     const next = { ...liveSaved, [id]: !liveSaved[id] };
-    if (!next[id]) delete next[id];
+    if (!next[id]) delete next[id]; else snapshotLive(place);
     setLiveSaved(next); setLS("gpl_saved", next);
   }
-  function toggleLiveVisit(id: string) {
+  function toggleLiveVisit(id: string, place?: LivePlace) {
     const next = { ...liveVisited, [id]: !liveVisited[id] };
-    if (!next[id]) delete next[id];
+    if (!next[id]) delete next[id]; else snapshotLive(place);
     setLiveVisited(next); setLS("gpl_visited", next);
   }
 
@@ -832,18 +843,55 @@ export default function Places() {
       <div className="max-w-screen-xl mx-auto px-4 py-5">
 
         {/* Saved view */}
-        {view === "saved" && (
-          <>
-            <div className="pl-heading">
-              <h1>Saved</h1>
-              <p>Your collection — places kept for the right moment.</p>
-            </div>
-            {Object.keys(saved).length === 0
-              ? <div className="pl-grid"><div className="pl-empty">Nothing saved yet — tap ♡ on a place you love.</div></div>
-              : <PaginatedPlaceGrid items={places.filter(p => saved[p.id])} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />
-            }
-          </>
-        )}
+        {view === "saved" && (() => {
+          const meta = getLS<Record<string, Partial<LivePlace>>>("gpl_meta", {});
+          const liveIds = Object.keys(savedSeg === "saved" ? liveSaved : liveVisited);
+          const liveItems: LivePlace[] = liveIds.map(id => ({
+            place_id: id, name: meta[id]?.name || "Saved from Google",
+            rating: meta[id]?.rating ?? null, user_rating_count: meta[id]?.user_rating_count ?? null,
+            address: meta[id]?.address || "", short_address: meta[id]?.short_address || "",
+            photo_url: meta[id]?.photo_url ?? null, types: [],
+          }));
+          const curated = places.filter(p => (savedSeg === "saved" ? saved[p.id] : visited[p.id]));
+          const empty = curated.length === 0 && liveItems.length === 0;
+          return (
+            <>
+              <div className="pl-heading">
+                <h1>{savedSeg === "saved" ? "Saved" : "Been there"}</h1>
+                <p>{savedSeg === "saved"
+                  ? "Your collection — places kept for the right moment."
+                  : "Everywhere you've actually been — your city, collected."}</p>
+              </div>
+              <div className="pl-toggles" style={{ marginBottom: 14 }}>
+                <button className={`pl-toggle${savedSeg === "saved" ? " on" : ""}`} onClick={() => setSavedSeg("saved")}>♡ Saved</button>
+                <button className={`pl-toggle${savedSeg === "been" ? " on" : ""}`} onClick={() => setSavedSeg("been")}>✓ Been</button>
+              </div>
+              {empty
+                ? <div className="pl-grid"><div className="pl-empty">{savedSeg === "saved"
+                    ? "Nothing saved yet — tap ♡ on a place you love."
+                    : "No visits marked yet — tap ✓ Been there on places you've seen."}</div></div>
+                : <>
+                    {curated.length > 0 &&
+                      <PaginatedPlaceGrid items={curated} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />}
+                    {liveItems.length > 0 && (
+                      <div className="pl-section" style={{ marginTop: curated.length ? 22 : 0 }}>
+                        <div className="pl-sec-head"><span className="pl-sec-title">From Google</span>
+                          <span className="pl-sec-note">{liveItems.length} place{liveItems.length > 1 ? "s" : ""}</span></div>
+                        <div className="pl-grid">
+                          {liveItems.map(p => (
+                            <LivePlaceCard key={p.place_id} p={p}
+                              saved={!!liveSaved[p.place_id]} visited={!!liveVisited[p.place_id]}
+                              onSave={e => { e.stopPropagation(); toggleLiveSave(p.place_id, p); }}
+                              onVisit={e => { e.stopPropagation(); toggleLiveVisit(p.place_id, p); }} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+              }
+            </>
+          );
+        })()}
 
         {/* Map view */}
         {view === "map" && (
@@ -953,8 +1001,8 @@ export default function Places() {
                         <LivePlaceCard key={p.place_id} p={p}
                           saved={!!liveSaved[p.place_id]}
                           visited={!!liveVisited[p.place_id]}
-                          onSave={e => { e.stopPropagation(); toggleLiveSave(p.place_id); }}
-                          onVisit={e => { e.stopPropagation(); toggleLiveVisit(p.place_id); }} />
+                          onSave={e => { e.stopPropagation(); toggleLiveSave(p.place_id, p); }}
+                          onVisit={e => { e.stopPropagation(); toggleLiveVisit(p.place_id, p); }} />
                       ))}
                     </div>
                   ) : (

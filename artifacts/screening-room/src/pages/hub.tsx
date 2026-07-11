@@ -125,6 +125,7 @@ export default function Hub() {
       <div className="hub-top">
         <div className="hub-brand">Screening Room</div>
         <div className="hub-user">
+          <button onClick={() => nav("/social")}>Social</button>
           {user ? (
             <>
               {displayName && <span>Hi, {displayName}</span>}
