@@ -1,0 +1,31 @@
+/* ── Follow-up card — the maître d' checking back in ─────────────────────── */
+.fu-card {
+  width: min(680px, 94vw);
+  margin: 4px auto 14px;
+  display: flex; gap: 14px; align-items: flex-start;
+  text-align: left;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,211,107,.18);
+  border-radius: 18px;
+  padding: 16px 18px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeUp .6s ease .05s both;
+}
+.fu-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; box-shadow: 0 0 10px rgba(255,211,107,.5); }
+.fu-body { min-width: 0; }
+.fu-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: #ffd36b; margin-bottom: 3px; }
+.fu-title { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 600; color: #fff; margin: 0 0 2px; }
+.fu-prompt { font-size: 12.5px; color: var(--mut); margin: 0 0 10px; }
+.fu-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.fu-btn {
+  font-size: 12.5px; font-weight: 600; color: #fff;
+  padding: 7px 14px; border-radius: 9px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+  cursor: pointer; transition: opacity .15s ease, border-color .15s ease;
+}
+.fu-btn:hover { opacity: .88; }
+.fu-btn:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 2px; }
+.fu-primary { border: 0; }
+.fu-quiet { background: none; border-color: transparent; color: var(--mut); }
+.fu-quiet:hover { color: #fff; }

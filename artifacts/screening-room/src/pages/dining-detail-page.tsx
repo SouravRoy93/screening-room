@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { stampDiningFlag } from "@/lib/followups";
 import { useParams, useLocation } from "wouter";
 import { ChevronLeft, Star, ExternalLink, MapPin, Clock, Globe, Bookmark, CheckCircle } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
@@ -302,21 +303,21 @@ export default function DiningDetailPage() {
         <div className="ddp-actions-row">
           <button
             className={`ddp-act-btn${saved ? " active" : ""}`}
-            onClick={() => { setSaved(v => { localStorage.setItem(savedKey, !v ? "1" : "0"); syncCloud({ saved: !v, booked, visited }); return !v; }); }}
+            onClick={() => { setSaved(v => { localStorage.setItem(savedKey, !v ? "1" : "0"); stampDiningFlag(storageKey, "saved", !v); syncCloud({ saved: !v, booked, visited }); return !v; }); }}
           >
             <Bookmark size={14} fill={saved ? "currentColor" : "none"} />
             Want to go
           </button>
           <button
             className={`ddp-act-btn${booked ? " active" : ""}`}
-            onClick={() => { setBooked(v => { localStorage.setItem(bookedKey, !v ? "1" : "0"); syncCloud({ saved, booked: !v, visited }); return !v; }); }}
+            onClick={() => { setBooked(v => { localStorage.setItem(bookedKey, !v ? "1" : "0"); stampDiningFlag(storageKey, "booked", !v); syncCloud({ saved, booked: !v, visited }); return !v; }); }}
           >
             <CheckCircle size={14} fill={booked ? "currentColor" : "none"} />
             Booked
           </button>
           <button
             className={`ddp-act-btn${visited ? " active" : ""}`}
-            onClick={() => { setVisited(v => { localStorage.setItem(visitedKey, !v ? "1" : "0"); syncCloud({ saved, booked, visited: !v }); return !v; }); }}
+            onClick={() => { setVisited(v => { localStorage.setItem(visitedKey, !v ? "1" : "0"); stampDiningFlag(storageKey, "visited", !v); syncCloud({ saved, booked, visited: !v }); return !v; }); }}
           >
             <CheckCircle size={14} fill={visited ? "currentColor" : "none"} />
             Been here

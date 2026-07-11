@@ -5,6 +5,7 @@ import { useDining } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import { pushSave, hydrateDining, migrateDiningLocal } from "@/lib/cloud-saves";
 import { recognitionScore, haversineMeters } from "@/lib/pairing";
+import { stampDiningFlag } from "@/lib/followups";
 import type { DiningItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -83,6 +84,7 @@ function DiningCard({ r, onClick, onFlags }: { r: DiningItem; onClick: () => voi
     if (type === "saved") { next.saved = !saved; setSaved(next.saved); localStorage.setItem(key, next.saved ? "1" : "0"); }
     if (type === "booked") { next.booked = !booked; setBooked(next.booked); localStorage.setItem(key, next.booked ? "1" : "0"); }
     if (type === "visited") { next.visited = !visited; setVisited(next.visited); localStorage.setItem(key, next.visited ? "1" : "0"); }
+    stampDiningFlag(r.id, type, next[type]);
     void pushSave("dining", r.id, r.name, next);
     onFlags?.();   // mirror to cloud when signed in
   };
