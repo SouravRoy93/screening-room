@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { TonightCard } from "@/components/tonight-card";
 
 const CATS = [
   {
@@ -142,6 +143,8 @@ export default function Hub() {
           <h1 className={`intro-title${skip ? " skip" : ""}`}>Screening Room</h1>
           <p className={`intro-tag${skip ? " skip" : ""}`}>Pick a world. Track what you love. Discover what's next.</p>
         </div>
+
+        <TonightCard />
 
         <div className="cat-grid">
           {CATS.map(cat => {
