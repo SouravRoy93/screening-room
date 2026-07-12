@@ -3,6 +3,7 @@ import healthRouter from "./health";
 import tmdbRouter from "./tmdb";
 import notificationsRouter from "./notifications";
 import placesRouter from "./places";
+import diningRouter from "./dining";
 
 const router: IRouter = Router();
 
@@ -10,5 +11,6 @@ router.use(healthRouter);
 router.use(tmdbRouter);
 router.use(notificationsRouter);
 router.use(placesRouter);
+router.use(diningRouter);
 
 export default router;
