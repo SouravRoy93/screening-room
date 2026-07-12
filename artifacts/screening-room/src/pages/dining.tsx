@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { pushSave, hydrateDining, migrateDiningLocal } from "@/lib/cloud-saves";
 import { recognitionScore, haversineMeters } from "@/lib/pairing";
 import { stampDiningFlag } from "@/lib/followups";
+import { chooseDining } from "@/lib/choose";
+import { ChooseForMe } from "@/components/choose-for-me";
 import type { DiningItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -438,6 +440,24 @@ export default function Dining() {
             </div>
           </div>
         </div>
+
+        {tab !== "mine" && shown.length > 0 && (
+          <ChooseForMe
+            noun="table"
+            verb="Take me there"
+            pick={ex => chooseDining({
+              candidates: shown,
+              all: dining,
+              history: [
+                ...[...myFlags.saved].map(id => ({ diningId: id, status: "want" as const })),
+                ...[...myFlags.booked].map(id => ({ diningId: id, status: "booked" as const })),
+                ...[...myFlags.visited].map(id => ({ diningId: id, status: "visited" as const })),
+              ],
+              now: new Date(),
+              exclude: ex,
+            })}
+          />
+        )}
 
         {tab === "mine" ? (
           mineCount === 0 ? (

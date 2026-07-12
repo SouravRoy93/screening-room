@@ -4,6 +4,8 @@ import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, ChevronDown, Search, E
 import { usePlaces } from "@/hooks/use-catalog";
 import { useAuth } from "@/hooks/use-auth";
 import { pushSave, hydratePlaces, migratePlacesLocal } from "@/lib/cloud-saves";
+import { choosePlace } from "@/lib/choose";
+import { ChooseForMe } from "@/components/choose-for-me";
 import type { PlaceItem } from "@/types";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
@@ -1028,6 +1030,21 @@ export default function Places() {
 
                 {places.length === 0 && (
                   <div className="pl-empty">The catalog is updating — check back shortly.</div>
+                )}
+
+                {filtered.length > 0 && (
+                  <ChooseForMe
+                    noun="place"
+                    verb="Take me there"
+                    pick={ex => choosePlace({
+                      candidates: filtered,
+                      savedIds: Object.keys(saved).filter(k => saved[Number(k)]).map(Number),
+                      visitedIds: Object.keys(visited).filter(k => visited[Number(k)]).map(Number),
+                      weather: wxRaw,
+                      now: new Date(),
+                      exclude: ex,
+                    })}
+                  />
                 )}
 
                 {sections.map(sec => (
