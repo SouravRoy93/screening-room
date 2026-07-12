@@ -4,6 +4,7 @@ import { ArrowLeft, Share2, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { preferredName } from "@/lib/profile";
 
 export default function Social() {
   const [, nav] = useLocation();
@@ -29,7 +30,7 @@ export default function Social() {
     const next = !shareEnabled;
     const { error } = await supabase.from("profiles").upsert({
       user_id: user.id,
-      display_name: user.email?.split("@")[0] || null,
+      display_name: preferredName(user) || user.email?.split("@")[0] || null,
       share_enabled: next,
       updated_at: new Date().toISOString(),
     });

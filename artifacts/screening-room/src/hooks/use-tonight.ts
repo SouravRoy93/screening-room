@@ -12,9 +12,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/lib/supabase";
 import { useDining, usePlaces } from "@/hooks/use-catalog";
 import type { HistoryEntry } from "@/lib/pairing";
+import { preferredName } from "@/lib/profile";
 import {
   composeTonight,
-  nameFromEmail,
   type TonightPlan,
   type WatchlistFilm,
   type WeatherNow,
@@ -115,7 +115,7 @@ export function useTonight(): { plan: TonightPlan | null; ready: boolean } {
     if (!ready) return null;
     return composeTonight({
       now: new Date(),
-      name: nameFromEmail(user?.email),
+      name: preferredName(user),
       weather,
       places,
       savedPlaceIds: lsIdMap("pl_saved"),

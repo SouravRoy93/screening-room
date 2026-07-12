@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { TonightCard } from "@/components/tonight-card";
 import { FollowUpCard } from "@/components/followup-card";
+import { preferredName, cleanName } from "@/lib/profile";
 
 const CATS = [
   {
@@ -108,7 +109,19 @@ export default function Hub() {
     }
   }, []);
 
-  const displayName = user?.email ? user.email.split("@")[0] : "";
+  const displayName = preferredName(user);
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
+
+  async function saveName(e: React.FormEvent) {
+    e.preventDefault();
+    const n = cleanName(nameDraft);
+    setEditingName(false);
+    if (!n || n === displayName) return;
+    const { error } = await sb.auth.updateUser({ data: { first_name: n } });
+    if (error) toast({ title: "Couldn't save your name", description: error.message, variant: "destructive" });
+    else toast({ title: `Lovely to meet you, ${n}.` });
+  }
 
   function handleTile(cat: typeof CATS[0]) {
     if (cat.href) nav(cat.href);
@@ -129,7 +142,33 @@ export default function Hub() {
           <button onClick={() => nav("/social")}>Social</button>
           {user ? (
             <>
-              {displayName && <span>Hi, {displayName}</span>}
+              {editingName ? (
+                <form onSubmit={saveName} style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+                  <input
+                    autoFocus
+                    value={nameDraft}
+                    onChange={e => setNameDraft(e.target.value)}
+                    maxLength={30}
+                    placeholder="Your first name"
+                    aria-label="Your first name"
+                    style={{
+                      width: 140, padding: "5px 10px", borderRadius: 8, fontSize: 13,
+                      background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff",
+                    }}
+                  />
+                  <button type="submit">Save</button>
+                  <button type="button" onClick={() => setEditingName(false)}>Cancel</button>
+                </form>
+              ) : (
+                <button
+                  onClick={() => { setNameDraft(displayName || ""); setEditingName(true); }}
+                  title="Tell us what to call you"
+                  aria-label="Edit your name"
+                  style={{ border: "none", background: "none", padding: 0 }}
+                >
+                  {displayName ? `Hi, ${displayName}` : "Set your name"} <span style={{ opacity: .5, fontSize: 11 }}>✎</span>
+                </button>
+              )}
               <button onClick={() => sb.auth.signOut()}>Sign out</button>
             </>
           ) : (

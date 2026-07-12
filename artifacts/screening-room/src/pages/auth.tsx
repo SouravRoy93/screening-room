@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { cleanName } from "@/lib/profile";
 import { AuroraBg } from "@/components/aurora-bg";
 import { supabase } from "@/lib/supabase";
 import { useLocation } from "wouter";
@@ -12,6 +13,7 @@ export default function Auth() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ type: "error" | "ok"; text: string } | null>(null);
 
@@ -24,7 +26,11 @@ export default function Auth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) setMsg({ type: "error", text: error.message });
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const fn = cleanName(firstName);
+        const { error } = await supabase.auth.signUp({
+          email, password,
+          ...(fn ? { options: { data: { first_name: fn } } } : {}),
+        });
         if (error) setMsg({ type: "error", text: error.message });
         else setMsg({ type: "ok", text: "Check your email to confirm your account." });
       }
@@ -93,6 +99,27 @@ export default function Auth() {
 
         {/* Form */}
         <form onSubmit={submit} className="flex flex-col gap-4 mb-4">
+          {mode === "signup" && (
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-1.5">
+                First name <span className="text-muted-foreground font-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                placeholder="What should we call you?"
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+                maxLength={30}
+                autoComplete="given-name"
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none focus:ring-1 focus:ring-primary"
+                style={{
+                  background: "rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff",
+                }}
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-semibold text-foreground mb-1.5">Email</label>
             <input
