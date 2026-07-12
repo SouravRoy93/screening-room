@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation, useParams } from "wouter";
-import { Star, Play, ChevronLeft, ChevronDown, Bell, BellOff, Bookmark, Eye, CheckCircle, Film, Tv, Volume2 } from "lucide-react";
+import { Star, Play, ChevronLeft, ChevronDown, Bell, BellOff, Bookmark, Eye, CheckCircle, Film, Tv, Volume2, ExternalLink } from "lucide-react";
+import { justWatchUrl, showtimesUrl } from "@/lib/handoffs";
+import "@/components/handoffs.css";
 import { IMG_BACKDROP, IMG_BASE, IMG_PROFILE } from "@/types";
 import type { MediaItem, TrackedItem } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
@@ -355,6 +357,16 @@ export default function MediaDetailPage() {
 
         {/* Where to watch — luxury dropdown, combined providers, via JustWatch */}
         {detail?.watch && <WhereToWatch watch={detail.watch} />}
+
+        {/* From intent to action — a plan for tonight (roadmap #10) */}
+        {detail && (
+          <div className="ho-row">
+            {mediaType === "movie" && (
+              <a className="ho-btn" href={showtimesUrl(detail.title)} target="_blank" rel="noopener noreferrer">Find showtimes <ExternalLink size={11} /></a>
+            )}
+            <a className="ho-btn" href={justWatchUrl(detail.title)} target="_blank" rel="noopener noreferrer">Where to stream <ExternalLink size={11} /></a>
+          </div>
+        )}
 
         {/* Next episode (TV) */}
         {mediaType === "tv" && detail?.next_episode_to_air && (

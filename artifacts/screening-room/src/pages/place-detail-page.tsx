@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { nextSaturday } from "@/lib/handoffs";
+import { AddToCalendar } from "@/components/add-to-calendar";
 import { useLocation, useParams } from "wouter";
 import { ChevronLeft, CheckCircle, ExternalLink } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
@@ -144,6 +146,22 @@ export default function PlaceDetailPage() {
           >
             <ExternalLink size={13} /> Maps
           </a>
+          <AddToCalendar
+            label="Plan this visit"
+            defaultWhen={nextSaturday(10, 0)}
+            makeEvent={when => ({
+              title: `Visit ${place.name}`,
+              start: when,
+              durationMin: place.dur || 90,
+              location: `${place.name}, ${place.area || place.city || "New York"}`,
+              description: [
+                place.best && `Best time: ${place.best}`,
+                place.dress && `Dress: ${place.dress}`,
+                place.insider && `Insider: ${place.insider}`,
+                place.worth && `Worth it: ${place.worth}`,
+              ].filter(Boolean).join("\n"),
+            })}
+          />
         </div>
 
         {/* Cross-vertical pairing: appears once the user shows interest. */}
