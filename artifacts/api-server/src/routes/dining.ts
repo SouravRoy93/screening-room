@@ -39,7 +39,31 @@ function extractReservationLink(html: string): string | null {
   return hits.sort((a, b) => a.length - b.length)[0];
 }
 
+// Private/internal IP ranges that must never be fetched (SSRF guard).
+// Covers loopback, link-local (AWS metadata 169.254.x.x), RFC-1918, IPv6 equivalents.
+const PRIVATE_IP_RE = /^(127\.|0\.|169\.254\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|::1$|fc|fd|fe80)/i;
+
+/**
+ * Return true only if the URL is safe to fetch:
+ *  - protocol must be http: or https:
+ *  - hostname must not be a private/internal address or resolve to one
+ *    (we check the literal hostname; DNS rebinding is out of scope for this use-case)
+ */
+function isSafeUrl(raw: string): boolean {
+  let parsed: URL;
+  try { parsed = new URL(raw); } catch { return false; }
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+  const host = parsed.hostname.toLowerCase();
+  if (PRIVATE_IP_RE.test(host)) return false;
+  // Block bare IP addresses that aren't already caught above (numeric octets)
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) return false;
+  // Block localhost variants
+  if (host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) return false;
+  return true;
+}
+
 async function fetchHtml(url: string): Promise<string | null> {
+  if (!isSafeUrl(url)) return null;          // SSRF guard — reject private/non-http targets
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 6500);
