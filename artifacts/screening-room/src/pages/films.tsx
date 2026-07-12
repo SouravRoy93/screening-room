@@ -4,6 +4,8 @@ import { Bell } from "lucide-react";
 import { MediaCard } from "@/components/media-card";
 import { EpisodeBanner } from "@/components/episode-banner";
 import { RatingsBarChart, WatchedOverTimeChart } from "@/components/ratings-chart";
+import { chooseFilm } from "@/lib/choose";
+import { ChooseForMe } from "@/components/choose-for-me";
 import { useCatalog } from "@/hooks/use-catalog";
 import { useTracked } from "@/hooks/use-tracked";
 import { useAuth } from "@/hooks/use-auth";
@@ -279,6 +281,22 @@ export default function Films() {
             </select>
             <span className="count">{displayItems.length > 0 ? `${displayItems.length} titles` : ""}</span>
           </div>
+
+          {!q.trim() && displayItems.length > 0 && (
+            <ChooseForMe
+              noun="title"
+              verb="Watch this one"
+              pick={ex => chooseFilm({
+                candidates: displayItems,
+                watchlist: Object.values(tracked)
+                  .filter(t => t.status === "want")
+                  .map(t => ({ tmdb_id: t.tmdb_id, media_type: t.media_type, title: t.title, year: t.year, status: t.status })),
+                tasteGenres,
+                now: new Date(),
+                exclude: ex,
+              })}
+            />
+          )}
 
           {loading && !q && (
             <div className="grid">
