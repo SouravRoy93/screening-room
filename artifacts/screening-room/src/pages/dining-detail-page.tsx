@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { stampDiningFlag } from "@/lib/followups";
+import { resyUrl, openTableUrl, mapsUrl, nextSaturday } from "@/lib/handoffs";
+import { AddToCalendar } from "@/components/add-to-calendar";
 import { useParams, useLocation } from "wouter";
 import { ChevronLeft, Star, ExternalLink, MapPin, Clock, Globe, Bookmark, CheckCircle } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
@@ -323,6 +325,30 @@ export default function DiningDetailPage() {
             Been here
           </button>
         </div>
+
+        {/* From intent to action — booking handoffs (roadmap #10) */}
+        {r && (
+          <div className="ho-row">
+            <a className="ho-btn" href={resyUrl(r.name)} target="_blank" rel="noopener noreferrer">Resy <ExternalLink size={11} /></a>
+            <a className="ho-btn" href={openTableUrl(r.name, r.city || "New York")} target="_blank" rel="noopener noreferrer">OpenTable <ExternalLink size={11} /></a>
+            <a className="ho-btn" href={mapsUrl(`${r.name} ${places?.address || r.neighborhood || r.city || "New York"}`)} target="_blank" rel="noopener noreferrer">Maps <ExternalLink size={11} /></a>
+            <AddToCalendar
+              defaultWhen={nextSaturday(19, 30)}
+              makeEvent={when => ({
+                title: `Dinner at ${r.name}`,
+                start: when,
+                durationMin: 120,
+                location: places?.address || [r.neighborhood, r.city || "New York"].filter(Boolean).join(", "),
+                description: [
+                  r.signature && `Order: ${r.signature}`,
+                  r.dress && `Dress: ${r.dress}`,
+                  r.arrival && `Arrival: ${r.arrival}`,
+                  r.bestTables && `Best tables: ${r.bestTables}`,
+                ].filter(Boolean).join("\n"),
+              })}
+            />
+          </div>
+        )}
 
         {/* Info table */}
         <div className="ddp-info-table">
