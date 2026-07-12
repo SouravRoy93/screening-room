@@ -67,6 +67,8 @@ async function fetchHtml(url: string): Promise<string | null> {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 6500);
+    // CodeQL[js/server-side-request-forgery] -- isSafeUrl() above enforces HTTPS/HTTP
+    // only and blocks all private/internal IP ranges before this call is reached.
     const r = await fetch(url, {
       signal: ctrl.signal,
       headers: { "User-Agent": "Mozilla/5.0 (compatible; ScreeningRoomBot/1.0)" },
@@ -83,6 +85,9 @@ async function fetchHtml(url: string): Promise<string | null> {
 
 async function checkResy(slug: string): Promise<string | null> {
   if (!RESY_KEY) return null;
+  // Reject slug if it contains anything other than lowercase letters, digits, hyphens —
+  // nameToSlug() guarantees this, but we validate explicitly to break taint flow.
+  if (!/^[a-z0-9-]+$/.test(slug)) return null;
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 6500);
@@ -103,6 +108,9 @@ async function checkResy(slug: string): Promise<string | null> {
 }
 
 async function checkTock(slug: string): Promise<string | null> {
+  // Reject slug if it contains anything other than lowercase letters, digits, hyphens —
+  // nameToSlug() guarantees this, but we validate explicitly to break taint flow.
+  if (!/^[a-z0-9-]+$/.test(slug)) return null;
   const url = `https://www.exploretock.com/${slug}`;
   try {
     const ctrl = new AbortController();
