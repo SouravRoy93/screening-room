@@ -242,6 +242,32 @@ export default function DiningDetailPage() {
   const photos = places?.photos || [];
   const r = restaurant;
 
+  // ── Reserve a table ──────────────────────────────────────────────────────
+  // Calls the backend which tries (in order): homepage scrape → /reservations
+  // sub-page scrape → Resy API → Tock → restaurant website → OpenTable search.
+  const [reserveLoading, setReserveLoading] = useState(false);
+
+  const handleReserve = useCallback(async () => {
+    const fallback = places?.website ?? places?.maps_url ?? null;
+    setReserveLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (places?.website) params.set("website", places.website);
+      if (r?.name)          params.set("name", r.name);
+      const resp = await fetch(`${API_BASE}/api/dining/reservation-url?${params}`);
+      if (resp.ok) {
+        const { url } = await resp.json() as { url: string | null };
+        if (url) { window.open(url, "_blank", "noopener,noreferrer"); return; }
+      }
+      // API failed or returned null — use best static fallback
+      if (fallback) window.open(fallback, "_blank", "noopener,noreferrer");
+    } catch {
+      if (fallback) window.open(fallback, "_blank", "noopener,noreferrer");
+    } finally {
+      setReserveLoading(false);
+    }
+  }, [places, r]);
+
   return (
     <div className="ddp-root">
       {/* ── TOP BAR ── */}
@@ -249,15 +275,14 @@ export default function DiningDetailPage() {
         <button className="ddp-back" onClick={() => nav("/dining")}>
           <ChevronLeft size={16} /> Back
         </button>
-        {places?.maps_url && (
-          <a
-            href={places.maps_url}
-            target="_blank"
-            rel="noopener noreferrer"
+        {r && (
+          <button
             className="ddp-reserve-btn"
+            onClick={handleReserve}
+            disabled={reserveLoading}
           >
-            Reserve a table <ExternalLink size={13} />
-          </a>
+            {reserveLoading ? "Finding reservation…" : <>Reserve a table <ExternalLink size={13} /></>}
+          </button>
         )}
       </div>
 

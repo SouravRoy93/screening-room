@@ -29,6 +29,7 @@ function AppRouter() {
   // When the user arrives from a password-reset email, Supabase emits
   // PASSWORD_RECOVERY — route them to the new-password form.
   useEffect(() => {
+    if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") nav("/reset");
     });
