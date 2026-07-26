@@ -1,0 +1,104 @@
+/* ── Taste Passport — the signed-out hero (roadmap #4) ───────────────────── */
+.tp-wrap {
+  width: min(760px, 94vw);
+  margin: 6px auto 34px;
+  display: flex; flex-direction: column; align-items: center; gap: 22px;
+  animation: fadeUp .8s ease .1s both;
+}
+
+/* stage gives the card real perspective */
+.tp-stage { perspective: 1000px; perspective-origin: 50% 40%; padding: 6px 0 2px; }
+
+.tp-card {
+  position: relative;
+  width: min(420px, 88vw);
+  aspect-ratio: 1.62 / 1;                 /* credit-card proportions */
+  border-radius: 18px;
+  padding: 20px 22px;
+  text-align: left;
+  transform: rotateX(8deg) rotateY(-8deg);
+  transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.2,.7,.3,1);
+  background: linear-gradient(135deg, #2a2140 0%, #151021 58%, #241a33 100%);
+  border: 1px solid rgba(255, 211, 107, .42);
+  box-shadow: 0 34px 64px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.16);
+  overflow: hidden;
+}
+
+/* foil sweep — travels across on hover */
+.tp-foil {
+  position: absolute; inset: 0; pointer-events: none; border-radius: 18px;
+  background: linear-gradient(115deg,
+    transparent 34%, rgba(255,211,107,.26) 46%,
+    rgba(255,255,255,.34) 51%, rgba(255,211,107,.22) 56%, transparent 68%);
+  transform: translateX(-16%);
+  transition: transform 1s cubic-bezier(.2,.7,.3,1);
+}
+.tp-stage:hover .tp-foil { transform: translateX(16%); }
+
+.tp-specimen {
+  position: absolute; top: 14px; right: 16px;
+  font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700;
+  color: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 3px 8px;
+}
+
+.tp-eyebrow {
+  font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; font-weight: 800;
+  color: #ffd36b;
+}
+.tp-archetype {
+  font-family: 'Oswald', sans-serif; font-weight: 700;
+  font-size: clamp(19px, 4.4vw, 26px); line-height: 1.12; color: #fff;
+  margin: 10px 0 0; letter-spacing: .01em;
+  transition: opacity .4s ease, transform .4s ease;
+}
+.tp-archetype.fading { opacity: 0; transform: translateY(-5px); }
+
+.tp-stats { display: flex; gap: clamp(14px, 4vw, 26px); margin: 14px 0 0; transition: opacity .4s ease; }
+.tp-stats.fading { opacity: 0; }
+.tp-stats div { display: flex; flex-direction: column-reverse; }
+.tp-stats dt { font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.45); margin-top: 3px; }
+.tp-stats dd { margin: 0; font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; line-height: 1; }
+
+.tp-seal {
+  position: absolute; right: 20px; bottom: 18px;
+  width: 34px; height: 34px; border-radius: 9px; opacity: .92;
+  box-shadow: 0 6px 16px rgba(0,0,0,.45);
+}
+
+/* copy block */
+.tp-copy { text-align: center; max-width: 520px; }
+.tp-title {
+  font-family: 'Oswald', sans-serif; font-weight: 600;
+  font-size: clamp(21px, 4.6vw, 30px); color: #fff; margin: 0 0 8px;
+}
+.tp-sub { font-size: 13.5px; line-height: 1.6; color: var(--mut); margin: 0 0 16px; }
+
+.tp-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.tp-cta {
+  font-size: 13.5px; font-weight: 700; letter-spacing: .03em; color: #1a1206;
+  padding: 11px 26px; border: 0; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(135deg, #ffd36b, #f0a94b);
+  box-shadow: 0 6px 22px rgba(255,211,107,.3);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.tp-cta:hover { transform: translateY(-1px); box-shadow: 0 9px 28px rgba(255,211,107,.42); }
+.tp-ghost {
+  font-size: 13.5px; font-weight: 600; color: #fff;
+  padding: 11px 20px; border-radius: 999px; cursor: pointer;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16);
+}
+.tp-ghost:hover { background: rgba(255,255,255,.12); }
+.tp-cta:focus-visible, .tp-ghost:focus-visible { outline: 2px solid rgba(255,255,255,.6); outline-offset: 3px; }
+
+/* mobile: drop the 3D, keep the object */
+@media (max-width: 719px) {
+  .tp-card { transform: none; }
+  .tp-stage { perspective: none; }
+}
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .tp-card, .tp-foil, .tp-archetype, .tp-stats { transition: none; }
+  .tp-wrap { animation: none; }
+}

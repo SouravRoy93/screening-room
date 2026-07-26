@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TonightCard } from "@/components/tonight-card";
 import { FollowUpCard } from "@/components/followup-card";
 import { preferredName, cleanName } from "@/lib/profile";
+import { TastePassport } from "@/components/taste-passport";
 
 const CATS = [
   {
@@ -185,9 +186,14 @@ export default function Hub() {
           <p className={`intro-tag${skip ? " skip" : ""}`}>Pick a world. Track what you love. Discover what's next.</p>
         </div>
 
-        <FollowUpCard />
-
-        <TonightCard />
+        {user ? (
+          <>
+            <FollowUpCard />
+            <TonightCard />
+          </>
+        ) : (
+          <TastePassport />
+        )}
 
         <div className="cat-grid">
           {CATS.map(cat => {
@@ -218,7 +224,7 @@ export default function Hub() {
           })}
         </div>
 
-        <div className={`hub-hint${skip ? " skip" : ""}`}>Tap a world to dive in</div>
+        <div className={`hub-hint${skip ? " skip" : ""}`}>{user ? "Tap a world to dive in" : "Or dive straight into a world"}</div>
 
         {/* Footer: attribution + legal */}
         <footer style={{ marginTop: 48, paddingBottom: 24, textAlign: "center" }}>
