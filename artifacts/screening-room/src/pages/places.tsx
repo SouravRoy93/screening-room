@@ -1,0 +1,1070 @@
+import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
+import { useLocation } from "wouter";
+import { ArrowLeft, MapPin, CheckCircle, X, ChevronRight, ChevronDown, Search, ExternalLink, Heart, Check, Footprints, Bus, Car, Ship } from "lucide-react";
+import { usePlaces } from "@/hooks/use-catalog";
+import { useAuth } from "@/hooks/use-auth";
+import { pushSave, hydratePlaces, migratePlacesLocal } from "@/lib/cloud-saves";
+import { choosePlace } from "@/lib/choose";
+import { ChooseForMe } from "@/components/choose-for-me";
+import type { PlaceItem } from "@/types";
+
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+const _photoMemo = new Map<string, string | null>();
+function useLivePhoto(p: { img?: string | null; photoName?: string | null; placeId?: string | null; name?: string | null }) {
+  const [url, setUrl] = useState<string | null>(p.img || null);
+  useEffect(() => {
+    let alive = true;
+    const key = p.placeId || p.photoName || p.name || p.img || "";
+
+    // Resolve a fresh photo from the API. Try the stored Google token / placeId
+    // first (tokens expire, placeId is stable); then, for legacy curated places
+    // that have neither, fall back to a live search by name.
+    const goLive = async () => {
+      if (key && _photoMemo.has(key)) { if (alive) setUrl(_photoMemo.get(key)!); return; }
+      try {
+        const qs = [
+          p.photoName ? `name=${encodeURIComponent(p.photoName)}` : "",
+          p.placeId ? `placeId=${encodeURIComponent(p.placeId)}` : "",
+        ].filter(Boolean).join("&");
+        if (qs) {
+          const r = await fetch(`${API_BASE}/places/photo?${qs}&w=640`);
+          const d = r.ok ? await r.json() : null;
+          const u = (d && d.photo_url) || null;
+          if (u) { if (key) _photoMemo.set(key, u); if (alive) setUrl(u); return; }
+        }
+        if (p.name) {
+          const r = await fetch(`${API_BASE}/places/explore?q=${encodeURIComponent(p.name)}`);
+          const d = r.ok ? await r.json() : null;
+          const u = Array.isArray(d) && d[0] && d[0].photo_url ? d[0].photo_url : null;
+          if (u) { if (key) _photoMemo.set(key, u); if (alive) setUrl(u); return; }
+        }
+        if (alive) setUrl(null);
+      } catch { if (alive) setUrl(null); }
+    };
+
+    if (p.img) {
+      // Show the stored image, but verify it actually loads — many legacy
+      // Wikimedia URLs have rotted. If it 404s, self-heal with a live photo.
+      setUrl(p.img);
+      const probe = new Image();
+      probe.onerror = () => { if (alive) goLive(); };
+      probe.src = p.img;
+      return () => { alive = false; };
+    }
+
+    goLive();
+    return () => { alive = false; };
+  }, [p.img, p.photoName, p.placeId, p.name]);
+  return url;
+}
+
+interface LivePlace {
+  place_id: string;
+  name: string;
+  rating: number | null;
+  user_rating_count: number | null;
+  address: string;
+  short_address: string;
+  photo_url: string | null;
+  types: string[];
+}
+
+const STYLES = ["Iconic","Hidden gems","Luxury","Romantic","Food & cafés","Culture","Nature & views","Nightlife","Shopping","Wellness","Photography","Family"];
+const MOODS: [string, string][] = [
+  ["all","All"],["beautiful","Beautiful"],["romantic","Romantic"],
+  ["calm","Calm"],["premium","Premium"],["hidden","Hidden gems"],
+  ["iconic","Iconic"],["photo","Photo worthy"],["quick","≤ 90 min"],
+  ["avoid-crowds","Uncrowded"],["classy","Classy"],
+];
+const WX: Record<number, [string, string]> = {
+  0:["Clear","☀"],1:["Mainly clear","🌤"],2:["Partly cloudy","⛅"],3:["Overcast","☁"],
+  45:["Foggy","🌫"],51:["Light drizzle","🌦"],61:["Light rain","🌧"],63:["Rain","🌧"],
+  71:["Snow","🌨"],80:["Showers","🌦"],95:["Thunderstorm","⛈"],
+};
+
+function getLS<T>(k: string, def: T): T {
+  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; }
+}
+function setLS(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+function PlacesOnboarding({ onDone }: { onDone: (styles: string[], pace: string) => void }) {
+  const [step, setStep] = useState<"styles" | "pace">("styles");
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [pace, setPace] = useState("");
+
+  function toggleStyle(s: string) {
+    const n = new Set(picked);
+    if (n.has(s)) n.delete(s); else n.add(s);
+    setPicked(n);
+  }
+
+  if (step === "styles") return (
+    <div className="pl-onb">
+      <div className="pl-onbox">
+        <div className="pl-onlabel">PLACES · NEW YORK</div>
+        <h2 className="pl-onh2">How do you like to explore?</h2>
+        <p className="pl-onp">Choose a few. We'll quietly shape everything around them.</p>
+        <div className="pl-onopts">
+          {STYLES.map(s => (
+            <button key={s} className={`pl-onopt${picked.has(s) ? " on" : ""}`} onClick={() => toggleStyle(s)}>{s}</button>
+          ))}
+        </div>
+        <button className="pl-onbtn" disabled={picked.size === 0} onClick={() => setStep("pace")}>Continue</button>
+        <button className="pl-skip" onClick={() => onDone(["Iconic","Hidden gems","Romantic"], "Balanced")}>Skip for now</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="pl-onb">
+      <div className="pl-onbox">
+        <div className="pl-onlabel">ALMOST THERE</div>
+        <h2 className="pl-onh2">What pace do you prefer?</h2>
+        <p className="pl-onp">Luxury is rarely rushed.</p>
+        <div className="pl-onopts">
+          {["Relaxed","Balanced","Packed itinerary"].map(p => (
+            <button key={p} className={`pl-onopt${pace === p ? " on" : ""}`} onClick={() => setPace(p)}>{p}</button>
+          ))}
+        </div>
+        <button className="pl-onbtn" disabled={!pace} onClick={() => onDone([...picked], pace.replace(" itinerary",""))}>Enter</button>
+        <button className="pl-skip" onClick={() => onDone([...picked], "Balanced")}>Skip</button>
+      </div>
+    </div>
+  );
+}
+
+function LeafletMap({ places }: { places: PlaceItem[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<unknown>(null);
+
+  useEffect(() => {
+    const L = (window as unknown as { L: Record<string, unknown> }).L;
+    if (!L || !ref.current || mapRef.current) return;
+    const map = (L.map as Function)(ref.current, { center: [40.7128,-74.006], zoom: 12, scrollWheelZoom: false });
+    (L.tileLayer as Function)("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution:"© CARTO", subdomains:"abcd", maxZoom:20 }).addTo(map);
+    const PAL = ["#ec4899","#f59e0b","#8b5cf6","#10b981","#3b82f6","#ef4444","#14b8a6","#f43f5e"];
+    const pts = places.filter(p => p.lat && p.lng);
+    pts.forEach(p => {
+      const color = PAL[(p.id || 0) % PAL.length];
+      const marker = (L.circleMarker as Function)([p.lat!, p.lng!], { radius: 8, color: "#fff", weight: 2, fillColor: color, fillOpacity: 0.95 }).addTo(map);
+      marker.bindPopup(`<b>${p.name}</b><br/><small>${p.area||""}</small>`);
+    });
+    if (pts.length) {
+      const b = (L.latLngBounds as Function)(pts.map(p => [p.lat!, p.lng!]));
+      (map as { fitBounds: (b: unknown, o?: unknown) => void }).fitBounds((b as { pad: (n: number) => unknown }).pad(0.2));
+    }
+    mapRef.current = map;
+    setTimeout(() => (map as { invalidateSize: () => void }).invalidateSize(), 80);
+  }, [places]);
+
+  return <div ref={ref} className="pl-map" />;
+}
+
+function PlaceCard({ p, saved, visited, onSave, onVisit }: {
+  p: PlaceItem; saved: boolean; visited: boolean;
+  onSave: (e: React.MouseEvent) => void;
+  onVisit: (e: React.MouseEvent) => void;
+}) {
+  const [, nav] = useLocation();
+  const sc = p.scores ? Math.round((p.scores.b + p.scores.u + p.scores.v + p.scores.l) / 4 * 10) / 5 : null;
+  const photo = useLivePhoto(p);
+  const [imgFailed, setImgFailed] = useState(false);
+  // reset the failure flag whenever the resolved photo URL changes (self-heal)
+  useEffect(() => { setImgFailed(false); }, [photo]);
+  return (
+    <div className="pl-card" onClick={() => nav(`/places/${p.id}`)}>
+      <div className="pl-photo">
+        {photo && !imgFailed
+          ? <img src={photo} alt={p.name} loading="lazy" onError={() => setImgFailed(true)} />
+          : <div className="pl-photo-fallback" />
+        }
+        {p.badges?.[0] && <div className="pl-badge">{p.badges[0]}</div>}
+        {sc !== null && <div className="pl-score">{sc.toFixed(1)} ★</div>}
+        {visited && <div className="pl-visited-stamp">✓ Been</div>}
+      </div>
+      <div className="pl-body">
+        {p.area && <div className="pl-area">{p.area}</div>}
+        <h3 className="pl-name">{p.name}</h3>
+        {p.vibe && <div className="pl-vibe">{p.vibe}</div>}
+        <div className="pl-meta">
+          {p.city && <span>{p.city}</span>}
+          {p.dur && <span>{p.dur} min</span>}
+          {p.crowd && <span>{p.crowd} crowd</span>}
+          {p.price && <span>{p.price}</span>}
+          {(p.scores?.mustVisit ?? 0) >= 5 && <span style={{ color: "#ffd36b" }}>★ Must-visit</span>}
+        </div>
+        <div className="pl-card-actions" onClick={e => e.stopPropagation()}>
+          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave} aria-label="Want to go">
+            <Heart size={13} /><span>{saved ? "Saved" : "Want to go"}</span>
+          </button>
+          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit} aria-label="Been there">
+            <Check size={13} /><span>{visited ? "Been" : "Been there"}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+function PaginatedPlaceGrid({ items, saved, visited, toggleSave, toggleVisit, label = "places" }: {
+  items: PlaceItem[]; saved: Record<number, boolean>; visited: Record<number, boolean>;
+  toggleSave: (id: number) => void; toggleVisit: (id: number) => void; label?: string;
+}) {
+  const [vis, setVis] = useState(30);
+  useEffect(() => { setVis(30); }, [items]);
+  return (
+    <>
+      <div className="pl-grid">
+        {items.slice(0, vis).map(p => (
+          <PlaceCard key={p.id} p={p} saved={!!saved[p.id]} visited={!!visited[p.id]}
+            onSave={e => { e.stopPropagation(); toggleSave(p.id); }}
+            onVisit={e => { e.stopPropagation(); toggleVisit(p.id); }} />
+        ))}
+      </div>
+      {items.length > vis && (
+        <div className="pl-viewmore-wrap">
+          <button className="pl-viewmore" onClick={() => setVis(v => v + 30)}>
+            VIEW MORE {label.toUpperCase()} <ChevronDown size={14} />
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ─── Live Google Place Card ──────────────────────────────────────────────────
+
+function LivePlaceCard({ p, saved, visited, onSave, onVisit }: {
+  p: LivePlace; saved: boolean; visited: boolean;
+  onSave: (e: React.MouseEvent) => void;
+  onVisit: (e: React.MouseEvent) => void;
+}) {
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}&query_place_id=${p.place_id}`;
+  return (
+    <div className="pl-card" style={{ cursor: "default" }}>
+      <div className="pl-photo">
+        {p.photo_url
+          ? <img src={p.photo_url} alt={p.name} loading="lazy" />
+          : <div className="pl-photo-fallback" />
+        }
+        {visited && <div className="pl-visited-stamp">✓ Been</div>}
+        <div className="pl-live-badge">via Google</div>
+      </div>
+      <div className="pl-info">
+        {p.short_address && <div className="pl-area">{p.short_address}</div>}
+        <h3 className="pl-name">{p.name}</h3>
+        <div className="pl-meta">
+          {p.rating && <span>★ {p.rating.toFixed(1)}{p.user_rating_count ? ` (${p.user_rating_count.toLocaleString()})` : ""}</span>}
+        </div>
+        <div className="pl-card-actions" onClick={e => e.stopPropagation()}>
+          <button className={`pl-card-btn${saved ? " on" : ""}`} onClick={onSave} aria-label="Want to go">
+            <Heart size={13} /><span>{saved ? "Saved" : "Want to go"}</span>
+          </button>
+          <button className={`pl-card-btn pl-card-btn-been${visited ? " on" : ""}`} onClick={onVisit} aria-label="Been there">
+            <Check size={13} /><span>{visited ? "Been" : "Been there"}</span>
+          </button>
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="pl-card-btn pl-card-btn-maps" onClick={e => e.stopPropagation()}>
+            <ExternalLink size={10} />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Perfect Day ────────────────────────────────────────────────────────────
+
+const DAY_TYPES = [
+  { id: "romantic",  label: "Romantic evening",    moods: ["romantic"],         styles: [] as string[], crowd: "",    startHour: 17, outfit: "Something elevated — the evening may end at dinner.", tip: "book a restaurant for the end of the day now; tables fill after 7pm." },
+  { id: "calm",      label: "Quiet & restorative",  moods: ["calm"],             styles: [] as string[], crowd: "Low", startHour: 10, outfit: "Comfortable layers — this day is about slowing down.", tip: "weekdays are twice as good at these spots; avoid the weekend rush." },
+  { id: "iconic",    label: "Iconic first-timer",   moods: ["iconic","beautiful"],styles: [] as string[], crowd: "",    startHour: 10, outfit: "Comfortable shoes — you'll cover real ground.", tip: "arrive 20 minutes before each venue opens to beat the first rush." },
+  { id: "art",       label: "Art & culture",         moods: ["beautiful"],        styles: ["Culture"],    crowd: "",    startHour: 10, outfit: "Casual smart — galleries appreciate the effort.", tip: "many museums are free on Friday evenings after 4pm." },
+  { id: "photo",     label: "Golden-hour photo",     moods: ["photo"],            styles: ["Photography"],crowd: "",    startHour: 15, outfit: "Light layers — golden light means you need to move fast.", tip: "check tonight's sunset time and be at your last stop 30 minutes before." },
+] as const;
+
+const DURATIONS = [
+  { id: "few",  label: "A few hours",  stops: 2, dinner: false },
+  { id: "half", label: "Half a day",   stops: 3, dinner: false },
+  { id: "full", label: "Full day",     stops: 4, dinner: true  },
+];
+
+function fmtTime(h: number, m: number) {
+  const ap = h >= 12 ? "PM" : "AM";
+  const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  return `${h12}:${String(m).padStart(2, "0")} ${ap}`;
+}
+
+function humanMin(m: number): string {
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60), mm = m % 60;
+  return mm ? `${h}h ${mm}m` : `${h}h`;
+}
+
+// ── Feasibility engine: profiles, water-aware travel, time-budgeted routing ──
+type LL = { lat: number; lng: number };
+function haversineKm(a: LL, b: LL): number {
+  const R = 6371, toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const ISLAND_RE = /\b(governors island|liberty island|ellis island|roosevelt island|randall'?s island|city island)\b/i;
+function isWaterPlace(p: PlaceItem): boolean {
+  if (/little island/i.test(p.name)) return false;
+  return ISLAND_RE.test(`${p.name} ${p.area || ""}`) || (/\btram\b/i.test(p.name) && /east river|island/i.test(`${p.name} ${p.area || ""}`));
+}
+
+// Realistic "time consumed" at a place: entry/queue + visit + exit/return.
+type Profile = { cat: string; dwell: number; accessIn: number; accessOut: number; water: boolean; roundTrip: boolean; total: number; note: string };
+function profilePlace(p: PlaceItem): Profile {
+  const hay = `${p.name} ${p.area || ""} ${p.vibe || ""}`;
+  const littleIsland = /little island/i.test(p.name);
+  let cat = "attraction", accessIn = 8, accessOut = 5, minDwell = 45, water = false, roundTrip = false, note = "";
+  if (!littleIsland && (ISLAND_RE.test(hay) || (/\btram\b/i.test(p.name) && /east river|island/i.test(hay)))) {
+    cat = "island"; accessIn = 25; accessOut = 30; minDwell = 75; water = true; roundTrip = true;
+    note = "Round-trip by tram/ferry — allow real time on the island";
+  } else if (/observator|observation|top of the rock|empire state|one world|summit|the edge|\bdeck\b|tallest/i.test(hay)) {
+    cat = "observation"; accessIn = 25; accessOut = 15; minDwell = 50;
+    note = "Timed entry — tickets, security & elevator";
+  } else if (/\b(the met\b|metropolitan museum|moma|museum of modern|natural history|guggenheim|whitney|brooklyn museum|the frick|frick collection|morgan library)\b/i.test(hay) || (/museum/i.test(hay) && (p.dur || 0) >= 120)) {
+    cat = "museum_major"; accessIn = 15; accessOut = 10; minDwell = 120;
+    note = "A major museum — give it real time";
+  } else if (/museum|gallery|collection|cloisters/i.test(hay)) {
+    cat = "museum"; accessIn = 12; accessOut = 8; minDwell = 70;
+  } else if (/market|food hall|seaport/i.test(hay)) {
+    cat = "market"; accessIn = 5; accessOut = 5; minDwell = 40;
+  } else if (/park|garden|promenade|high ?line|conservatory|botanic/i.test(hay)) {
+    cat = "park"; accessIn = 5; accessOut = 5; minDwell = 40;
+  } else if (/bridge|terminal|square|cathedral|library|memorial|center/i.test(hay)) {
+    cat = "landmark"; accessIn = 6; accessOut = 5; minDwell = 30;
+  }
+  const dwell = Math.min(240, Math.max(minDwell, p.dur || minDwell));
+  return { cat, dwell, accessIn, accessOut, water, roundTrip, total: accessIn + dwell + accessOut, note };
+}
+
+export type TravelOpt = { mode: "walk" | "transit" | "car" | "ferry"; label: string; min: number };
+export type TravelLeg = { km: number; mi: number; opts: TravelOpt[] };
+function travelOptions(a: PlaceItem, b: PlaceItem): TravelLeg | null {
+  if (!a.lat || !a.lng || !b.lat || !b.lng) return null;
+  const straight = haversineKm({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
+  const km = straight * 1.35;   // detour factor — streets/transit aren't straight lines
+  const mi = straight * 0.621371;
+  const water = isWaterPlace(a) || isWaterPlace(b);
+  const opts: TravelOpt[] = [];
+  if (!water && km <= 2.6) opts.push({ mode: "walk", label: "Walk", min: Math.max(2, Math.round((km / 4.8) * 60)) });
+  opts.push({ mode: "transit", label: "Transit", min: Math.max(6, Math.round((km / 15) * 60) + 7 + (water ? 8 : 0)) });
+  opts.push({ mode: "car", label: "Car", min: Math.max(4, Math.round((km / 20) * 60) + 5) });
+  if (water) opts.push({ mode: "ferry", label: "Ferry", min: Math.max(10, Math.round((km / 22) * 60) + 12) });
+  opts.sort((x, y) => x.min - y.min);   // fastest first = the recommended mode
+  return { km: straight, mi, opts };
+}
+
+type DayStop = { time: string; name: string; desc: string; area: string; lat: number | null; lng: number | null; stopMin: number; note: string; roundTrip: boolean; travel: TravelLeg | null };
+
+const DAY_END_MIN = 23 * 60;   // never schedule past ~11pm
+const DUR_BUDGET: Record<string, number> = { few: 210, half: 360, full: 540 };
+const DUR_CAP: Record<string, number> = { few: 3, half: 4, full: 5 };
+const nrmName = (x: string) => (x || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function buildItinerary(places: PlaceItem[], typeId: string, durId: string, addDinner: boolean) {
+  const dt = DAY_TYPES.find(d => d.id === typeId)!;
+  const cap = DUR_CAP[durId] || 4;
+  const budget = Math.min(DUR_BUDGET[durId] || 360, DAY_END_MIN - dt.startHour * 60);
+
+  const scored = places
+    .map(p => ({
+      p,
+      score: dt.moods.filter(m => p.moods?.includes(m)).length * 3
+           + dt.styles.filter(s => p.styles?.includes(s)).length * 2
+           + (dt.crowd === "Low" && p.crowd === "Low" ? 2 : 0),
+    }))
+    .filter(s => s.score > 0 && s.p.lat && s.p.lng)
+    .sort((a, b) => b.score - a.score);
+
+  let selected: PlaceItem[];
+  if (scored.length >= 1) {
+    const pool = scored.slice(0, 18).map(s => s.p);
+    const anchor = pool[0];
+    const isDup = (cand: PlaceItem, route: PlaceItem[]) => route.some(r =>
+      haversineKm({ lat: cand.lat!, lng: cand.lng! }, { lat: r.lat!, lng: r.lng! }) < 0.2 || nrmName(cand.name) === nrmName(r.name));
+    const route: PlaceItem[] = [anchor];
+    let used = profilePlace(anchor).total;
+    const rem = pool.slice(1);
+    while (route.length < cap && rem.length) {
+      const last = route[route.length - 1];
+      rem.sort((a, b) =>
+        haversineKm({ lat: last.lat!, lng: last.lng! }, { lat: a.lat!, lng: a.lng! })
+        - haversineKm({ lat: last.lat!, lng: last.lng! }, { lat: b.lat!, lng: b.lng! }));
+      let chosen = -1;
+      for (let i = 0; i < rem.length; i++) {
+        if (isDup(rem[i], route)) continue;
+        const leg = travelOptions(last, rem[i]);
+        const legMin = leg && leg.opts.length ? leg.opts[0].min : 20;
+        const cost = legMin + profilePlace(rem[i]).total;
+        if (used + cost <= budget) { chosen = i; used += cost; break; }
+      }
+      if (chosen < 0) break;
+      route.push(rem.splice(chosen, 1)[0]);
+    }
+    selected = route;
+  } else {
+    selected = [];
+  }
+
+  let hour = dt.startHour, min = 0;
+  const stops_out: DayStop[] = selected.map((p, i) => {
+    const pr = profilePlace(p);
+    const time = fmtTime(hour, min);
+    const travel = i < selected.length - 1 ? travelOptions(p, selected[i + 1]) : null;
+    const legMin = travel && travel.opts.length ? travel.opts[0].min : 0;
+    const total = min + pr.total + legMin;
+    hour += Math.floor(total / 60);
+    min = total % 60;
+    return { time, name: p.name, desc: p.vibe || "", area: p.area || "", lat: p.lat ?? null, lng: p.lng ?? null, stopMin: pr.total, note: pr.note, roundTrip: pr.roundTrip, travel };
+  });
+
+  if (addDinner && selected.length) {
+    const lastPlace = selected[selected.length - 1];
+    const dinnerName = lastPlace?.dinner || "a restaurant near your last stop";
+    stops_out.push({ time: fmtTime(hour, 0), name: "Dinner", desc: dinnerName, area: "", lat: null, lng: null, stopMin: 0, note: "", roundTrip: false, travel: null });
+  }
+
+  return { stops: stops_out, outfit: dt.outfit, tip: dt.tip };
+}
+
+const TRAVEL_ICON = { walk: Footprints, transit: Bus, car: Car, ship: Ship } as const;
+function TravelConnector({ leg }: { leg: TravelLeg }) {
+  const [sel, setSel] = useState<string | null>(null);
+  const distLabel = leg.mi < 0.6 ? `${Math.round(leg.km * 1000)} m` : `${leg.mi.toFixed(1)} mi`;
+  return (
+    <div className="pl-travel">
+      <div className="pl-travel-rail" />
+      <div className="pl-travel-opts">
+        {leg.opts.map(o => {
+          const Icon = o.mode === "walk" ? Footprints : o.mode === "transit" ? Bus : o.mode === "car" ? Car : Ship;
+          const on = sel === o.mode;
+          return (
+            <button key={o.mode} className={`pl-travel-pill${on ? " on" : ""}`}
+              onClick={() => setSel(on ? null : o.mode)} title={o.label}>
+              <Icon size={13} />
+              <span>{on ? `~${o.min} min` : o.label}</span>
+            </button>
+          );
+        })}
+        <span className="pl-travel-dist">{distLabel}</span>
+      </div>
+    </div>
+  );
+}
+
+function weatherDayNote(dayTypeId: string, code: number | null, temp: number | null): string | null {
+  if (code === null || temp === null) return null;
+  const isRain = [51,53,55,61,63,65,80,81,82,95,96,99].includes(code);
+  const isSnow = [71,73,75,77].includes(code);
+  const isClear = code <= 2;
+  const warm = temp >= 68;
+  const hot = temp >= 85;
+  const cold = temp < 45;
+
+  if (dayTypeId === "photo") {
+    if (isRain) return "Rainy skies — diffused light can be stunning; bring an umbrella and lean into moody shots.";
+    if (isSnow) return "Snow on the ground — golden hour will be soft and magical.";
+    if (isClear && warm) return "Clear skies — your golden-hour stops will shine.";
+    return "Check tonight's sunset time for the best light windows.";
+  }
+  if (dayTypeId === "romantic") {
+    if (isRain) return "Rainy evening — perfect for slowing down inside; lean into candlelit venues.";
+    if (isClear && warm) return "Clear and warm — beautiful evening to linger outside.";
+    return "Mild evening — a light layer and you're set.";
+  }
+  if (dayTypeId === "calm") {
+    if (isRain || isSnow) return "Quiet, grey day — perfect for this kind of slow exploration.";
+    if (cold) return "Cold but crisp — the uncrowded spots will feel especially peaceful.";
+    return "Comfortable conditions — ideal for moving at a gentle pace.";
+  }
+  if (dayTypeId === "iconic") {
+    if (isRain) return "Bring an umbrella — the iconic spots are worth it in any weather.";
+    if (hot) return "Very warm — start early and take breaks in the shade.";
+    if (isClear) return "Perfect visibility — great day for skyline views.";
+    return "Good conditions for covering ground across the city.";
+  }
+  if (dayTypeId === "art") {
+    if (isRain) return "Rainy day — couldn't be more perfect for galleries and museums.";
+    if (isClear && warm) return "Nice out, but the interiors are the point today.";
+    return "Comfortable day to move between indoor spaces.";
+  }
+  return null;
+}
+
+function PerfectDayModal({ places, wxText, wxRaw, onClose }: { places: PlaceItem[]; wxText: string | null; wxRaw: { code: number; temp: number } | null; onClose: () => void }) {
+  const [step, setStep] = useState<"type" | "duration" | "building" | "result">("type");
+  const [dayType, setDayType] = useState<string>("");
+  const [durId, setDurId] = useState<string>("");
+
+  const dur = DURATIONS.find(d => d.id === durId);
+  const itinerary = useMemo(() => {
+    if (!dayType || !dur || !places.length) return null;
+    return buildItinerary(places, dayType, durId, dur.dinner);
+  }, [places, dayType, dur]);
+
+  useEffect(() => {
+    if (step !== "building") return;
+    const t = setTimeout(() => setStep("result"), 1900);
+    return () => clearTimeout(t);
+  }, [step]);
+
+  return (
+    <div className="pl-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pl-sheet pl-day-modal">
+        <button className="pl-close" onClick={onClose}><X size={16} /></button>
+
+        {step === "type" && (
+          <div className="pl-day-step">
+            <div className="pl-day-step-label">DESIGN MY PERFECT DAY</div>
+            <h2 className="pl-day-step-title">What kind of day are you planning?</h2>
+            <p className="pl-day-step-sub">We'll build a timed itinerary just for you.</p>
+            <div className="pl-day-opts">
+              {DAY_TYPES.map(dt => (
+                <button
+                  key={dt.id}
+                  className={`pl-day-opt${dayType === dt.id ? " on" : ""}`}
+                  onClick={() => setDayType(dt.id)}
+                >
+                  {dt.label}
+                </button>
+              ))}
+            </div>
+            <button className="pl-day-next" disabled={!dayType} onClick={() => setStep("duration")}>
+              Next <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
+
+        {step === "duration" && (
+          <div className="pl-day-step">
+            <button className="pl-day-back" onClick={() => setStep("type")}>← Back</button>
+            <div className="pl-day-step-label">DESIGN MY PERFECT DAY</div>
+            <h2 className="pl-day-step-title">How long do you have?</h2>
+            <p className="pl-day-step-sub">We'll pace the day to fit your time.</p>
+            <div className="pl-day-opts">
+              {DURATIONS.map(d => (
+                <button
+                  key={d.id}
+                  className={`pl-day-opt${durId === d.id ? " on" : ""}`}
+                  onClick={() => setDurId(d.id)}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+            <button className="pl-day-next" disabled={!durId} onClick={() => setStep("building")}>
+              Build my day ✦
+            </button>
+          </div>
+        )}
+
+        {step === "building" && (
+          <div className="pl-day-building">
+            <div className="pl-orb">
+              <span className="pl-orb-core" />
+              <span className="pl-orb-ring" />
+              <span className="pl-orb-ring r2" />
+              <span className="pl-orb-dot d1" />
+              <span className="pl-orb-dot d2" />
+              <span className="pl-orb-dot d3" />
+            </div>
+            <div className="pl-build-title">Curating your perfect day</div>
+            <div className="pl-build-sub">Charting a route that flows, stop to stop…</div>
+          </div>
+        )}
+
+        {step === "result" && itinerary && (
+          <div className="pl-day-result">
+            <div className="pl-day-result-head">
+              <div>
+                <h2 className="pl-day-result-title">Your perfect day</h2>
+                <div className="pl-day-result-sub">{DURATIONS.find(d=>d.id===durId)?.label} · New York</div>
+              </div>
+            </div>
+
+            {/* Type switcher */}
+            <div className="pl-day-types">
+              {DAY_TYPES.map(dt => (
+                <button
+                  key={dt.id}
+                  className={`pl-day-type-pill${dayType === dt.id ? " on" : ""}`}
+                  onClick={() => setDayType(dt.id)}
+                >
+                  {dt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="pl-day-divider" />
+
+            {/* Timeline */}
+            <div className="pl-day-timeline">
+              {itinerary.stops.map((stop, i) => (
+                <Fragment key={i}>
+                  <div className="pl-day-stop">
+                    <div className="pl-day-time">{stop.time}</div>
+                    <div className="pl-day-stop-right">
+                      <div className="pl-day-dot" />
+                      <div className="pl-day-stop-info">
+                        {stop.area && <div className="pl-day-stop-area">{stop.area}</div>}
+                        <div className="pl-day-stop-name">{stop.name}</div>
+                        {stop.desc && <div className="pl-day-stop-desc">{stop.desc}</div>}
+                        {stop.stopMin > 0 && (
+                          <div className="pl-day-stop-meta">
+                            <span className="pl-day-dwell">≈ {humanMin(stop.stopMin)} here</span>
+                            {stop.note && <span className="pl-day-stop-note">{stop.note}</span>}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {stop.travel && <TravelConnector leg={stop.travel} />}
+                </Fragment>
+              ))}
+            </div>
+
+            <div className="pl-day-divider" />
+
+            {/* Footer notes */}
+            <div className="pl-day-notes">
+              <div className="pl-day-note"><span>Outfit</span> {itinerary.outfit}</div>
+              {(() => {
+                const wNote = weatherDayNote(dayType, wxRaw?.code ?? null, wxRaw?.temp ?? null);
+                const display = wNote ?? wxText;
+                return display ? <div className="pl-day-note"><span>Weather</span> {display}</div> : null;
+              })()}
+              <div className="pl-day-note"><span>Tip</span> {itinerary.tip}</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main page ───────────────────────────────────────────────────────────────
+
+export default function Places() {
+  const [, nav] = useLocation();
+  const { places } = usePlaces();
+  const { user } = useAuth();
+
+  const [profStyles, setProfStyles] = useState<string[] | null>(() => getLS<string[] | null>("pl_styles", null));
+  const [mood, setMood] = useState("all");
+  const [view, setView] = useState<"home" | "map" | "saved">("home");
+  const [lux, setLux] = useState(false);
+  const [trap, setTrap] = useState(false);
+  const [saved, setSaved] = useState<Record<number, boolean>>(() => getLS("pl_saved", {}));
+  const [visited, setVisited] = useState<Record<number, boolean>>(() => getLS("pl_visited", {}));
+  const [searchQ, setSearchQ] = useState("");
+  const [liveResults, setLiveResults] = useState<LivePlace[]>([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveSaved, setLiveSaved] = useState<Record<string, boolean>>(() => getLS("gpl_saved", {}));
+  const [liveVisited, setLiveVisited] = useState<Record<string, boolean>>(() => getLS("gpl_visited", {}));
+  const [savedSeg, setSavedSeg] = useState<"saved" | "been">("saved");
+  const liveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [wxText, setWxText] = useState<string | null>(null);
+  const [wxRaw, setWxRaw] = useState<{ code: number; temp: number } | null>(null);
+  const [showPerfectDay, setShowPerfectDay] = useState(false);
+
+  const hour = new Date().getHours();
+  const salutation = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || null;
+
+  // Cloud sync: backfill local saves once, then merge cloud saves into state.
+  useEffect(() => {
+    if (!user || places.length === 0) return;
+    (async () => {
+      await migratePlacesLocal(places);
+      const merged = await hydratePlaces();
+      setSaved(merged.saved);
+      setVisited(merged.visited);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, places.length]);
+
+  function onboardDone(styles: string[], pace: string) {
+    setProfStyles(styles);
+    setLS("pl_styles", styles);
+    setLS("pl_pace", pace);
+  }
+
+  function toggleSave(id: number) {
+    const next = { ...saved, [id]: !saved[id] };
+    if (!next[id]) delete next[id];
+    setSaved(next);
+    setLS("pl_saved", next);
+    const item = places.find(pl => pl.id === id);
+    if (item) void pushSave("places", id, item.name, { saved: !!next[id], visited: !!visited[id] });
+  }
+
+  function toggleVisit(id: number) {
+    const next = { ...visited, [id]: !visited[id] };
+    if (!next[id]) delete next[id];
+    setVisited(next);
+    setLS("pl_visited", next);
+    const item = places.find(pl => pl.id === id);
+    if (item) void pushSave("places", id, item.name, { saved: !!saved[id], visited: !!next[id] });
+  }
+
+  function snapshotLive(p?: LivePlace) {
+    if (!p) return;
+    const meta = getLS<Record<string, Partial<LivePlace>>>("gpl_meta", {});
+    meta[p.place_id] = {
+      place_id: p.place_id, name: p.name, rating: p.rating,
+      user_rating_count: p.user_rating_count, short_address: p.short_address,
+      address: p.address, photo_url: p.photo_url,
+    };
+    setLS("gpl_meta", meta);
+  }
+  function toggleLiveSave(id: string, place?: LivePlace) {
+    const next = { ...liveSaved, [id]: !liveSaved[id] };
+    if (!next[id]) delete next[id]; else snapshotLive(place);
+    setLiveSaved(next); setLS("gpl_saved", next);
+  }
+  function toggleLiveVisit(id: string, place?: LivePlace) {
+    const next = { ...liveVisited, [id]: !liveVisited[id] };
+    if (!next[id]) delete next[id]; else snapshotLive(place);
+    setLiveVisited(next); setLS("gpl_visited", next);
+  }
+
+  // Debounced live Google search
+  useEffect(() => {
+    if (liveTimer.current) clearTimeout(liveTimer.current);
+    const q = searchQ.trim();
+    if (!q || q.length < 2) { setLiveResults([]); setLiveLoading(false); return; }
+    setLiveLoading(true);
+    liveTimer.current = setTimeout(async () => {
+      try {
+        const r = await fetch(`${API_BASE}/places/explore?q=${encodeURIComponent(q)}`);
+        const data = await r.json();
+        setLiveResults(Array.isArray(data) ? data : []);
+      } catch { setLiveResults([]); }
+      setLiveLoading(false);
+    }, 700);
+    return () => { if (liveTimer.current) clearTimeout(liveTimer.current); };
+  }, [searchQ]);
+
+  const matches = useCallback((p: PlaceItem) => {
+    if (trap && p.badges?.includes("Tourist Heavy")) return false;
+    if (lux && !(p.styles?.includes("Luxury") || p.badges?.includes("Quiet Luxury") || p.badges?.includes("Worth the Price"))) return false;
+    if (mood === "all") return true;
+    if (mood === "quick") return (p.dur || 999) <= 90;
+    if (mood === "avoid-crowds") return p.crowd === "Low";
+    if (mood === "classy") return p.styles?.includes("Nightlife") || p.styles?.includes("Luxury") || p.badges?.includes("Quiet Luxury");
+    return p.moods?.includes(mood);
+  }, [trap, lux, mood]);
+
+  const filtered = useMemo(() => places.filter(matches), [places, matches]);
+
+  const sections = useMemo(() => {
+    if (!places.length) return [];
+    if (mood !== "all") {
+      const lbl = MOODS.find(m => m[0] === mood)?.[1] || mood;
+      return [{ title: lbl, items: filtered }];
+    }
+    const byStyle = filtered.filter(p => p.styles?.some((s: string) => profStyles?.includes(s)));
+    const base = filtered;
+    return ([
+      { title: "Handpicked for you", note: "based on your taste", items: (byStyle.length ? byStyle : base).slice(0, 6) },
+      { title: "Best at golden hour", note: "plan around the light", items: base.filter(p => p.badges?.includes("Best at Sunset")).slice(0, 6) },
+      { title: "Quiet — less touristy", note: "where locals go", items: base.filter(p => p.crowd === "Low").slice(0, 6) },
+      { title: "Perfect for two hours", note: "a beautiful in-between", items: base.filter(p => (p.dur || 999) <= 90).slice(0, 6) },
+    ] as { title: string; note?: string; items: PlaceItem[] }[]).filter(s => s.items.length > 0);
+  }, [places, filtered, mood, profStyles]);
+
+  useEffect(() => {
+    if (!places.length) return;
+    const pts = places.filter(p => p.lat && p.lng);
+    if (!pts.length) return;
+    const lat = pts.reduce((s, p) => s + p.lat!, 0) / pts.length;
+    const lng = pts.reduce((s, p) => s + p.lng!, 0) / pts.length;
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`)
+      .then(r => r.json())
+      .then(d => {
+        const c = d.current.weather_code as number, t = Math.round(d.current.temperature_2m);
+        const wx = WX[c] || ["Clear", "🌡"];
+        setWxRaw({ code: c, temp: t });
+        // Code-aware, temperature-tuned recommendation
+        let note: string;
+        if ([95, 96, 99].includes(c))       note = "thunderstorms — stay indoors, this is a museum day.";
+        else if ([71, 73, 75, 77].includes(c)) note = "snow on the ground — the park looks magical; dress warm.";
+        else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(c)) note = "rainy today — perfect for galleries and cozy dining.";
+        else if (c === 45 || c === 48)       note = "foggy this morning — the skyline looks beautifully mysterious.";
+        else if (t >= 88)                    note = "very hot — seek shade or head underground to a museum.";
+        else if (t >= 75 && c <= 2)         note = "beautiful day for a rooftop or a park.";
+        else if (t >= 65 && c <= 3)         note = "great walking weather — the city is yours today.";
+        else if (t >= 55)                    note = "comfortable and mild — perfect for exploring on foot.";
+        else if (t >= 40)                    note = "crisp — bundle up for that skyline view.";
+        else                                 note = "very cold — lean into indoor gems today.";
+        setWxText(`${wx[1]}\u00a0${t}°\u00b7${wx[0]} — ${note}`);
+      }).catch(() => {});
+  }, [places]);
+
+  if (profStyles === null) {
+    return (
+      <div className="min-h-screen bg-background">
+        <PlacesOnboarding onDone={onboardDone} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Sticky header */}
+      <header className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
+        style={{ background: "rgba(8,8,13,0.9)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <button aria-label="Back" onClick={() => nav("/")} className="text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <MapPin className="w-4 h-4" style={{ color: "rgba(255,255,255,0.5)" }} />
+        <h1 className="text-lg font-bold tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>PLACES</h1>
+        <span className="dc-city-badge">NEW YORK</span>
+        <div style={{ flex: 1 }} />
+        <button
+          className="pl-taste-btn"
+          onClick={() => { setProfStyles(null); setLS("pl_styles", null); }}
+          title="Edit your taste profile"
+        >
+          ✦ Taste
+        </button>
+        <div className="pl-viewnav">
+          <button className={`pl-viewtab${view === "home" ? " on" : ""}`} onClick={() => setView("home")}>Discover</button>
+          <button className={`pl-viewtab${view === "map" ? " on" : ""}`} onClick={() => setView("map")}>Map</button>
+          <button className={`pl-viewtab${view === "saved" ? " on" : ""}`} onClick={() => setView("saved")}>Saved</button>
+        </div>
+      </header>
+
+      <div className="max-w-screen-xl mx-auto px-4 py-5">
+
+        {/* Saved view */}
+        {view === "saved" && (() => {
+          const meta = getLS<Record<string, Partial<LivePlace>>>("gpl_meta", {});
+          const liveIds = Object.keys(savedSeg === "saved" ? liveSaved : liveVisited);
+          const liveItems: LivePlace[] = liveIds.map(id => ({
+            place_id: id, name: meta[id]?.name || "Saved from Google",
+            rating: meta[id]?.rating ?? null, user_rating_count: meta[id]?.user_rating_count ?? null,
+            address: meta[id]?.address || "", short_address: meta[id]?.short_address || "",
+            photo_url: meta[id]?.photo_url ?? null, types: [],
+          }));
+          const curated = places.filter(p => (savedSeg === "saved" ? saved[p.id] : visited[p.id]));
+          const empty = curated.length === 0 && liveItems.length === 0;
+          return (
+            <>
+              <div className="pl-heading">
+                <h1>{savedSeg === "saved" ? "Saved" : "Been there"}</h1>
+                <p>{savedSeg === "saved"
+                  ? "Your collection — places kept for the right moment."
+                  : "Everywhere you've actually been — your city, collected."}</p>
+              </div>
+              <div className="pl-toggles" style={{ marginBottom: 14 }}>
+                <button className={`pl-toggle${savedSeg === "saved" ? " on" : ""}`} onClick={() => setSavedSeg("saved")}>♡ Saved</button>
+                <button className={`pl-toggle${savedSeg === "been" ? " on" : ""}`} onClick={() => setSavedSeg("been")}>✓ Been</button>
+              </div>
+              {empty
+                ? <div className="pl-grid"><div className="pl-empty">{savedSeg === "saved"
+                    ? "Nothing saved yet — tap ♡ on a place you love."
+                    : "No visits marked yet — tap ✓ Been there on places you've seen."}</div></div>
+                : <>
+                    {curated.length > 0 &&
+                      <PaginatedPlaceGrid items={curated} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />}
+                    {liveItems.length > 0 && (
+                      <div className="pl-section" style={{ marginTop: curated.length ? 22 : 0 }}>
+                        <div className="pl-sec-head"><span className="pl-sec-title">From Google</span>
+                          <span className="pl-sec-note">{liveItems.length} place{liveItems.length > 1 ? "s" : ""}</span></div>
+                        <div className="pl-grid">
+                          {liveItems.map(p => (
+                            <LivePlaceCard key={p.place_id} p={p}
+                              saved={!!liveSaved[p.place_id]} visited={!!liveVisited[p.place_id]}
+                              onSave={e => { e.stopPropagation(); toggleLiveSave(p.place_id, p); }}
+                              onVisit={e => { e.stopPropagation(); toggleLiveVisit(p.place_id, p); }} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+              }
+            </>
+          );
+        })()}
+
+        {/* Map view */}
+        {view === "map" && (
+          <>
+            <div className="pl-heading">
+              <h1>The map</h1>
+              <p>Every place, located.</p>
+            </div>
+            <div className="pl-moodbar">
+              {MOODS.map(([id, lbl]) => (
+                <button key={id} className={`pl-mood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
+              ))}
+            </div>
+            <LeafletMap places={filtered} />
+          </>
+        )}
+
+        {/* Discover view */}
+        {view === "home" && (
+          <>
+            {/* Greeting */}
+            <div className="pl-greeting">
+              <h2 className="pl-greeting-text">
+                {salutation}{displayName ? `, ${displayName}` : ""}.
+              </h2>
+              <p className="pl-greeting-sub">
+                {hour < 12
+                  ? "Beautiful ways to start your morning in the city."
+                  : hour < 17
+                  ? "The best of New York — right now."
+                  : "Beautiful ways to spend your evening in New York."}
+              </p>
+              {wxText && <div className="pl-wx">{wxText}</div>}
+              <button className="pl-perfect-day-btn" onClick={() => setShowPerfectDay(true)}>
+                ✦ Design my perfect day
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="pl-search-row">
+              <div className="dc-search-wrap">
+                <Search className="dc-search-icon" size={14} />
+                <input
+                  type="text"
+                  placeholder="Search places in New York..."
+                  value={searchQ}
+                  onChange={e => setSearchQ(e.target.value)}
+                  className="dc-search-input"
+                  autoComplete="off"
+                />
+                {searchQ && (
+                  <button className="pl-search-clear" onClick={() => setSearchQ("")}>×</button>
+                )}
+              </div>
+            </div>
+
+            {searchQ.trim() ? (
+              /* Search results */
+              <>
+                {(() => {
+                  const q = searchQ.toLowerCase().trim();
+                  const localResults = places.filter(p =>
+                    p.name?.toLowerCase().includes(q) ||
+                    p.area?.toLowerCase().includes(q) ||
+                    p.vibe?.toLowerCase().includes(q) ||
+                    p.badges?.some((b: string) => b.toLowerCase().includes(q)) ||
+                    p.styles?.some((s: string) => s.toLowerCase().includes(q))
+                  );
+                  return localResults.length > 0 ? (
+                    <div className="pl-section">
+                      <div className="pl-sec-head">
+                        <span className="pl-sec-title">In our guide</span>
+                        <span className="pl-sec-note">{localResults.length} found</span>
+                      </div>
+                      <PaginatedPlaceGrid items={localResults} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />
+                    </div>
+                  ) : null;
+                })()}
+
+                {/* Live Google results */}
+                <div className="pl-section">
+                  <div className="pl-sec-head">
+                    <span className="pl-sec-title">
+                      {liveLoading
+                        ? <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Searching Google…</span>
+                        : "Live from Google"}
+                    </span>
+                    {!liveLoading && liveResults.length > 0 && (
+                      <span className="pl-sec-note">{liveResults.length} results</span>
+                    )}
+                  </div>
+                  {liveLoading ? (
+                    <div className="pl-grid">
+                      {[0,1,2].map(i => (
+                        <div key={i} className="pl-card" style={{ opacity: 0.4 }}>
+                          <div className="pl-photo" style={{ background: "rgba(255,255,255,0.06)", height: 140 }} />
+                          <div className="pl-info">
+                            <div className="mdp-shimmer" style={{ width: "60%", height: 12, borderRadius: 6, marginBottom: 8 }} />
+                            <div className="mdp-shimmer" style={{ width: "80%", height: 16, borderRadius: 6 }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : liveResults.length > 0 ? (
+                    <div className="pl-grid">
+                      {liveResults.map(p => (
+                        <LivePlaceCard key={p.place_id} p={p}
+                          saved={!!liveSaved[p.place_id]}
+                          visited={!!liveVisited[p.place_id]}
+                          onSave={e => { e.stopPropagation(); toggleLiveSave(p.place_id, p); }}
+                          onVisit={e => { e.stopPropagation(); toggleLiveVisit(p.place_id, p); }} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="pl-empty" style={{ padding: "16px 0", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>
+                      No Google results yet
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="pl-filterbar">
+                  <div className="pl-moodbar">
+                    {MOODS.map(([id, lbl]) => (
+                      <button key={id} className={`pl-mood${mood === id ? " on" : ""}`} onClick={() => setMood(id)}>{lbl}</button>
+                    ))}
+                  </div>
+                  <div className="pl-toggles">
+                    <button className={`pl-toggle${trap ? " on" : ""}`} onClick={() => setTrap(v => !v)}>No tourist traps</button>
+                    <button className={`pl-toggle${lux ? " on" : ""}`} onClick={() => setLux(v => !v)}>Luxury only</button>
+                  </div>
+                </div>
+
+                {places.length === 0 && (
+                  <div className="pl-empty">The catalog is updating — check back shortly.</div>
+                )}
+
+                {filtered.length > 0 && (
+                  <ChooseForMe
+                    noun="place"
+                    verb="Take me there"
+                    pick={ex => choosePlace({
+                      candidates: filtered,
+                      savedIds: Object.keys(saved).filter(k => saved[Number(k)]).map(Number),
+                      visitedIds: Object.keys(visited).filter(k => visited[Number(k)]).map(Number),
+                      weather: wxRaw,
+                      now: new Date(),
+                      exclude: ex,
+                    })}
+                  />
+                )}
+
+                {sections.map(sec => (
+                  <div key={sec.title} className="pl-section">
+                    <div className="pl-sec-head">
+                      <span className="pl-sec-title">{sec.title}</span>
+                      {sec.note && <span className="pl-sec-note">{sec.note}</span>}
+                    </div>
+                    <PaginatedPlaceGrid items={sec.items} saved={saved} visited={visited} toggleSave={toggleSave} toggleVisit={toggleVisit} />
+                  </div>
+                ))}
+              </>
+            )}
+          </>
+        )}
+      </div>
+
+      {showPerfectDay && (
+        <PerfectDayModal places={places} wxText={wxText} wxRaw={wxRaw} onClose={() => setShowPerfectDay(false)} />
+      )}
+    </div>
+  );
+}

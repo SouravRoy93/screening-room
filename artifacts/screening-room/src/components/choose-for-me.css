@@ -1,0 +1,45 @@
+/* ── Choose for me — the gold button and its moment ──────────────────────── */
+.cfm-row { display: flex; justify-content: center; margin: 14px 0 4px; }
+.cfm-btn {
+  font-size: 13px; font-weight: 700; letter-spacing: .04em; color: #1a1206;
+  padding: 10px 22px; border: 0; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(135deg, #ffd36b, #f0a94b);
+  box-shadow: 0 4px 18px rgba(255, 211, 107, .28);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.cfm-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255, 211, 107, .4); }
+.cfm-btn:focus-visible { outline: 2px solid #ffd36b; outline-offset: 3px; }
+.cfm-spark { margin-right: 4px; }
+
+.cfm-overlay {
+  position: fixed; inset: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(5, 5, 10, .78);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: fadeUp .25s ease both;
+}
+.cfm-card {
+  width: min(460px, 94vw); text-align: center;
+  background: rgba(20, 18, 28, .92);
+  border: 1px solid rgba(255, 211, 107, .3);
+  border-radius: 24px; padding: 34px 28px 26px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .6);
+  animation: fadeUp .35s ease both;
+}
+.cfm-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase;
+  background: linear-gradient(90deg, #ffd36b, #ec4899);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin-bottom: 10px;
+}
+.cfm-title { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 600; color: #fff; margin: 0 0 4px; }
+.cfm-sub { font-size: 13px; color: var(--mut); margin-bottom: 12px; }
+.cfm-reason { font-size: 14px; font-style: italic; color: rgba(255,255,255,.72); margin: 0 0 20px; }
+.cfm-actions { display: flex; flex-direction: column; gap: 9px; align-items: center; }
+.cfm-ghost {
+  font-size: 13px; font-weight: 600; color: #fff; padding: 9px 18px; border-radius: 999px;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); cursor: pointer;
+}
+.cfm-ghost:hover { background: rgba(255,255,255,.13); }
+.cfm-quiet { font-size: 12.5px; color: var(--mut); background: none; border: 0; cursor: pointer; padding: 6px; }
+.cfm-quiet:hover { color: #fff; }

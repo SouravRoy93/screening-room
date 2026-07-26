@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [screening-room-growth]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npx -y pnpm@10.26.1 install --no-frozen-lockfile
+      - name: Typecheck
+        run: npx -y pnpm@10.26.1 run typecheck
