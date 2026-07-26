@@ -140,7 +140,7 @@ export default function Hub() {
       <div className="hub-top">
         <div className="hub-brand">Screening Room</div>
         <div className="hub-user">
-          <button onClick={() => nav("/social")}>Social</button>
+          {user && <button onClick={() => nav("/social")}>Social</button>}
           {user ? (
             <>
               {editingName ? (
@@ -195,36 +195,40 @@ export default function Hub() {
           <TastePassport />
         )}
 
-        <div className="cat-grid">
-          {CATS.map(cat => {
-            const enterable = cat.active || cat.ready;
-            const cls = `cat-tile${cat.active ? " active" : cat.ready ? " ready" : " soon"}`;
-            return (
-              <button
-                key={cat.v}
-                className={cls}
-                onClick={() => enterable && handleTile(cat)}
-                disabled={cat.soon}
-              >
-                {cat.soon && <span className="lock">Soon</span>}
-                {cat.ready && <span className="newbadge">New</span>}
-
-                <span
-                  className="cat-medallion"
-                  style={{ "--c1": cat.c1, "--c2": cat.c2, "--glow": cat.glow } as React.CSSProperties}
+        {user && (
+          <>
+          <div className="cat-grid">
+            {CATS.map(cat => {
+              const enterable = cat.active || cat.ready;
+              const cls = `cat-tile${cat.active ? " active" : cat.ready ? " ready" : " soon"}`;
+              return (
+                <button
+                  key={cat.v}
+                  className={cls}
+                  onClick={() => enterable && handleTile(cat)}
+                  disabled={cat.soon}
                 >
-                  <CatIcon type={cat.icon} />
-                </span>
+                  {cat.soon && <span className="lock">Soon</span>}
+                  {cat.ready && <span className="newbadge">New</span>}
 
-                <span className="cat-name">{cat.name}</span>
-                <span className="cat-sub">{cat.sub}</span>
-                {enterable && <span className="enter">Enter</span>}
-              </button>
-            );
-          })}
-        </div>
+                  <span
+                    className="cat-medallion"
+                    style={{ "--c1": cat.c1, "--c2": cat.c2, "--glow": cat.glow } as React.CSSProperties}
+                  >
+                    <CatIcon type={cat.icon} />
+                  </span>
 
-        <div className={`hub-hint${skip ? " skip" : ""}`}>{user ? "Tap a world to dive in" : "Or dive straight into a world"}</div>
+                  <span className="cat-name">{cat.name}</span>
+                  <span className="cat-sub">{cat.sub}</span>
+                  {enterable && <span className="enter">Enter</span>}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className={`hub-hint${skip ? " skip" : ""}`}>Tap a world to dive in</div>
+          </>
+        )}
 
         {/* Footer: attribution + legal */}
         <footer style={{ marginTop: 48, paddingBottom: 24, textAlign: "center" }}>

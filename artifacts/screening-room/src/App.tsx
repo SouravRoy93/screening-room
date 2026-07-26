@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { Switch, Route, Redirect, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,7 +23,7 @@ import NotFound from "@/pages/not-found";
 const queryClient = new QueryClient();
 
 function AppRouter() {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
   const [, nav] = useLocation();
 
   // When the user arrives from a password-reset email, Supabase emits
@@ -49,7 +49,22 @@ function AppRouter() {
     );
   }
 
-  // Public browse: anyone can explore the catalogs; tracking prompts sign-in.
+  // Members only: signed-out visitors get the hero and the auth/legal pages.
+  // Every other route redirects home so no app content is reachable.
+  if (!user) {
+    return (
+      <Switch>
+        <Route path="/" component={Hub} />
+        <Route path="/auth" component={Auth} />
+        <Route path="/reset" component={ResetPassword} />
+        <Route path="/privacy" component={Privacy} />
+        {/* Opt-in share pages stay reachable — they exist to be shown to non-members. */}
+        <Route path="/u/:id" component={PublicProfilePage} />
+        <Route><Redirect to="/" /></Route>
+      </Switch>
+    );
+  }
+
   return (
     <Switch>
       <Route path="/" component={Hub} />

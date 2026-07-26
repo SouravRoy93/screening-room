@@ -88,12 +88,6 @@ export function TastePassport() {
         </p>
         <div className="tp-actions">
           <button className="tp-cta" onClick={() => nav("/auth")}>Claim your card</button>
-          <button
-            className="tp-ghost"
-            onClick={() => document.querySelector(".cat-grid")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-          >
-            Look around first
-          </button>
         </div>
       </div>
     </section>
