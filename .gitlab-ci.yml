@@ -1,0 +1,115 @@
+# ============================================================================
+#  GitLab CI — typecheck on changes, plus the three daily catalog-grow jobs
+#  (ported from the old GitHub Actions workflows).
+#
+#  ── ONE-TIME SETUP ────────────────────────────────────────────────────────
+#  1. CI/CD variables — Settings → CI/CD → Variables. Mark each Masked, and
+#     also Protected if `main` is a protected branch:
+#       GOOGLE_PLACES_API_KEY   Google Places key (dining + places)
+#       ANTHROPIC_API_KEY       Claude key (editorial copy)
+#       TMDB_KEY                TMDB key (entertainment)
+#       GITLAB_PUSH_TOKEN       Project Access Token — role Maintainer,
+#                               scope `write_repository`. Lets the bot commit
+#                               the grown catalogs back to main.
+#       (Settings → Access tokens creates the Project Access Token.)
+#
+#  2. Schedules — Build → Pipeline schedules → New schedule. Create three,
+#     each on branch `main`, each with ONE variable `GROW`:
+#       GROW=places          cron  0 9 * * *     (09:00 UTC)
+#       GROW=dining          cron  45 9 * * *    (09:45 UTC)
+#       GROW=entertainment   cron  30 10 * * *   (10:30 UTC)
+#     The staggering keeps the three jobs from racing to push.
+#
+#  Grow commits carry [skip ci] so a bot push never triggers a new pipeline.
+# ============================================================================
+
+stages:
+  - check
+  - grow
+
+default:
+  image: node:22          # Debian image — ships with git, which the grow jobs need
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS   # avoid duplicate pipelines
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_BRANCH
+
+# ─────────────────────────────────────────────────────────────── typecheck ──
+typecheck:
+  stage: check
+  rules:
+    - if: $GROW                                   # never on a scheduled grow run
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - corepack enable && corepack prepare pnpm@10.26.1 --activate
+  script:
+    - pnpm install --no-frozen-lockfile
+    - pnpm run typecheck
+
+# ────────────────────────────────────────────────────────── grow template ──
+.grow:
+  stage: grow
+  variables:
+    GIT_DEPTH: "0"        # full history so the rebase-retry below works
+  before_script:
+    - git config user.name "catalog-bot"
+    - git config user.email "catalog-bot@users.noreply.gitlab.com"
+    - git remote set-url origin "https://oauth2:${GITLAB_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - git fetch origin main
+    - git checkout -B main FETCH_HEAD
+  script:
+    - node "$GROW_SCRIPT"
+    - git add $GROW_FILES
+    - |
+      if git diff --staged --quiet; then
+        echo "No new entries this run — nothing to commit."
+        exit 0
+      fi
+    - git commit -m "$GROW_MESSAGE ($(date -u +%Y-%m-%d)) [skip ci]"
+    - |
+      for i in 1 2 3 4 5; do
+        if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+          echo "Pushed."
+          exit 0
+        fi
+        echo "Push race — retrying ($i)…"
+        sleep 7
+      done
+      echo "Push failed after 5 retries."
+      exit 1
+
+# ───────────────────────────────────────────────────────────── grow: jobs ──
+grow:places:
+  extends: .grow
+  rules:
+    - if: $GROW == "places"
+  variables:
+    GROW_SCRIPT: scripts/grow/places.mjs
+    GROW_FILES: artifacts/screening-room/public/places.json
+    GROW_MESSAGE: Grow places
+    NEW_PER_RUN: "18"
+
+grow:dining:
+  extends: .grow
+  rules:
+    - if: $GROW == "dining"
+  variables:
+    GROW_SCRIPT: scripts/grow/dining.mjs
+    GROW_FILES: artifacts/screening-room/public/dining.json
+    GROW_MESSAGE: Grow dining
+    NEW_PER_RUN: "15"
+
+grow:entertainment:
+  extends: .grow
+  rules:
+    - if: $GROW == "entertainment"
+  variables:
+    GROW_SCRIPT: scripts/grow/entertainment.mjs
+    GROW_FILES: artifacts/screening-room/public/catalog.json artifacts/screening-room/public/catalog-top.json
+    GROW_MESSAGE: Grow catalog
