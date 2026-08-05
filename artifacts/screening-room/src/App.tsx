@@ -15,6 +15,7 @@ import DiningDetailPage from "@/pages/dining-detail-page";
 import Places from "@/pages/places";
 import PlaceDetailPage from "@/pages/place-detail-page";
 import Social from "@/pages/social";
+import Evening from "@/pages/evening";
 import ResetPassword from "@/pages/reset-password";
 import Privacy from "@/pages/privacy";
 import PublicProfilePage from "@/pages/public-profile";
@@ -79,6 +80,7 @@ function AppRouter() {
       <Route path="/dining/:id" component={DiningDetailPage} />
       <Route path="/places" component={Places} />
       <Route path="/places/:id" component={PlaceDetailPage} />
+      <Route path="/evening" component={Evening} />
       <Route path="/social" component={Social} />
       <Route component={NotFound} />
     </Switch>

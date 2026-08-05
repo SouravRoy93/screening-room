@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { TonightCard } from "@/components/tonight-card";
 import { FollowUpCard } from "@/components/followup-card";
+import { EveningInvite } from "@/components/evening-invite";
 import { preferredName, cleanName } from "@/lib/profile";
 import { TastePassport } from "@/components/taste-passport";
 
@@ -190,6 +191,7 @@ export default function Hub() {
           <>
             <FollowUpCard />
             <TonightCard />
+            <EveningInvite />
           </>
         ) : (
           <TastePassport />

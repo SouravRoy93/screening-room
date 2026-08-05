@@ -1,0 +1,213 @@
+/* ── Perfect Evening — occasion picker + the composed arc ─────────────────── */
+
+.ev-wrap {
+  width: min(760px, 94vw);
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* ── Occasion picker ─────────────────────────────────────────────────────── */
+.ev-ask {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(22px, 4.4vw, 30px);
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 4px;
+  letter-spacing: .01em;
+}
+.ev-ask-sub { font-size: 13px; color: var(--mut); margin: 0 0 18px; }
+
+.ev-occasions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 26px;
+}
+.ev-occasion {
+  position: relative;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px 14px 15px;
+  text-align: left;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.ev-occasion:hover { background: rgba(255,255,255,.07); transform: translateY(-1px); }
+.ev-occasion:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 2px; }
+.ev-occasion[aria-pressed="true"] {
+  border-color: rgba(255,211,107,.55);
+  background: linear-gradient(180deg, rgba(255,211,107,.13), rgba(255,255,255,.05));
+}
+.ev-occasion-name {
+  font-size: 14px; font-weight: 600; color: #fff;
+}
+.ev-occasion-tag { font-size: 12px; color: var(--mut); line-height: 1.35; }
+
+/* ── The arc ─────────────────────────────────────────────────────────────── */
+.ev-plan {
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 20px;
+  padding: 20px 22px 16px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeUp .6s ease both;
+}
+.ev-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  background: linear-gradient(90deg, #ffd36b, #ec4899);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin-bottom: 4px;
+}
+.ev-context { font-family: 'Oswald', sans-serif; font-size: 21px; font-weight: 600; color: #fff; margin: 0 0 2px; }
+.ev-note { font-size: 13px; font-style: italic; color: rgba(255,255,255,.6); margin: 0 0 6px; }
+
+.ev-acts { display: flex; flex-direction: column; }
+
+.ev-act {
+  display: grid;
+  grid-template-columns: 64px 38px 1fr auto;
+  align-items: start;
+  gap: 12px;
+  padding: 15px 4px 14px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+.ev-act:first-child { border-top: 0; }
+
+.ev-time {
+  font-size: 12px; font-weight: 600; color: #fff; opacity: .85;
+  padding-top: 9px; white-space: nowrap;
+}
+
+.ev-rail { position: relative; display: flex; justify-content: center; padding-top: 4px; }
+.ev-medallion {
+  width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  z-index: 1;
+}
+/* The thread that makes three picks read as one evening. */
+.ev-act:not(:last-child) .ev-rail::after {
+  content: "";
+  position: absolute;
+  top: 40px; bottom: -22px; left: 50%;
+  width: 1px; margin-left: -.5px;
+  background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.04));
+}
+
+.ev-body { min-width: 0; }
+.ev-label {
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mut); margin-bottom: 2px;
+}
+.ev-title {
+  display: inline-block;
+  font-size: 16px; font-weight: 600; color: #fff;
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+  transition: color .18s ease;
+}
+.ev-title:hover { color: #ffd36b; }
+.ev-title:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 3px; border-radius: 4px; }
+.ev-sub { font-size: 12px; color: var(--mut); margin-top: 1px; }
+.ev-reason { font-size: 12.5px; font-style: italic; color: rgba(255,255,255,.58); margin-top: 4px; line-height: 1.45; }
+
+.ev-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.ev-tag {
+  font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 8px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.62);
+}
+.ev-tag-gold { border-color: rgba(255,211,107,.45); color: #ffd36b; }
+
+.ev-swap {
+  align-self: center;
+  font-size: 11px; letter-spacing: .04em;
+  padding: 5px 10px; border-radius: 999px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.7);
+  cursor: pointer; white-space: nowrap;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
+}
+.ev-swap:hover { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.25); }
+.ev-swap:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 2px; }
+
+/* ── Footer actions ──────────────────────────────────────────────────────── */
+.ev-foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding-top: 14px; margin-top: 4px;
+}
+.ev-foot-spacer { margin-left: auto; }
+.ev-reset {
+  font-size: 12px; color: rgba(255,255,255,.5);
+  background: none; border: 0; cursor: pointer; text-decoration: underline;
+}
+.ev-reset:hover { color: #fff; }
+
+/* ── City switch, only once there's more than one ────────────────────────── */
+.ev-cities { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; }
+.ev-city {
+  font-size: 12px; padding: 4px 11px; border-radius: 999px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.7); cursor: pointer;
+}
+.ev-city[aria-pressed="true"] { border-color: rgba(255,211,107,.5); color: #ffd36b; }
+
+/* ── Hub invite ──────────────────────────────────────────────────────────── */
+.ev-invite {
+  width: min(680px, 94vw);
+  margin: 0 auto 30px;
+  text-align: left;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 20px;
+  padding: 16px 20px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeUp .7s ease .25s both;
+}
+.ev-invite-head { min-width: 0; flex: 1 1 260px; }
+.ev-invite-eyebrow {
+  font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  background: linear-gradient(90deg, #ffd36b, #ec4899);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin-bottom: 3px;
+}
+.ev-invite-title { font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 600; color: #fff; margin: 0 0 2px; }
+.ev-invite-sub { font-size: 12.5px; color: var(--mut); margin: 0; }
+.ev-invite-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.ev-invite-chip {
+  font-size: 12px; padding: 6px 13px; border-radius: 999px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.78);
+  cursor: pointer; white-space: nowrap;
+  transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+.ev-invite-chip:hover {
+  background: rgba(255,211,107,.13);
+  border-color: rgba(255,211,107,.5);
+  color: #ffd36b;
+  transform: translateY(-1px);
+}
+.ev-invite-chip:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 2px; }
+
+/* ── Empty / loading ─────────────────────────────────────────────────────── */
+.ev-empty {
+  border: 1px dashed rgba(255,255,255,.14);
+  border-radius: 18px; padding: 28px 22px;
+  text-align: center; color: var(--mut); font-size: 13.5px; line-height: 1.6;
+}
+
+@media (max-width: 620px) {
+  .ev-occasions { grid-template-columns: 1fr; }
+  .ev-act { grid-template-columns: 54px 32px 1fr; gap: 10px; }
+  .ev-swap { grid-column: 3; justify-self: start; margin-top: 8px; }
+  .ev-medallion { width: 30px; height: 30px; border-radius: 10px; }
+  .ev-act:not(:last-child) .ev-rail::after { top: 36px; }
+  .ev-plan { padding: 16px 16px 12px; }
+}
