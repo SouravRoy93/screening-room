@@ -57,6 +57,37 @@ export interface DiningItem {
     privacy?: number; beverage?: number; view?: number; value?: number;
     consistency?: number; romantic?: number; business?: number;
   };
+  /** How this table releases reservations — drives Table Watch (roadmap #8). */
+  booking?: BookingPolicy;
+}
+
+/**
+ * A restaurant's reservation-release convention.
+ *
+ * This is editorial, not scraped, so `confidence` governs how specifically the
+ * app is allowed to speak. At "high" it may name the day and hour; at "low" it
+ * softens to "usually about a month ahead" and tells the member to confirm.
+ * Absent entirely — which is the case for everything predating the backfill —
+ * Table Watch falls back to guidance derived from `rope` alone.
+ */
+export interface BookingPolicy {
+  /**
+   * rolling  — a window opens a fixed number of days ahead, every day
+   * monthly  — the whole month drops on one date
+   * walk-in  — no reservations; queue or turn up
+   * waitlist — request-only, notified if something frees up
+   */
+  mode: "rolling" | "monthly" | "walk-in" | "waitlist";
+  /** For rolling: how many days ahead the window opens (e.g. 30). */
+  daysAhead?: number;
+  /** For monthly: which day of the month the drop lands on (1–28). */
+  dayOfMonth?: number;
+  /** Local release time in 24h "HH:MM". */
+  time?: string;
+  /** Where the booking actually happens. */
+  platform?: "Resy" | "OpenTable" | "Tock" | "SevenRooms" | "Direct" | "Phone";
+  /** How much the app is allowed to claim. */
+  confidence: "high" | "medium" | "low";
 }
 
 export interface PlaceItem {

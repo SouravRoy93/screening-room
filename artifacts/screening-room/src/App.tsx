@@ -16,6 +16,7 @@ import Places from "@/pages/places";
 import PlaceDetailPage from "@/pages/place-detail-page";
 import Social from "@/pages/social";
 import Evening from "@/pages/evening";
+import WatchPage from "@/pages/watch";
 import ResetPassword from "@/pages/reset-password";
 import Privacy from "@/pages/privacy";
 import PublicProfilePage from "@/pages/public-profile";
@@ -81,6 +82,7 @@ function AppRouter() {
       <Route path="/places" component={Places} />
       <Route path="/places/:id" component={PlaceDetailPage} />
       <Route path="/evening" component={Evening} />
+      <Route path="/watch" component={WatchPage} />
       <Route path="/social" component={Social} />
       <Route component={NotFound} />
     </Switch>

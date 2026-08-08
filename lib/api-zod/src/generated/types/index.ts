@@ -8,6 +8,7 @@
 
 export * from './castMember';
 export * from './episodeAlert';
+export * from './episodeAlertStatus';
 export * from './episodeCheckInput';
 export * from './healthStatus';
 export * from './mediaCard';

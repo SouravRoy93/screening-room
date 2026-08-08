@@ -292,6 +292,20 @@ components:
           maxItems: 50
           items:
             type: integer
+        days_back:
+          type: integer
+          minimum: 0
+          maximum: 30
+          default: 7
+          description: How many days of already-aired episodes to include.
+        days_ahead:
+          type: integer
+          minimum: 0
+          maximum: 30
+          default: 0
+          description: >-
+            How many days of upcoming episodes to include. 0 preserves the
+            original behaviour of reporting only what has already aired.
       required:
         - tmdb_ids
 
@@ -312,6 +326,10 @@ components:
           type: string
         poster_path:
           type: ["string", "null"]
+        status:
+          type: string
+          enum: [aired, upcoming]
+          description: Whether the episode has already aired or is still to come.
       required:
         - tmdb_id
         - title

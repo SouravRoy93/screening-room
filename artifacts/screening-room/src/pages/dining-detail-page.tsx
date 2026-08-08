@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { stampDiningFlag } from "@/lib/followups";
 import { resyUrl, openTableUrl, mapsUrl, nextSaturday } from "@/lib/handoffs";
 import { AddToCalendar } from "@/components/add-to-calendar";
+import { WatchButton } from "@/components/watch-button";
 import { useParams, useLocation } from "wouter";
 import { ChevronLeft, Star, ExternalLink, MapPin, Clock, Globe, Bookmark, CheckCircle } from "lucide-react";
 import { useDining } from "@/hooks/use-catalog";
@@ -346,6 +347,14 @@ export default function DiningDetailPage() {
                   r.bestTables && `Best tables: ${r.bestTables}`,
                 ].filter(Boolean).join("\n"),
               })}
+            />
+            {/* Table Watch (roadmap #8) — tell me when I can actually book it. */}
+            <WatchButton
+              kind="table"
+              refId={r.id}
+              title={r.name}
+              subtitle={[r.cuisine, r.neighborhood].filter(Boolean).join(" · ")}
+              askForDate
             />
           </div>
         )}

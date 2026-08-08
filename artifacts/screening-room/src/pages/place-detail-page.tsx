@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { nextSaturday } from "@/lib/handoffs";
 import { AddToCalendar } from "@/components/add-to-calendar";
+import { WatchButton } from "@/components/watch-button";
 import { useLocation, useParams } from "wouter";
 import { ChevronLeft, CheckCircle, ExternalLink } from "lucide-react";
 import { usePlaces } from "@/hooks/use-catalog";
@@ -161,6 +162,13 @@ export default function PlaceDetailPage() {
                 place.worth && `Worth it: ${place.worth}`,
               ].filter(Boolean).join("\n"),
             })}
+          />
+          {/* Table Watch (roadmap #8) — tell me when the weather turns good for this. */}
+          <WatchButton
+            kind="place"
+            refId={place.id}
+            title={place.name}
+            subtitle={[place.area, place.city || "New York"].filter(Boolean).join(" · ")}
           />
         </div>
 

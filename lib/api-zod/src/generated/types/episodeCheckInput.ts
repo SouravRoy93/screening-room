@@ -7,5 +7,18 @@
  */
 
 export interface EpisodeCheckInput {
+  /** @maxItems 50 */
   tmdb_ids: number[];
+  /**
+     * How many days of already-aired episodes to include.
+     * @minimum 0
+     * @maximum 30
+     */
+  days_back?: number;
+  /**
+     * How many days of upcoming episodes to include. 0 preserves the original behaviour of reporting only what has already aired.
+     * @minimum 0
+     * @maximum 30
+     */
+  days_ahead?: number;
 }

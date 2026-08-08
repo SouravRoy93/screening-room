@@ -5,6 +5,7 @@
  * Screening Room API — TMDB proxy and notifications
  * OpenAPI spec version: 0.1.0
  */
+import type { EpisodeAlertStatus } from './episodeAlertStatus';
 
 export interface EpisodeAlert {
   tmdb_id: number;
@@ -15,4 +16,6 @@ export interface EpisodeAlert {
   air_date: string;
   /** @nullable */
   poster_path?: string | null;
+  /** Whether the episode has already aired or is still to come. */
+  status?: EpisodeAlertStatus;
 }

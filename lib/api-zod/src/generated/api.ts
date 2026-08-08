@@ -162,8 +162,22 @@ export const SearchMediaResponse = zod.array(SearchMediaResponseItem)
 /**
  * @summary Check for new episodes for a list of TV shows
  */
+export const checkNewEpisodesBodyTmdbIdsMax = 50;
+
+export const checkNewEpisodesBodyDaysBackDefault = 7;
+export const checkNewEpisodesBodyDaysBackMin = 0;
+export const checkNewEpisodesBodyDaysBackMax = 30;
+
+export const checkNewEpisodesBodyDaysAheadDefault = 0;
+export const checkNewEpisodesBodyDaysAheadMin = 0;
+export const checkNewEpisodesBodyDaysAheadMax = 30;
+
+
+
 export const CheckNewEpisodesBody = zod.object({
-  "tmdb_ids": zod.array(zod.number())
+  "tmdb_ids": zod.array(zod.number()).max(checkNewEpisodesBodyTmdbIdsMax),
+  "days_back": zod.number().min(checkNewEpisodesBodyDaysBackMin).max(checkNewEpisodesBodyDaysBackMax).default(checkNewEpisodesBodyDaysBackDefault).describe('How many days of already-aired episodes to include.'),
+  "days_ahead": zod.number().min(checkNewEpisodesBodyDaysAheadMin).max(checkNewEpisodesBodyDaysAheadMax).default(checkNewEpisodesBodyDaysAheadDefault).describe('How many days of upcoming episodes to include. 0 preserves the original behaviour of reporting only what has already aired.')
 })
 
 export const CheckNewEpisodesResponseItem = zod.object({
@@ -173,7 +187,8 @@ export const CheckNewEpisodesResponseItem = zod.object({
   "episode_number": zod.number(),
   "episode_name": zod.string(),
   "air_date": zod.string(),
-  "poster_path": zod.string().nullish()
+  "poster_path": zod.string().nullish(),
+  "status": zod.enum(['aired', 'upcoming']).optional().describe('Whether the episode has already aired or is still to come.')
 })
 export const CheckNewEpisodesResponse = zod.array(CheckNewEpisodesResponseItem)
 

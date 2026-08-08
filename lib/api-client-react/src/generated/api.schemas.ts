@@ -91,8 +91,32 @@ export interface MediaDetail {
 }
 
 export interface EpisodeCheckInput {
+  /** @maxItems 50 */
   tmdb_ids: number[];
+  /**
+     * How many days of already-aired episodes to include.
+     * @minimum 0
+     * @maximum 30
+     */
+  days_back?: number;
+  /**
+     * How many days of upcoming episodes to include. 0 preserves the original behaviour of reporting only what has already aired.
+     * @minimum 0
+     * @maximum 30
+     */
+  days_ahead?: number;
 }
+
+/**
+ * Whether the episode has already aired or is still to come.
+ */
+export type EpisodeAlertStatus = typeof EpisodeAlertStatus[keyof typeof EpisodeAlertStatus];
+
+
+export const EpisodeAlertStatus = {
+  aired: 'aired',
+  upcoming: 'upcoming',
+} as const;
 
 export interface EpisodeAlert {
   tmdb_id: number;
@@ -103,6 +127,8 @@ export interface EpisodeAlert {
   air_date: string;
   /** @nullable */
   poster_path?: string | null;
+  /** Whether the episode has already aired or is still to come. */
+  status?: EpisodeAlertStatus;
 }
 
 export type SearchMediaParams = {

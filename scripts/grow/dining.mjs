@@ -11,7 +11,7 @@
 //  Env (GitHub Actions secrets): GOOGLE_PLACES_API_KEY (or GOOGLE_API_KEY), ANTHROPIC_API_KEY
 //  Optional env: NEW_PER_RUN (default 15), DINING_FILE, CITIES_FILE, CUISINES_FILE
 // ============================================================================
-import { anthropicJSON, loadJson, saveJson, pick, clamp, norm, keyOf, intEnv } from "./_shared.mjs";
+import { anthropicJSON, loadJson, saveJson, pick, clamp, norm, keyOf, intEnv, bookingOf } from "./_shared.mjs";
 
 const GKEY = process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_API_KEY;
 const DINING_FILE  = process.env.DINING_FILE   || "artifacts/screening-room/public/dining.json";
@@ -60,13 +60,13 @@ async function discover(city, cuisine) {
 async function editorial(cand, city, cuisine) {
   const facts = { name: cand.name, city: city.short, country: city.country, cuisine_hint: cuisine,
     address: cand.address, google_price: cand.priceLevel, rating: cand.rating, ratings_count: cand.ratings, primary_type: cand.primaryType };
-  const system = "You classify restaurants for a premium dining guide. Accurate and tasteful. Only claim a Michelin star / Bib Gourmand / James Beard award if it is genuinely well known; otherwise use 'Local favorite', 'Neighborhood gem', or ''. Output ONLY valid minified JSON.";
+  const system = "You classify restaurants for a premium dining guide. Accurate and tasteful. Only claim a Michelin star / Bib Gourmand / James Beard award if it is genuinely well known; otherwise use 'Local favorite', 'Neighborhood gem', or ''. Reservation policies change often: state one only if you actually know it for this restaurant, and set booking.confidence honestly — 'low' is the correct answer for most places. Output ONLY valid minified JSON.";
   const user = `Restaurant facts:
 ${JSON.stringify(facts)}
 
 Return JSON with EXACTLY these keys:
-{"cuisine":"clean cuisine label (e.g. Italian, Japanese, New American)","format":"short evocative format (e.g. 'Tasting-menu temple','Cozy trattoria','Buzzy izakaya','Counter-seat omakase')","neighborhood":"the neighborhood/district in ${city.short} (general if unsure)","occasion":["1-3 from: ${OCCASION.join(", ")}"],"rope":<1-4 reservation difficulty: 1 easy walk-in, 4 near-impossible>,"recognition":"award if truly notable (e.g. '★★ Michelin','Bib Gourmand','James Beard') else 'Local favorite' or ''","signature":"one signature dish (short)","blurb":"one elegant sentence (max ~16 words)","chef":"chef name/reputation if notable, else ''","noise":"Quiet|Moderate|Lively|Loud","dress":"dress code & crowd style (short, e.g. 'Smart casual, polished crowd')","bestTables":"which seats/tables are best (short, general if unsure)","arrival":"ease of arrival — valet/parking/transit note (short)","privateDining":"Yes|Limited|No (private dining rooms)","scores":{"food":<1-5 food quality>,"service":<1-5 service excellence>,"ambiance":<1-5 ambiance & design>,"clientele":<1-5 clientele quality>,"privacy":<1-5 privacy>,"beverage":<1-5 wine & beverage program>,"view":<1-5 view quality>,"value":<1-5 value for money>,"consistency":<1-5 consistency>,"romantic":<1-5 romantic suitability>,"business":<1-5 business-dining suitability>}}`;
-  return anthropicJSON({ system, user, maxTokens: 800 });
+{"cuisine":"clean cuisine label (e.g. Italian, Japanese, New American)","format":"short evocative format (e.g. 'Tasting-menu temple','Cozy trattoria','Buzzy izakaya','Counter-seat omakase')","neighborhood":"the neighborhood/district in ${city.short} (general if unsure)","occasion":["1-3 from: ${OCCASION.join(", ")}"],"rope":<1-4 reservation difficulty: 1 easy walk-in, 4 near-impossible>,"recognition":"award if truly notable (e.g. '★★ Michelin','Bib Gourmand','James Beard') else 'Local favorite' or ''","signature":"one signature dish (short)","blurb":"one elegant sentence (max ~16 words)","chef":"chef name/reputation if notable, else ''","noise":"Quiet|Moderate|Lively|Loud","dress":"dress code & crowd style (short, e.g. 'Smart casual, polished crowd')","bestTables":"which seats/tables are best (short, general if unsure)","arrival":"ease of arrival — valet/parking/transit note (short)","privateDining":"Yes|Limited|No (private dining rooms)","scores":{"food":<1-5 food quality>,"service":<1-5 service excellence>,"ambiance":<1-5 ambiance & design>,"clientele":<1-5 clientele quality>,"privacy":<1-5 privacy>,"beverage":<1-5 wine & beverage program>,"view":<1-5 view quality>,"value":<1-5 value for money>,"consistency":<1-5 consistency>,"romantic":<1-5 romantic suitability>,"business":<1-5 business-dining suitability>},"booking":{"mode":"rolling|monthly|walk-in|waitlist","daysAhead":<for rolling: days ahead the window opens, e.g. 30; omit otherwise>,"dayOfMonth":<for monthly: 1-28; omit otherwise>,"time":"local release time HH:MM 24h, omit if unknown","platform":"Resy|OpenTable|Tock|SevenRooms|Direct|Phone","confidence":"high only if you genuinely know this restaurant's policy; medium if it follows an obvious convention for its type; low otherwise"}}`;
+  return anthropicJSON({ system, user, maxTokens: 900 });
 }
 
 // ---- 3) RECORD ----
@@ -98,7 +98,8 @@ function record(id, cand, e, city, cuisine) {
       clientele: clamp(s.clientele), privacy: clamp(s.privacy), beverage: clamp(s.beverage),
       view: clamp(s.view), value: clamp(s.value), consistency: clamp(s.consistency),
       romantic: clamp(s.romantic), business: clamp(s.business)
-    }
+    },
+    booking: bookingOf(e.booking, clamp(e.rope, 1, 4, 2))
   };
 }
 

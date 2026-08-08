@@ -40,3 +40,44 @@ export const clamp = (n, lo = 1, hi = 5, dflt = 3) => { n = parseInt(n, 10); ret
 export const norm  = s => String(s == null ? "" : s).trim();
 export const keyOf = s => norm(s).toLowerCase();
 export const intEnv = (name, dflt) => parseInt(process.env[name] || String(dflt), 10);
+
+// ---- booking policy (Table Watch, roadmap #8) ----
+// Shared by dining.mjs (new items) and backfill-booking.mjs (the existing
+// catalog), so both normalise identically.
+export const BOOKING_MODE = ["rolling", "monthly", "walk-in", "waitlist"];
+export const BOOKING_PLATFORM = ["Resy", "OpenTable", "Tock", "SevenRooms", "Direct", "Phone"];
+export const CONFIDENCE = ["high", "medium", "low"];
+
+/**
+ * Normalise a model-supplied reservation convention.
+ *
+ * The model will sometimes invent a policy. This discards anything malformed
+ * and downgrades confidence whenever the claim isn't supported by the fields
+ * actually present, so the app never names an hour it can't stand behind.
+ */
+export function bookingOf(raw, rope) {
+  const b = raw && typeof raw === "object" ? raw : {};
+  const mode = BOOKING_MODE.includes(b.mode) ? b.mode : (rope <= 1 ? "walk-in" : "rolling");
+
+  const out = { mode, confidence: CONFIDENCE.includes(b.confidence) ? b.confidence : "low" };
+
+  if (mode === "rolling") {
+    const d = parseInt(b.daysAhead, 10);
+    if (Number.isFinite(d) && d >= 1 && d <= 365) out.daysAhead = d;
+  }
+  if (mode === "monthly") {
+    const d = parseInt(b.dayOfMonth, 10);
+    if (Number.isFinite(d) && d >= 1 && d <= 28) out.dayOfMonth = d;
+  }
+  if (/^([01]\d|2[0-3]):[0-5]\d$/.test(String(b.time || ""))) out.time = b.time;
+  if (BOOKING_PLATFORM.includes(b.platform)) out.platform = b.platform;
+
+  // A walk-in has no release to watch; a claim without a shape isn't a claim.
+  if (mode === "walk-in" || mode === "waitlist") out.confidence = "low";
+  if (mode === "rolling" && out.daysAhead == null) out.confidence = "low";
+  if (mode === "monthly" && out.dayOfMonth == null) out.confidence = "low";
+  // You can only name the hour if you were given one.
+  if (out.confidence === "high" && !out.time) out.confidence = "medium";
+
+  return out;
+}

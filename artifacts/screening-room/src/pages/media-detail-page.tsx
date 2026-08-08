@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation, useParams } from "wouter";
 import { Star, Play, ChevronLeft, ChevronDown, Bell, BellOff, Bookmark, Eye, CheckCircle, Film, Tv, Volume2, ExternalLink } from "lucide-react";
 import { justWatchUrl, showtimesUrl } from "@/lib/handoffs";
+import { WatchButton } from "@/components/watch-button";
 import "@/components/handoffs.css";
 import { IMG_BACKDROP, IMG_BASE, IMG_PROFILE } from "@/types";
 import type { MediaItem, TrackedItem } from "@/types";
@@ -377,6 +378,10 @@ export default function MediaDetailPage() {
                 S{detail.next_episode_to_air.season_number}E{detail.next_episode_to_air.episode_number} · {detail.next_episode_to_air.name}
               </span>
               <span className="mdp-next-ep-date">{detail.next_episode_to_air.air_date}</span>
+              {/* Table Watch (roadmap #8) — surfaces the episode on the hub too. */}
+              <div style={{ marginTop: 8 }}>
+                <WatchButton kind="show" refId={detail.tmdb_id} title={detail.title} />
+              </div>
             </div>
             <button
               className="mdp-notify-btn"

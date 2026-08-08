@@ -1,0 +1,153 @@
+/* ── Table Watch — moments on the hub, and the watch list ─────────────────── */
+
+/* ── Hub: live moments ───────────────────────────────────────────────────── */
+.wt-card {
+  width: min(680px, 94vw);
+  margin: 0 auto 30px;
+  text-align: left;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 20px;
+  padding: 18px 20px 8px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: fadeUp .7s ease .2s both;
+}
+.wt-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.wt-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  background: linear-gradient(90deg, #ffd36b, #ec4899);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.wt-all {
+  margin-left: auto; font-size: 12px; color: rgba(255,255,255,.5);
+  background: none; border: 0; cursor: pointer; text-decoration: underline;
+}
+.wt-all:hover { color: #fff; }
+
+.wt-moment {
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  align-items: start;
+  gap: 12px;
+  padding: 13px 4px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+.wt-moment:first-of-type { border-top: 0; }
+
+.wt-medallion {
+  width: 34px; height: 34px; border-radius: 11px; margin-top: 2px;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35); flex-shrink: 0;
+}
+
+.wt-body { min-width: 0; }
+.wt-when {
+  display: inline-block;
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mut); margin-bottom: 2px;
+}
+.wt-when.now { color: #ffd36b; }
+.wt-title {
+  display: block;
+  font-size: 15px; font-weight: 600; color: #fff;
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+  transition: color .18s ease;
+}
+.wt-title:hover { color: #ffd36b; }
+.wt-title:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 3px; border-radius: 4px; }
+.wt-sub { font-size: 12px; color: var(--mut); margin-top: 1px; }
+.wt-line { font-size: 13px; color: rgba(255,255,255,.78); margin: 5px 0 0; line-height: 1.45; }
+
+.wt-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+.wt-action {
+  font-size: 11.5px; padding: 5px 12px; border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,211,107,.18), rgba(236,72,153,.14));
+  border: 1px solid rgba(255,211,107,.4); color: #ffd36b;
+  cursor: pointer; text-decoration: none; white-space: nowrap;
+  transition: background .18s ease, transform .18s ease;
+}
+.wt-action:hover { background: rgba(255,211,107,.26); transform: translateY(-1px); }
+.wt-dismiss {
+  font-size: 11.5px; padding: 5px 10px; border-radius: 999px;
+  background: none; border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.55); cursor: pointer; white-space: nowrap;
+}
+.wt-dismiss:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+
+/* ── Watch button (dining / place detail pages) ──────────────────────────── */
+.wt-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 6px 13px; border-radius: 999px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.14);
+  color: rgba(255,255,255,.78);
+  cursor: pointer; white-space: nowrap;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.wt-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+.wt-btn.on {
+  background: linear-gradient(135deg, rgba(255,211,107,.2), rgba(236,72,153,.14));
+  border-color: rgba(255,211,107,.5); color: #ffd36b;
+}
+.wt-btn:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 2px; }
+
+.wt-when-form {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin-top: 10px; padding: 12px 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+}
+.wt-when-label { font-size: 12px; color: var(--mut); }
+.wt-input {
+  padding: 6px 10px; border-radius: 9px; font-size: 13px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.2); color: #fff;
+}
+.wt-input:focus-visible { outline: 2px solid rgba(255,211,107,.5); outline-offset: 1px; }
+
+/* ── /watch page ─────────────────────────────────────────────────────────── */
+.wt-wrap { width: min(760px, 94vw); margin: 0 auto; text-align: left; }
+.wt-page-intro { font-size: 13.5px; color: var(--mut); margin: 0 0 22px; line-height: 1.6; }
+
+.wt-group-title {
+  font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 600; color: #fff;
+  margin: 26px 0 8px; letter-spacing: .02em;
+}
+.wt-group-title:first-of-type { margin-top: 0; }
+
+.wt-row {
+  display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start;
+  padding: 14px 16px; margin-bottom: 8px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+}
+.wt-row.paused { opacity: .55; }
+.wt-row-title { font-size: 14.5px; font-weight: 600; color: #fff; }
+.wt-row-sub { font-size: 12px; color: var(--mut); margin-top: 1px; }
+.wt-row-next { font-size: 12.5px; color: rgba(255,255,255,.7); margin-top: 6px; font-style: italic; }
+.wt-row-quiet { font-size: 12.5px; color: rgba(255,255,255,.42); margin-top: 6px; font-style: italic; }
+.wt-row-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.wt-mini {
+  font-size: 11.5px; padding: 4px 10px; border-radius: 999px;
+  background: none; border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.6); cursor: pointer; white-space: nowrap;
+}
+.wt-mini:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+.wt-mini.danger:hover { color: #fca5a5; border-color: rgba(252,165,165,.45); }
+
+.wt-empty {
+  border: 1px dashed rgba(255,255,255,.14);
+  border-radius: 18px; padding: 28px 22px;
+  text-align: center; color: var(--mut); font-size: 13.5px; line-height: 1.7;
+}
+
+@media (max-width: 620px) {
+  .wt-moment { grid-template-columns: 30px 1fr; }
+  .wt-actions { grid-column: 1 / -1; }
+  .wt-card { padding: 15px 15px 6px; }
+  .wt-row { grid-template-columns: 1fr; }
+  .wt-row-actions { flex-direction: row; align-items: center; }
+}
