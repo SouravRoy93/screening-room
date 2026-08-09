@@ -3,7 +3,15 @@
 //   using (user_id = auth.uid()) with check (user_id = auth.uid())
 // on ALL commands for role `authenticated`).
 // Keep this file in sync with any dashboard changes so schema is versioned.
-import { pgTable, uuid, text, bigint, integer, numeric, jsonb, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+//
+// The canonical DDL now lives in scripts/sql/bootstrap.sql — apply that to a
+// fresh project and this file describes what you get.
+//
+// `tmdb_id` was bigint until the database was rebuilt from scratch (the
+// original project was lost with its GitHub-linked account). It is text now,
+// which is what lets Google live-search results — whose place ids are strings
+// — sync to the cloud instead of staying on one device.
+import { pgTable, uuid, text, integer, numeric, jsonb, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -13,7 +21,7 @@ export const trackedItemsTable = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     user_id: uuid("user_id").notNull(),
     vertical: text("vertical").notNull().default("entertainment"),
-    tmdb_id: bigint("tmdb_id", { mode: "number" }).notNull(),
+    tmdb_id: text("tmdb_id").notNull(),
     media_type: text("media_type").notNull(),
     title: text("title"),
     year: integer("year"),

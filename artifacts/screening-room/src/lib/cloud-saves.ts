@@ -10,8 +10,13 @@
 //
 // Row mapping: vertical 'dining'|'places', tmdb_id = curated numeric id,
 // media_type 'dining'|'place', status = visited→'watched' | booked→'booked'
-// | saved→'want', flags & journal in `meta`. Google live results (string ids)
-// stay local-only — the bigint id column can't hold them.
+// | saved→'want', flags & journal in `meta`.
+//
+// Google live results (string place ids) still stay local-only, but that is
+// now a choice rather than a limit: tracked_items.tmdb_id became text when the
+// database was rebuilt, so the column can hold them whenever we decide those
+// saves should sync. The `Number.isFinite(id)` guard in pushSave is the only
+// thing standing in the way.
 // ─────────────────────────────────────────────────────────────────────────────
 import { supabase } from "@/lib/supabase";
 
