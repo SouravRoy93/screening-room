@@ -441,18 +441,30 @@
   color: #8e8ea6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
+/* Icon-only status row. Each state hints its own colour at rest so the three
+   are legible at a glance on the dark grid, then fills solid once committed.
+   Tints match the .lib-seg filter chips below, so the two agree. */
 .statusrow { display: flex; gap: 6px; }
 .statusrow button {
-  flex: 1; font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
-  padding: 7px 4px; border-radius: 9px; background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.1); color: #8e8ea6; cursor: pointer;
-  transition: .12s; font-family: inherit;
+  flex: 1; display: inline-flex; align-items: center; justify-content: center;
+  padding: 7px 4px; border-radius: 9px; cursor: pointer;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1); color: #8e8ea6;
+  transition: background .14s, border-color .14s, color .14s;
+  font-family: inherit; line-height: 0;
 }
-.statusrow button:hover { border-color: var(--gold); color: #fff; }
-.statusrow button.on { color: #fff; border-color: transparent; }
-.statusrow button.on.want { background: #1098ad; }
-.statusrow button.on.watching { background: #f08c00; }
-.statusrow button.on.watched { background: #2f9e44; }
+.statusrow button.want     { background: rgba(16,152,173,.12); border-color: rgba(16,152,173,.35); color: #4fc3d4; }
+.statusrow button.watching { background: rgba(240,140,0,.12);  border-color: rgba(240,140,0,.35);  color: #f8b04a; }
+.statusrow button.watched  { background: rgba(63,185,80,.12);  border-color: rgba(63,185,80,.35);  color: #6fcf80; }
+
+.statusrow button:hover { border-color: currentColor; }
+.statusrow button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* Committed. Glyphs go dark on amber and green — white fails contrast there. */
+.statusrow button.on { border-color: transparent; }
+.statusrow button.on.want     { background: #1098ad; color: #fff; }
+.statusrow button.on.watching { background: #f08c00; color: #241800; }
+.statusrow button.on.watched  { background: #3fb950; color: #08200d; }
 
 /* ===== LIBRARY ===== */
 .lib-seg { display: flex; gap: 8px; padding: 16px 20px 12px; }
@@ -463,7 +475,7 @@
 }
 .lib-seg button.on.want { background: rgba(16,152,173,.15); border-color: rgba(16,152,173,.4); color: #4fc3d4; }
 .lib-seg button.on.watching { background: rgba(240,140,0,.15); border-color: rgba(240,140,0,.4); color: #f8b04a; }
-.lib-seg button.on.watched { background: rgba(47,158,68,.15); border-color: rgba(47,158,68,.4); color: #6fcf80; }
+.lib-seg button.on.watched { background: rgba(63,185,80,.15); border-color: rgba(63,185,80,.4); color: #6fcf80; }
 
 /* ===== STATS ===== */
 .stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; padding: 16px 20px 0; }

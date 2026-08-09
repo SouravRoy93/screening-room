@@ -1,5 +1,15 @@
+import { Bookmark, Play, Check } from "lucide-react";
 import type { MediaItem, TrackedItem } from "@/types";
 import { IMG_BASE, IMG_POSTER, IMG_POSTER_LG, colorFor } from "@/types";
+
+type Status = "want" | "watching" | "watched";
+
+/** Icon-only status row: bookmark → watchlist, play → watching, tick → done. */
+const STATUS_META: Record<Status, { label: string; Icon: typeof Bookmark }> = {
+  want: { label: "Watchlist", Icon: Bookmark },
+  watching: { label: "Watching", Icon: Play },
+  watched: { label: "Watched", Icon: Check },
+};
 
 interface Props {
   item: MediaItem;
@@ -61,16 +71,22 @@ export function MediaCard({ item, tracked, onOpen, onStatus }: Props) {
         {genres && <div className="cgenres">{genres}</div>}
         {onStatus && (
           <div className="statusrow" onClick={e => e.stopPropagation()}>
-            {(["want", "watching", "watched"] as const).map(s => (
-              <button
-                key={s}
-                className={`${s}${tracked?.status === s ? " on" : ""}`}
-                onClick={() => onStatus(item, s)}
-                title={s === "want" ? "Watchlist" : s === "watching" ? "Watching" : "Watched"}
-              >
-                {s === "want" ? "Want" : s === "watching" ? "Watch" : "Done"}
-              </button>
-            ))}
+            {(["want", "watching", "watched"] as const).map(s => {
+              const { label, Icon } = STATUS_META[s];
+              const on = tracked?.status === s;
+              return (
+                <button
+                  key={s}
+                  className={`${s}${on ? " on" : ""}`}
+                  onClick={() => onStatus(item, s)}
+                  title={label}
+                  aria-label={`${label}: ${item.title}`}
+                  aria-pressed={on}
+                >
+                  <Icon size={15} strokeWidth={2} aria-hidden />
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
