@@ -1,4 +1,6 @@
 import { Bookmark, Play, Check } from "lucide-react";
+import { VerdictCard } from "@/components/verdict-card";
+import type { Advocacy, Question, Verdict } from "@/lib/verdict";
 import type { MediaItem, TrackedItem } from "@/types";
 import { IMG_BASE, IMG_POSTER, IMG_POSTER_LG, colorFor } from "@/types";
 
@@ -17,9 +19,17 @@ interface Props {
   onOpen?: (item: MediaItem) => void;
   onStatus?: (item: MediaItem, status: "want" | "watching" | "watched") => void;
   compact?: boolean;
+  /** Set by the page when this card should be asking its question. */
+  ask?: Question | null;
+  onAnswer?: (item: MediaItem, question: Question, value: Verdict | Advocacy) => void;
+  onExplicit?: (item: MediaItem, rating: number) => void;
+  onDismissAsk?: (item: MediaItem) => void;
 }
 
-export function MediaCard({ item, tracked, onOpen, onStatus }: Props) {
+export function MediaCard({
+  item, tracked, onOpen, onStatus,
+  ask, onAnswer, onExplicit, onDismissAsk,
+}: Props) {
   const genre = item.genres?.[0] || "";
   const [g1, g2] = colorFor(genre);
   const genres = item.genres?.slice(0, 3).join(" · ") || "";
@@ -68,7 +78,18 @@ export function MediaCard({ item, tracked, onOpen, onStatus }: Props) {
       </div>
 
       <div className="cbody">
-        {genres && <div className="cgenres">{genres}</div>}
+        {/* The question takes the body while it's being asked; the status row
+            stays put underneath so the member can undo or move on. */}
+        {ask && onAnswer && onExplicit && onDismissAsk ? (
+          <VerdictCard
+            question={ask}
+            onAnswer={v => onAnswer(item, ask, v)}
+            onExplicit={r => onExplicit(item, r)}
+            onDismiss={() => onDismissAsk(item)}
+          />
+        ) : (
+          genres && <div className="cgenres">{genres}</div>
+        )}
         {onStatus && (
           <div className="statusrow" onClick={e => e.stopPropagation()}>
             {(["want", "watching", "watched"] as const).map(s => {

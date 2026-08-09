@@ -1,0 +1,42 @@
+/* ── Verdict card — the one question, in place ────────────────────────────── */
+.vd { display: flex; flex-direction: column; gap: 7px; animation: vdIn .18s ease both; }
+@keyframes vdIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+.vd-q {
+  font-size: 11.5px; font-weight: 600; color: #cfcfe0; line-height: 1.35;
+}
+.vd-compact .vd-q { font-size: 11px; }
+
+.vd-opts { display: flex; flex-direction: column; gap: 4px; }
+.vd-opt {
+  width: 100%; text-align: left; font-family: inherit;
+  font-size: 11.5px; color: #b9b9cc;
+  padding: 6px 9px; border-radius: 8px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  cursor: pointer; transition: background .14s, border-color .14s, color .14s;
+}
+.vd-opt:hover { background: rgba(255,211,107,.12); border-color: rgba(255,211,107,.45); color: #ffd36b; }
+.vd-opt:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.vd-foot { display: flex; align-items: center; gap: 10px; margin-top: 1px; }
+.vd-link {
+  font-family: inherit; font-size: 10.5px; color: #6b7280;
+  background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline;
+}
+.vd-link:hover { color: #cfcfe0; }
+.vd-later { margin-left: auto; }
+
+/* Explicit door */
+.vd-stars { display: flex; flex-wrap: wrap; gap: 2px; }
+.vd-star {
+  background: none; border: 0; padding: 1px; cursor: pointer; line-height: 0;
+  color: #4b4b60; transition: color .1s;
+}
+.vd-star.lit { color: #ffd36b; }
+.vd-star:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; border-radius: 3px; }
+
+/* Detail panel: roomier, horizontal options */
+.vd-panel .vd-q { font-size: 13px; color: #fff; }
+.vd-panel .vd-opts { flex-direction: row; flex-wrap: wrap; }
+.vd-panel .vd-opt { width: auto; font-size: 12px; padding: 7px 12px; border-radius: 999px; }

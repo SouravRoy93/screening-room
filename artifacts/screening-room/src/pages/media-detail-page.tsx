@@ -3,6 +3,15 @@ import { useLocation, useParams } from "wouter";
 import { Star, Play, ChevronLeft, ChevronDown, Bell, BellOff, Bookmark, Eye, CheckCircle, Film, Tv, Volume2, ExternalLink } from "lucide-react";
 import { justWatchUrl, showtimesUrl } from "@/lib/handoffs";
 import { WatchButton } from "@/components/watch-button";
+import { VerdictCard } from "@/components/verdict-card";
+import {
+  canAskNow,
+  nextQuestion,
+  parseAnswers,
+  type Advocacy,
+  type Question,
+  type Verdict,
+} from "@/lib/verdict";
 import "@/components/handoffs.css";
 import { IMG_BACKDROP, IMG_BASE, IMG_PROFILE } from "@/types";
 import type { MediaItem, TrackedItem } from "@/types";
@@ -153,7 +162,10 @@ export default function MediaDetailPage() {
   const params = useParams<{ type: string; id: string }>();
   const [, nav] = useLocation();
   const { user } = useAuth();
-  const { tracked, setStatus, saveRating } = useTracked("films", user?.id);
+  const {
+    tracked, setStatus, saveRating,
+    answerVerdict, rateExplicit, dismissVerdict,
+  } = useTracked("films", user?.id);
 
   const mediaType = params.type as "movie" | "tv";
   const tmdbId = Number(params.id);
@@ -223,10 +235,26 @@ export default function MediaDetailPage() {
     setStatus(fakeItem, status);
   }, [detail, fakeItem, setStatus]);
 
+  // Stars here mean "I'd rather just pick a number" — record that so the
+  // questions stop for this title everywhere, not only on this screen.
   const handleRating = useCallback((rating: number) => {
     if (!detail) return;
-    saveRating(fakeItem, rating);
-  }, [detail, fakeItem, saveRating]);
+    rateExplicit(fakeItem, rating);
+  }, [detail, fakeItem, rateExplicit]);
+
+  const handleAnswer = useCallback((question: Question, value: Verdict | Advocacy) => {
+    if (!detail) return;
+    answerVerdict(fakeItem, question, value);
+  }, [detail, fakeItem, answerVerdict]);
+
+  const handleDismissAsk = useCallback(() => {
+    if (!detail) return;
+    dismissVerdict(fakeItem);
+  }, [detail, fakeItem, dismissVerdict]);
+
+  // The question to show above the stars, if there is one still worth asking.
+  const panelAnswers = parseAnswers(tracked_item?.answers);
+  const panelAsk: Question | null = canAskNow(panelAnswers) ? nextQuestion(panelAnswers) : null;
 
   const backdropUrl = detail?.backdrop_path ? `${IMG_BACKDROP}${detail.backdrop_path}` : null;
   const posterUrl = detail?.poster_path ? `${IMG_BASE}${detail.poster_path}` : null;
@@ -335,9 +363,22 @@ export default function MediaDetailPage() {
           )}
         </div>
 
-        {/* Rating (if watched) */}
+        {/* Rating (if watched). The panel is the power-user surface, so the
+            stars always show — but the verdict question sits above them until
+            it's been answered or waved off, writing through the same engine. */}
         {(tracked_item?.status === "watched" || tracked_item?.rating) && (
           <div className="mdp-section">
+            {panelAsk && (
+              <div className="vd-panel" style={{ marginBottom: 16 }}>
+                <VerdictCard
+                  question={panelAsk}
+                  compact={false}
+                  onAnswer={v => handleAnswer(panelAsk, v)}
+                  onExplicit={handleRating}
+                  onDismiss={handleDismissAsk}
+                />
+              </div>
+            )}
             <div className="mdp-section-label">Your rating</div>
             <RatingStars current={tracked_item?.rating} onRate={handleRating} />
           </div>

@@ -1,4 +1,14 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import {
+  BULK_WINDOW_MS,
+  isBulkMarking,
+  nextQuestion,
+  parseAnswers,
+  shouldPromptOnWatched,
+  type Advocacy,
+  type Question,
+  type Verdict,
+} from "@/lib/verdict";
 import { useLocation } from "wouter";
 import { Bell } from "lucide-react";
 import { MediaCard } from "@/components/media-card";
@@ -60,7 +70,83 @@ export default function Films() {
   const [, nav] = useLocation();
   const { user } = useAuth();
   const { catalog, loading } = useCatalog();
-  const { tracked, setStatus, saveRating } = useTracked("films", user?.id);
+  const {
+    tracked, setStatus, saveRating,
+    answerVerdict, rateExplicit, dismissVerdict,
+  } = useTracked("films", user?.id);
+
+  // ── The watched prompt (Entertainment plan, phase A) ──────────────────────
+  // Which card is currently asking, and the session guards that keep a
+  // backfill from turning into an interrogation.
+  const [asking, setAsking] = useState<string | null>(null);
+  const markTimesRef = useRef<number[]>([]);
+  const [bulkSuppressed, setBulkSuppressed] = useState(false);
+
+  const keyOfItem = (i: MediaItem) => `${i.media_type}:${i.tmdb_id}`;
+
+  const handleStatus = useCallback(
+    async (item: MediaItem, status: "want" | "watching" | "watched") => {
+      const key = keyOfItem(item);
+      const wasOn = tracked[key]?.status === status;
+
+      // Status first, always — the rating is a bonus, never a gate.
+      await setStatus(item, status);
+
+      // Toggling watched off, or setting anything else, closes any question.
+      if (status !== "watched" || wasOn) {
+        setAsking(prev => (prev === key ? null : prev));
+        return;
+      }
+
+      const now = Date.now();
+      markTimesRef.current = [...markTimesRef.current.filter(t => now - t <= BULK_WINDOW_MS), now];
+
+      const bulk = isBulkMarking(markTimesRef.current, now);
+      if (bulk && !bulkSuppressed) setBulkSuppressed(true);
+
+      const ask = shouldPromptOnWatched({
+        answers: parseAnswers(tracked[key]?.answers),
+        recentMarks: markTimesRef.current,
+        sessionSuppressed: bulkSuppressed || bulk,
+      });
+      setAsking(ask ? key : null);
+    },
+    [tracked, setStatus, bulkSuppressed],
+  );
+
+  const handleAnswer = useCallback(
+    async (item: MediaItem, question: Question, value: Verdict | Advocacy) => {
+      await answerVerdict(item, question, value);
+      setAsking(null);
+    },
+    [answerVerdict],
+  );
+
+  const handleExplicit = useCallback(
+    async (item: MediaItem, rating: number) => {
+      await rateExplicit(item, rating);
+      setAsking(null);
+    },
+    [rateExplicit],
+  );
+
+  const handleDismissAsk = useCallback(
+    async (item: MediaItem) => {
+      await dismissVerdict(item);
+      setAsking(null);
+    },
+    [dismissVerdict],
+  );
+
+  /** The question this card should show, if it's the one being asked. */
+  const askFor = useCallback(
+    (item: MediaItem): Question | null => {
+      const key = keyOfItem(item);
+      if (asking !== key) return null;
+      return nextQuestion(parseAnswers(tracked[key]?.answers));
+    },
+    [asking, tracked],
+  );
 
   const [tab, setTab] = useState<Tab>("discover");
   const [libStatus, setLibStatus] = useState<"want" | "watching" | "watched">("watched");
@@ -317,7 +403,11 @@ export default function Films() {
                     item={item}
                     tracked={trackedFor(item)}
                     onOpen={openDetail}
-                    onStatus={setStatus}
+                    onStatus={handleStatus}
+                    ask={askFor(item)}
+                    onAnswer={handleAnswer}
+                    onExplicit={handleExplicit}
+                    onDismissAsk={handleDismissAsk}
                   />
                 ))}
               </div>
@@ -360,7 +450,11 @@ export default function Films() {
                   item={toMedia(t)}
                   tracked={trackedForLib(t)}
                   onOpen={openDetail}
-                  onStatus={setStatus}
+                  onStatus={handleStatus}
+                  ask={askFor(toMedia(t))}
+                  onAnswer={handleAnswer}
+                  onExplicit={handleExplicit}
+                  onDismissAsk={handleDismissAsk}
                 />
               ))}
             </div>
