@@ -1,0 +1,41 @@
+name: Grow entertainment catalog
+
+on:
+  schedule:
+    - cron: "30 10 * * *"    # daily 10:30 UTC (45 min after dining)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: grow-entertainment
+  cancel-in-progress: false
+
+jobs:
+  grow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Refresh catalog from TMDB
+        env:
+          TMDB_KEY: ${{ secrets.TMDB_KEY }}
+        run: node scripts/grow/entertainment.mjs
+      - name: Commit
+        run: |
+          git config user.name  "catalog-bot"
+          git config user.email "catalog-bot@users.noreply.github.com"
+          git add artifacts/screening-room/public/catalog.json artifacts/screening-room/public/catalog-top.json
+          if git diff --staged --quiet; then echo "No catalog changes."; exit 0; fi
+          git commit -m "Grow catalog ($(date -u +%Y-%m-%d)) [skip ci]"
+          for i in 1 2 3 4 5; do
+            git pull --rebase --autostash origin main && \
+            git push origin HEAD:main && exit 0
+            echo "push race, retrying ($i)…"; sleep 7
+          done
+          echo "push failed after 5 retries"; exit 1

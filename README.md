@@ -10,8 +10,8 @@ a "Choose for me" button, and booking/calendar handoffs.
 - **Frontend** — React + Vite + Wouter + TanStack Query (`artifacts/screening-room/`), deployed as a Render **static site**.
 - **API** — Express 5 (`artifacts/api-server/`), a Render **web service**; proxies TMDB + Google Places so keys stay server-side.
 - **Auth + data** — Supabase (`@supabase/supabase-js`), table `tracked_items` (owner-only RLS).
-- **Catalogs** — static JSON in `artifacts/screening-room/public/`, grown daily via GitHub Actions + Claude editorial scripts (`scripts/grow/`).
-- **Monorepo** — pnpm workspaces, TypeScript. CI runs `pnpm run typecheck`.
+- **Catalogs** — static JSON in `artifacts/screening-room/public/`, grown daily via GitHub Actions scheduled workflows + Claude editorial scripts (`scripts/grow/`).
+- **Monorepo** — pnpm workspaces, TypeScript. CI runs typecheck and deterministic engine self-tests.
 
 ## Local development
 
@@ -26,13 +26,7 @@ pnpm --filter @workspace/api-server run dev        # API (separate terminal)
 Self-contained engine tests (no test runner needed):
 
 ```bash
-cd scripts
-node --import tsx ../artifacts/screening-room/src/lib/tonight.selftest.ts
-node --import tsx ../artifacts/screening-room/src/lib/followups.selftest.ts
-node --import tsx ../artifacts/screening-room/src/lib/choose.selftest.ts
-node --import tsx ../artifacts/screening-room/src/lib/handoffs.selftest.ts
-node --import tsx ../artifacts/screening-room/src/lib/profile.selftest.ts
-node --import tsx ../artifacts/screening-room/src/lib/pairing.selftest.ts
+pnpm run selftest
 ```
 
 ## Deploy on Render
@@ -45,7 +39,7 @@ The repo ships a **`render.yaml`** blueprint (static frontend + Express API, bot
    - **Frontend:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_URL` (= your API URL + `/api`).
    - **API:** `GOOGLE_PLACES_API_KEY`, `TMDB_KEY`, `ALLOWED_ORIGINS` (your frontend URL), `DATABASE_URL` (optional).
 4. In Supabase → Auth → URL Configuration, add `https://<frontend>/reset` to the redirect allowlist.
-5. For the daily catalog-grow workflows, add GitHub repo **Secrets**: `GOOGLE_PLACES_API_KEY`, `ANTHROPIC_API_KEY`, `TMDB_KEY`.
+5. For the daily catalog-grow workflows, add GitHub Actions secrets: `GOOGLE_PLACES_API_KEY`, `ANTHROPIC_API_KEY`, `TMDB_KEY`. Also set Settings → Actions → General → Workflow permissions to **Read and write** so the bots can commit.
 
 ## Security notes
 

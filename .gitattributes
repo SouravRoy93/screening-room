@@ -1,0 +1,14 @@
+# Normalise line endings. The repo stores LF; Windows checkouts may use CRLF
+# locally. Without this, every file an editor touches shows as fully modified
+# (we once saw 78,000 phantom line changes across 31 files).
+* text=auto eol=lf
+
+# Binary — never touch these
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.zip  binary
+*.woff  binary
+*.woff2 binary

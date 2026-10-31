@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "selftest": "node --import tsx ../artifacts/screening-room/src/lib/choose.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/evening.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/followups.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/handoffs.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/pairing.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/profile.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/tonight.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/verdict.selftest.ts && node --import tsx ../artifacts/screening-room/src/lib/watch.selftest.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
