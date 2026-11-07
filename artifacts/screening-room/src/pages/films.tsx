@@ -16,6 +16,7 @@ import { EpisodeBanner } from "@/components/episode-banner";
 import { RatingsBarChart, WatchedOverTimeChart } from "@/components/ratings-chart";
 import { chooseFilm } from "@/lib/choose";
 import { ChooseForMe } from "@/components/choose-for-me";
+import { useSuggestions } from "@/hooks/use-suggestions";
 import { useCatalog } from "@/hooks/use-catalog";
 import { useTracked } from "@/hooks/use-tracked";
 import { useAuth } from "@/hooks/use-auth";
@@ -74,6 +75,7 @@ export default function Films() {
     tracked, setStatus, saveRating,
     answerVerdict, rateExplicit, dismissVerdict,
   } = useTracked("films", user?.id);
+  const { maybeSuggest, sheet: suggestionSheet } = useSuggestions({ catalog, tracked, setStatus });
 
   // ── The watched prompt (Entertainment plan, phase A) ──────────────────────
   // Which card is currently asking, and the session guards that keep a
@@ -93,8 +95,10 @@ export default function Films() {
       await setStatus(item, status);
 
       // Toggling watched off, or setting anything else, closes any question.
-      if (status !== "watched" || wasOn) {
+        if (status !== "watched" || wasOn) {
         setAsking(prev => (prev === key ? null : prev));
+        // "Want" is a moment worth building on; un-marking never is.
+        maybeSuggest(item, status, { turnedOff: wasOn, bulkSuppressed });
         return;
       }
 
@@ -110,8 +114,10 @@ export default function Films() {
         sessionSuppressed: bulkSuppressed || bulk,
       });
       setAsking(ask ? key : null);
+      // Only ever one interruption: the sheet stands down if we're asking.
+      maybeSuggest(item, status, { questionOpen: ask, bulkSuppressed: bulkSuppressed || bulk });
     },
-    [tracked, setStatus, bulkSuppressed],
+    [tracked, setStatus, bulkSuppressed, maybeSuggest],
   );
 
   const handleAnswer = useCallback(
@@ -502,6 +508,7 @@ export default function Films() {
         </>
       )}
 
+      {suggestionSheet}
     </div>
   );
 }

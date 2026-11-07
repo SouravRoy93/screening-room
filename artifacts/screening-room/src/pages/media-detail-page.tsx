@@ -17,6 +17,8 @@ import { IMG_BACKDROP, IMG_BASE, IMG_PROFILE } from "@/types";
 import type { MediaItem, TrackedItem } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
 import { useTracked } from "@/hooks/use-tracked";
+import { useCatalog } from "@/hooks/use-catalog";
+import { useSuggestions } from "@/hooks/use-suggestions";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
@@ -166,6 +168,9 @@ export default function MediaDetailPage() {
     tracked, setStatus, saveRating,
     answerVerdict, rateExplicit, dismissVerdict,
   } = useTracked("films", user?.id);
+  // The detail page had no catalog of its own; the suggestion sheet needs one.
+  const { catalog } = useCatalog();
+  const { maybeSuggest, sheet: suggestionSheet } = useSuggestions({ catalog, tracked, setStatus });
 
   const mediaType = params.type as "movie" | "tv";
   const tmdbId = Number(params.id);
@@ -230,10 +235,14 @@ export default function MediaDetailPage() {
     localStorage.setItem(notifyKey, next ? "1" : "0");
   };
 
-  const handleStatus = useCallback((status: "want" | "watching" | "watched") => {
+  const handleStatus = useCallback(async (status: "want" | "watching" | "watched") => {
     if (!detail) return;
-    setStatus(fakeItem, status);
-  }, [detail, fakeItem, setStatus]);
+    // setStatus toggles off when the same status is picked again; suggesting
+    // titles because someone *un*-marked one would be backwards.
+    const wasOn = tracked[`${fakeItem.media_type}:${fakeItem.tmdb_id}`]?.status === status;
+    await setStatus(fakeItem, status);
+    maybeSuggest(fakeItem, status, { turnedOff: wasOn });
+  }, [detail, fakeItem, setStatus, tracked, maybeSuggest]);
 
   // Stars here mean "I'd rather just pick a number" — record that so the
   // questions stop for this title everywhere, not only on this screen.
@@ -520,6 +529,8 @@ export default function MediaDetailPage() {
           </div>
         </div>
       )}
+
+      {suggestionSheet}
     </div>
   );
 }
